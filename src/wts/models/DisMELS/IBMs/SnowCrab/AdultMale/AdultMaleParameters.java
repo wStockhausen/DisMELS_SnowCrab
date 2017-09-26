@@ -1,11 +1,11 @@
 /*
- * AdultStageParameters.java
+ * AdultMaleParameters.java
  *
  * Created on September 26, 2017.
  *
  */
 
-package wts.models.DisMELS.IBMs.SnowCrab.Adult;
+package wts.models.DisMELS.IBMs.SnowCrab.AdultMale;
 
 import java.beans.PropertyChangeSupport;
 import java.util.LinkedHashMap;
@@ -33,7 +33,7 @@ import wts.models.DisMELS.framework.LifeStageParametersInterface;
  * @author William Stockhausen
  */
 @ServiceProvider(service=LifeStageParametersInterface.class)
-public class AdultStageParameters extends AbstractLHSParameters {
+public class AdultMaleParameters extends AbstractLHSParameters {
     
     public static final long serialVersionUID = 1L;
     
@@ -65,7 +65,7 @@ public class AdultStageParameters extends AbstractLHSParameters {
     /** The 'keys' used to store the ibm parameters */
     protected static final Set<String> setOfParamKeys = new LinkedHashSet<>(2*numParams);
     
-    private static final Logger logger = Logger.getLogger(AdultStageParameters.class.getName());
+    private static final Logger logger = Logger.getLogger(AdultMaleParameters.class.getName());
     
     /** Utility field used by bound properties.  */
     private transient PropertyChangeSupport propertySupport;
@@ -73,7 +73,7 @@ public class AdultStageParameters extends AbstractLHSParameters {
     /**
      * Creates a new instance of AdultStageParameters.
      */
-    public AdultStageParameters() {
+    public AdultMaleParameters() {
         super("",numParams,numFunctionCats);
         createMapToValues();
         createMapToSelectedFunctions();
@@ -83,7 +83,7 @@ public class AdultStageParameters extends AbstractLHSParameters {
     /**
      * Creates a new instance of AdultStageParameters
      */
-    public AdultStageParameters(String typeName) {
+    public AdultMaleParameters(String typeName) {
         super(typeName,numParams,numFunctionCats);
         createMapToValues();
         createMapToSelectedFunctions();
@@ -215,9 +215,9 @@ public class AdultStageParameters extends AbstractLHSParameters {
      */
     @Override
     public Object clone() {
-        AdultStageParameters clone = null;
+        AdultMaleParameters clone = null;
         try {
-            clone = (AdultStageParameters) super.clone();
+            clone = (AdultMaleParameters) super.clone();
             for (String pKey: setOfParamKeys) {
                 clone.setValue(pKey,this.getValue(pKey));
             }
@@ -249,9 +249,9 @@ public class AdultStageParameters extends AbstractLHSParameters {
      *              in the same order as the keys.
      */
     @Override
-    public AdultStageParameters createInstance(final String[] strv) {
+    public AdultMaleParameters createInstance(final String[] strv) {
         int c = 0;
-        AdultStageParameters params = new AdultStageParameters(strv[c++]);
+        AdultMaleParameters params = new AdultMaleParameters(strv[c++]);
         for (String key: setOfParamKeys) params.setValueFromString(key,strv[c++]);
         return params;
     }

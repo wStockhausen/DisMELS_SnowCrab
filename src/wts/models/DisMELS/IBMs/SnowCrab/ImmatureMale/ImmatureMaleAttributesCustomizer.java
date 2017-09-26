@@ -1,28 +1,25 @@
 /*
- * AdultStageAttributesCustomizer.java
+ * ImmatureMaleAttributesCustomizer.java
  *
  * Created on September 26, 2017.
  */
 
-package wts.models.DisMELS.IBMs.SnowCrab.Adult;
+package wts.models.DisMELS.IBMs.SnowCrab.ImmatureMale;
 
-import wts.models.DisMELS.framework.LifeStageAttributesInterface;
+import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.gui.AttributesCustomizer;
 
 /**
  * @author William Stockhausen
  */
-public class AdultStageAttributesCustomizer extends AttributesCustomizer {
+public class ImmatureMaleAttributesCustomizer extends AttributesCustomizer {
 
-    private boolean showHorizPos = true;
-    private boolean showVertPos = true;
-    
-    private AdultStageAttributes attributes = null;
+    private ImmatureMaleAttributes attributes = null;
     
     /**
-     * Creates new customizer EggStageAttributesCustomizer
+     * Creates new customizer BenthicJuvenileStageAttributesCustomizer
      */
-    public AdultStageAttributesCustomizer() {
+    public ImmatureMaleAttributesCustomizer() {
         initComponents();
     }
     
@@ -41,8 +38,6 @@ public class AdultStageAttributesCustomizer extends AttributesCustomizer {
         jLabel1 = new javax.swing.JLabel();
         jtfWeight = new javax.swing.JTextField();
         jLabel2 = new javax.swing.JLabel();
-        jtfGonadStage = new javax.swing.JTextField();
-        jLabel3 = new javax.swing.JLabel();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -61,7 +56,7 @@ public class AdultStageAttributesCustomizer extends AttributesCustomizer {
             }
         });
 
-        jLabel1.setText("Size (cm)");
+        jLabel1.setText("Size (mm)");
 
         jtfWeight.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
         jtfWeight.setText("0");
@@ -71,18 +66,8 @@ public class AdultStageAttributesCustomizer extends AttributesCustomizer {
             }
         });
 
-        jLabel2.setText("Weight (kg)");
-        jLabel2.setToolTipText("diameter in mm");
-
-        jtfGonadStage.setHorizontalAlignment(javax.swing.JTextField.TRAILING);
-        jtfGonadStage.setText("0");
-        jtfGonadStage.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtfGonadStageActionPerformed(evt);
-            }
-        });
-
-        jLabel3.setText("Gonad stage");
+        jLabel2.setText("Weight (g)");
+        jLabel2.setToolTipText("");
 
         org.jdesktop.layout.GroupLayout jPanel2Layout = new org.jdesktop.layout.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
@@ -91,15 +76,11 @@ public class AdultStageAttributesCustomizer extends AttributesCustomizer {
             .add(jPanel2Layout.createSequentialGroup()
                 .add(jtfSize, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 123, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .add(jLabel1, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 230, Short.MAX_VALUE))
             .add(jPanel2Layout.createSequentialGroup()
                 .add(jtfWeight, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 123, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE))
-            .add(jPanel2Layout.createSequentialGroup()
-                .add(jtfGonadStage, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 123, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jLabel3, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 239, Short.MAX_VALUE))
+                .add(jLabel2, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 229, Short.MAX_VALUE))
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
@@ -111,10 +92,7 @@ public class AdultStageAttributesCustomizer extends AttributesCustomizer {
                 .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jtfWeight, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jLabel2))
-                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                .add(jPanel2Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jtfGonadStage, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jLabel3)))
+                .add(67, 67, 67))
         );
 
         add(jPanel2, java.awt.BorderLayout.CENTER);
@@ -130,32 +108,26 @@ public class AdultStageAttributesCustomizer extends AttributesCustomizer {
         attributes.setValue(attributes.PROP_weight,n);
     }//GEN-LAST:event_jtfWeightActionPerformed
 
-    private void jtfGonadStageActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfGonadStageActionPerformed
-        Double n = new Double(jtfGonadStage.getText());
-        attributes.setValue(attributes.PROP_gonadStage,n);
-    }//GEN-LAST:event_jtfGonadStageActionPerformed
-
     @Override
     public void setObject(Object bean) {
-        if (bean instanceof AdultStageAttributes) {
-            setAttributes((AdultStageAttributes) bean);
+        if (bean instanceof ImmatureMaleAttributes) {
+            setAttributes((ImmatureMaleAttributes) bean);
         }
     }
     
     @Override
-    public AdultStageAttributes getAttributes() {
+    public ImmatureMaleAttributes getAttributes() {
         return attributes;
     }
     
     @Override
     public void setAttributes(LifeStageAttributesInterface newAtts) {
-        if (newAtts instanceof AdultStageAttributes) {
-            attributes = (AdultStageAttributes) newAtts;
+        if (newAtts instanceof ImmatureMaleAttributes) {
+            attributes = (ImmatureMaleAttributes) newAtts;
             czrStandardAttributes.setObject(attributes);
             Double d = null;
             jtfSize.setText(attributes.getValue(attributes.PROP_size,d).toString());
             jtfWeight.setText(attributes.getValue(attributes.PROP_weight,d).toString());
-            jtfGonadStage.setText(attributes.getValue(attributes.PROP_gonadStage,d).toString());
         }
     }
     
@@ -175,10 +147,8 @@ public class AdultStageAttributesCustomizer extends AttributesCustomizer {
     private wts.models.DisMELS.gui.AbstractLHSAttributes2Customizer czrStandardAttributes;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
-    private javax.swing.JLabel jLabel3;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
-    private javax.swing.JTextField jtfGonadStage;
     private javax.swing.JTextField jtfSize;
     private javax.swing.JTextField jtfWeight;
     // End of variables declaration//GEN-END:variables

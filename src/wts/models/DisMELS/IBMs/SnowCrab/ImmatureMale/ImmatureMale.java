@@ -1,11 +1,11 @@
 /*
- * BenthicJuvenileStage.java
+ * ImmatureMale.java
  *
  * Created on September 26, 2017.
  *
  */
 
-package wts.models.DisMELS.IBMs.SnowCrab.BenthicJuvenile;
+package wts.models.DisMELS.IBMs.SnowCrab.ImmatureMale;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import java.util.ArrayList;
@@ -17,8 +17,7 @@ import wts.models.DisMELS.IBMFunctions.Growth.LinearGrowthFunction;
 import wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
-import wts.models.DisMELS.IBMs.SnowCrab.ImmatureFemale.ImmatureFemale;
-import wts.models.DisMELS.IBMs.SnowCrab.ImmatureMale.ImmatureMale;
+import wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMale;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.models.utilities.DateTimeFunctions;
@@ -29,7 +28,7 @@ import wts.roms.model.LagrangianParticle;
  * @author William Stockhausen
  */
 @ServiceProvider(service=LifeStageInterface.class)
-public class BenthicJuvenileStage extends AbstractLHS {
+public class ImmatureMale extends AbstractLHS {
     
         //Static fields    
             //  Static fields new to this class
@@ -38,25 +37,24 @@ public class BenthicJuvenileStage extends AbstractLHS {
     /* flag to do debug operations */
     public static boolean debugOps = false;
     /* Class for attributes */
-    public static final String attributesClass = BenthicJuvenileStageAttributes.class.getName();
+    public static final String attributesClass = ImmatureMaleAttributes.class.getName();
     /* Class for parameters */
-    public static final String parametersClass = BenthicJuvenileStageParameters.class.getName();
+    public static final String parametersClass = ImmatureMaleParameters.class.getName();
     /* Class for feature type for point positions */
     public static final String pointFTClass = wts.models.DisMELS.framework.LHSPointFeatureType.class.getName();
 //            wts.models.DisMELS.IBMs.Arrowtooth.EggStage.EggStagePointFT.class.getName();
     /* Classes for next LHS */
-    public static final String[] nextLHSClasses = new String[]{BenthicJuvenileStage.class.getName(), 
-                                                               ImmatureFemale.class.getName(),
-                                                               ImmatureMale.class.getName()};
+    public static final String[] nextLHSClasses = new String[]{ImmatureMale.class.getName(),
+                                                               AdultMale.class.getName()};
     /* Classes for spawned LHS */
     public static final String[] spawnedLHSClasses = new String[]{};
     
     //Instance fields
             //  Fields hiding ones from superclass
     /* life stage atrbutes object */
-    protected BenthicJuvenileStageAttributes atts = null;
+    protected ImmatureMaleAttributes atts = null;
     /* life stage parameters object */
-    protected BenthicJuvenileStageParameters params = null;
+    protected ImmatureMaleParameters params = null;
     
     //  Fields new to class
         //fields that reflect parameter values
@@ -107,7 +105,7 @@ public class BenthicJuvenileStage extends AbstractLHS {
     private IBMFunctionInterface fcnSS = null; 
     
     /** logger for class */
-    private static final Logger logger = Logger.getLogger(BenthicJuvenileStage.class.getName());
+    private static final Logger logger = Logger.getLogger(ImmatureMale.class.getName());
     
     /**
      * Creates a new instance of GenericLHS.  
@@ -115,7 +113,7 @@ public class BenthicJuvenileStage extends AbstractLHS {
      *  the class names of the associated classes.
      * DO NOT DELETE THIS CONSTRUCTOR!!
      */
-    public BenthicJuvenileStage() {
+    public ImmatureMale() {
         super("");
         super.atts = atts;
         super.params = params;
@@ -130,15 +128,15 @@ public class BenthicJuvenileStage extends AbstractLHS {
      * then initialize() should be called to initialize all instance variables.
      * DO NOT DELETE THIS CONSTRUCTOR!!
      */
-    public BenthicJuvenileStage(String typeName) 
+    public ImmatureMale(String typeName) 
                 throws InstantiationException, IllegalAccessException {
         super(typeName);
-        atts = new BenthicJuvenileStageAttributes(typeName);
+        atts = new ImmatureMaleAttributes(typeName);
         atts.setValue(LifeStageAttributesInterface.PROP_id,id);
         atts.setValue(LifeStageAttributesInterface.PROP_parentID,id);
         atts.setValue(LifeStageAttributesInterface.PROP_origID,id);
         setAttributesFromSubClass(atts);  //set object in the superclass
-        params = (BenthicJuvenileStageParameters) LHS_Factory.createParameters(typeName);
+        params = (ImmatureMaleParameters) LHS_Factory.createParameters(typeName);
         setParameters(params);
     }
 
@@ -156,10 +154,10 @@ public class BenthicJuvenileStage extends AbstractLHS {
      * @throws java.lang.IllegalAccessException
      */
     @Override
-    public BenthicJuvenileStage createInstance(String[] strv) 
+    public ImmatureMale createInstance(String[] strv) 
                         throws InstantiationException, IllegalAccessException {
         LifeStageAttributesInterface theAtts = LHS_Factory.createAttributes(strv);
-        BenthicJuvenileStage lhs = createInstance(theAtts);
+        ImmatureMale lhs = createInstance(theAtts);
         return lhs;
     }
 
@@ -181,11 +179,11 @@ public class BenthicJuvenileStage extends AbstractLHS {
      * @throws java.lang.IllegalAccessException
      */
     @Override
-    public BenthicJuvenileStage createInstance(LifeStageAttributesInterface theAtts)
+    public ImmatureMale createInstance(LifeStageAttributesInterface theAtts)
                         throws InstantiationException, IllegalAccessException {
-        BenthicJuvenileStage lhs = null;
-        if (theAtts instanceof BenthicJuvenileStageAttributes) {
-            lhs = new BenthicJuvenileStage(theAtts.getTypeName());
+        ImmatureMale lhs = null;
+        if (theAtts instanceof ImmatureMaleAttributes) {
+            lhs = new ImmatureMale(theAtts.getTypeName());
             long newID = lhs.id;//save id of new instance
             lhs.setAttributes(theAtts);
             if (lhs.atts.getID()==-1) {
@@ -210,7 +208,7 @@ public class BenthicJuvenileStage extends AbstractLHS {
      *  Returns the associated attributes.  
      */
     @Override
-    public BenthicJuvenileStageAttributes getAttributes() {
+    public ImmatureMaleAttributes getAttributes() {
         return atts;
     }
 
@@ -354,7 +352,7 @@ public class BenthicJuvenileStage extends AbstractLHS {
      *  Returns the associated parameters.  
      */
     @Override
-    public BenthicJuvenileStageParameters getParameters() {
+    public ImmatureMaleParameters getParameters() {
         return params;
     }
 
@@ -364,8 +362,8 @@ public class BenthicJuvenileStage extends AbstractLHS {
      */
     @Override
     public void setParameters(LifeStageParametersInterface newParams) {
-        if (newParams instanceof BenthicJuvenileStageParameters) {
-            params = (BenthicJuvenileStageParameters) newParams;
+        if (newParams instanceof ImmatureMaleParameters) {
+            params = (ImmatureMaleParameters) newParams;
             setParametersFromSubClass(params);
             setParameterValues();
             setIBMFunctions();
@@ -378,9 +376,9 @@ public class BenthicJuvenileStage extends AbstractLHS {
      * Sets the IBM functions from the parameters object
      */
     private void setIBMFunctions(){
-        fcnGrowth  = params.getSelectedIBMFunctionForCategory(BenthicJuvenileStageParameters.FCAT_Growth);
-        fcnMort    = params.getSelectedIBMFunctionForCategory(BenthicJuvenileStageParameters.FCAT_Mortality);
-        fcnSS      = params.getSelectedIBMFunctionForCategory(BenthicJuvenileStageParameters.FCAT_SwimmingSpeed);
+        fcnGrowth  = params.getSelectedIBMFunctionForCategory(ImmatureMaleParameters.FCAT_Growth);
+        fcnMort    = params.getSelectedIBMFunctionForCategory(ImmatureMaleParameters.FCAT_Mortality);
+        fcnSS      = params.getSelectedIBMFunctionForCategory(ImmatureMaleParameters.FCAT_SwimmingSpeed);
     }
     
     /*
@@ -388,21 +386,21 @@ public class BenthicJuvenileStage extends AbstractLHS {
      */
     private void setParameterValues() {
         isSuperIndividual = 
-                params.getValue(BenthicJuvenileStageParameters.PARAM_isSuperIndividual,isSuperIndividual);
+                params.getValue(ImmatureMaleParameters.PARAM_isSuperIndividual,isSuperIndividual);
         horizRWP = 
-                params.getValue(BenthicJuvenileStageParameters.PARAM_horizRWP,horizRWP);
+                params.getValue(ImmatureMaleParameters.PARAM_horizRWP,horizRWP);
         initialSize = 
-                params.getValue(BenthicJuvenileStageParameters.PARAM_initialSize,initialSize);
+                params.getValue(ImmatureMaleParameters.PARAM_initialSize,initialSize);
         initialWeight = 
-                params.getValue(BenthicJuvenileStageParameters.PARAM_initialWeight,initialWeight);
+                params.getValue(ImmatureMaleParameters.PARAM_initialWeight,initialWeight);
         minStageDuration = 
-                params.getValue(BenthicJuvenileStageParameters.PARAM_minStageDuration,minStageDuration);
+                params.getValue(ImmatureMaleParameters.PARAM_minStageDuration,minStageDuration);
         maxStageDuration = 
-                params.getValue(BenthicJuvenileStageParameters.PARAM_maxStageDuration,maxStageDuration);
+                params.getValue(ImmatureMaleParameters.PARAM_maxStageDuration,maxStageDuration);
         minSize = 
-                params.getValue(BenthicJuvenileStageParameters.PARAM_minSize,minSize);
+                params.getValue(ImmatureMaleParameters.PARAM_minSize,minSize);
         randomizeTransitions = 
-                params.getValue(BenthicJuvenileStageParameters.PARAM_randomizeTransitions,true);
+                params.getValue(ImmatureMaleParameters.PARAM_randomizeTransitions,true);
     }
     
     /**
@@ -412,9 +410,9 @@ public class BenthicJuvenileStage extends AbstractLHS {
      */
     @Override
     public Object clone() {
-        BenthicJuvenileStage clone = null;
+        ImmatureMale clone = null;
         try {
-            clone = (BenthicJuvenileStage) super.clone();
+            clone = (ImmatureMale) super.clone();
             clone.setAttributes(atts);//this clones atts
             clone.setParameters(params);//this clones params
             clone.lp      = (LagrangianParticle) lp.clone();
@@ -845,10 +843,10 @@ public class BenthicJuvenileStage extends AbstractLHS {
     @Override
     protected void updateAttributes() {
         super.updateAttributes();
-        atts.setValue(BenthicJuvenileStageAttributes.PROP_size,size);
-        atts.setValue(BenthicJuvenileStageAttributes.PROP_weight,weight);
-        atts.setValue(BenthicJuvenileStageAttributes.PROP_salinity,salinity);
-        atts.setValue(BenthicJuvenileStageAttributes.PROP_temperature,temperature);
+        atts.setValue(ImmatureMaleAttributes.PROP_size,size);
+        atts.setValue(ImmatureMaleAttributes.PROP_weight,weight);
+        atts.setValue(ImmatureMaleAttributes.PROP_salinity,salinity);
+        atts.setValue(ImmatureMaleAttributes.PROP_temperature,temperature);
     }
 
     /**
@@ -857,10 +855,10 @@ public class BenthicJuvenileStage extends AbstractLHS {
     @Override
     protected void updateVariables() {
         super.updateVariables();
-        size        = atts.getValue(BenthicJuvenileStageAttributes.PROP_size,size);
-        weight      = atts.getValue(BenthicJuvenileStageAttributes.PROP_weight,weight);
-        salinity    = atts.getValue(BenthicJuvenileStageAttributes.PROP_salinity,salinity);
-        temperature = atts.getValue(BenthicJuvenileStageAttributes.PROP_temperature,temperature);
+        size        = atts.getValue(ImmatureMaleAttributes.PROP_size,size);
+        weight      = atts.getValue(ImmatureMaleAttributes.PROP_weight,weight);
+        salinity    = atts.getValue(ImmatureMaleAttributes.PROP_salinity,salinity);
+        temperature = atts.getValue(ImmatureMaleAttributes.PROP_temperature,temperature);
     }
 
 }

@@ -3,7 +3,7 @@
 *** GENERATED FROM project.xml - DO NOT EDIT  ***
 ***         EDIT ../build.xml INSTEAD         ***
 -->
-<project name="wts.models.DisMELS.IBMs.ArrowtoothFlounder-impl" basedir="..">
+<project name="wts.models.DisMELS.IBMs.SnowCrab-impl" basedir="..">
     <fail message="Please build using Ant 1.7.1 or higher.">
         <condition>
             <not>
