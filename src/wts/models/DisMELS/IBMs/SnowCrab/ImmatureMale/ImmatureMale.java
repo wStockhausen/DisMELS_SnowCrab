@@ -17,7 +17,7 @@ import wts.models.DisMELS.IBMFunctions.Growth.LinearGrowthFunction;
 import wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
-import wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMale;
+import wts.models.DisMELS.IBMs.SnowCrab.MatureMale.MatureMale;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.models.utilities.DateTimeFunctions;
@@ -42,10 +42,9 @@ public class ImmatureMale extends AbstractLHS {
     public static final String parametersClass = ImmatureMaleParameters.class.getName();
     /* Class for feature type for point positions */
     public static final String pointFTClass = wts.models.DisMELS.framework.LHSPointFeatureType.class.getName();
-//            wts.models.DisMELS.IBMs.Arrowtooth.EggStage.EggStagePointFT.class.getName();
     /* Classes for next LHS */
     public static final String[] nextLHSClasses = new String[]{ImmatureMale.class.getName(),
-                                                               AdultMale.class.getName()};
+                                                               MatureMale.class.getName()};
     /* Classes for spawned LHS */
     public static final String[] spawnedLHSClasses = new String[]{};
     

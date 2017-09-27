@@ -1,11 +1,11 @@
 /*
- * AdultMaleAttributes.java
+ * MatureMaleAttributes.java
  *
  * Created on September 26, 2017.
  *
  */
 
-package wts.models.DisMELS.IBMs.SnowCrab.AdultMale;
+package wts.models.DisMELS.IBMs.SnowCrab.MatureMale;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -20,7 +20,7 @@ import wts.models.DisMELS.framework.IBMAttributes.IBMAttributeDouble;
  * @author William Stockhausen
  */
 @ServiceProvider(service=wts.models.DisMELS.framework.LifeStageAttributesInterface.class)
-public class AdultMaleAttributes extends AbstractLHSAttributes2 {
+public class MatureMaleAttributes extends AbstractLHSAttributes2 {
     
     /** Number of attributes defined by this class (including typeName) */
     public static final int numNewAttributes = 5;
@@ -38,13 +38,13 @@ public class AdultMaleAttributes extends AbstractLHSAttributes2 {
     protected static final Class[]  classes    = new Class[numAttributes+numNewAttributes];
     protected static final String[] shortNames = new String[numAttributes+numNewAttributes];
    
-    private static final Logger logger = Logger.getLogger(AdultMaleAttributes.class.getName());
+    private static final Logger logger = Logger.getLogger(MatureMaleAttributes.class.getName());
     
     /**
      * This constructor is provided only to facilitate the ServiceProvider functionality.
      * DO NOT USE IT!!
      */
-    public AdultMaleAttributes(){
+    public MatureMaleAttributes(){
         super("NULL");
         finishInstantiation();
     }
@@ -52,7 +52,7 @@ public class AdultMaleAttributes extends AbstractLHSAttributes2 {
     /**
      * Creates a new attributes instance with type name 'typeName'.
      */
-    public AdultMaleAttributes(String typeName) {
+    public MatureMaleAttributes(String typeName) {
         super(typeName);
         finishInstantiation();
     }
@@ -64,7 +64,7 @@ public class AdultMaleAttributes extends AbstractLHSAttributes2 {
      */
     @Override
     public Object clone() {
-        AdultMaleAttributes clone = new AdultMaleAttributes(typeName);
+        MatureMaleAttributes clone = new MatureMaleAttributes(typeName);
         for (String key: allKeys) clone.setValue(key,this.getValue(key));
         return clone;
     }
@@ -77,8 +77,8 @@ public class AdultMaleAttributes extends AbstractLHSAttributes2 {
      * @return - the new instance
      */
     @Override
-    public AdultMaleAttributes createInstance(final String[] strv) {
-        AdultMaleAttributes atts = new AdultMaleAttributes(strv[0]);//this sets atts.typeName
+    public MatureMaleAttributes createInstance(final String[] strv) {
+        MatureMaleAttributes atts = new MatureMaleAttributes(strv[0]);//this sets atts.typeName
         atts.setValues(strv);
         return atts;
     }
@@ -237,8 +237,8 @@ public class AdultMaleAttributes extends AbstractLHSAttributes2 {
             for (String key: newKeys) setValueFromString(key,strv[j++]);
         } catch (java.lang.IndexOutOfBoundsException ex) {
             //@TODO: should throw an exception here that identifies the problem
-            String[] aKeys = new String[AdultMaleAttributes.allKeys.size()];
-            aKeys = AdultMaleAttributes.allKeys.toArray(aKeys);
+            String[] aKeys = new String[MatureMaleAttributes.allKeys.size()];
+            aKeys = MatureMaleAttributes.allKeys.toArray(aKeys);
                 String str = "Missing attribute value for "+aKeys[j-1]+".\n"+
                              "Prior values are ";
                 for (int i=0;i<(j);i++) str = str+strv[i]+" ";
@@ -249,8 +249,8 @@ public class AdultMaleAttributes extends AbstractLHSAttributes2 {
                         javax.swing.JOptionPane.ERROR_MESSAGE);
                 throw ex;
         } catch (java.lang.NumberFormatException ex) {
-            String[] aKeys = new String[AdultMaleAttributes.allKeys.size()];
-            aKeys = AdultMaleAttributes.allKeys.toArray(aKeys);
+            String[] aKeys = new String[MatureMaleAttributes.allKeys.size()];
+            aKeys = MatureMaleAttributes.allKeys.toArray(aKeys);
             String str = "Bad attribute value for "+aKeys[j-2]+".\n"+
                          "Value was '"+strv[j-1]+"'.\n"+
                          "Entry was '";

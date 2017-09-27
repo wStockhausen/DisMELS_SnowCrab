@@ -1,10 +1,10 @@
 /*
- * AdultFemaleAttributesCustomizer.java
+ * MatureFemaleAttributesCustomizer.java
  *
  * Created on September 26, 2017.
  */
 
-package wts.models.DisMELS.IBMs.SnowCrab.AdultFemale;
+package wts.models.DisMELS.IBMs.SnowCrab.MatureFemale;
 
 import wts.models.DisMELS.framework.LifeStageAttributesInterface;
 import wts.models.DisMELS.gui.AttributesCustomizer;
@@ -12,17 +12,17 @@ import wts.models.DisMELS.gui.AttributesCustomizer;
 /**
  * @author William Stockhausen
  */
-public class AdultFemaleAttributesCustomizer extends AttributesCustomizer {
+public class MatureFemaleAttributesCustomizer extends AttributesCustomizer {
 
     private boolean showHorizPos = true;
     private boolean showVertPos = true;
     
-    private AdultFemaleAttributes attributes = null;
+    private MatureFemaleAttributes attributes = null;
     
     /**
      * Creates new customizer EggStageAttributesCustomizer
      */
-    public AdultFemaleAttributesCustomizer() {
+    public MatureFemaleAttributesCustomizer() {
         initComponents();
     }
     
@@ -137,20 +137,20 @@ public class AdultFemaleAttributesCustomizer extends AttributesCustomizer {
 
     @Override
     public void setObject(Object bean) {
-        if (bean instanceof AdultFemaleAttributes) {
-            setAttributes((AdultFemaleAttributes) bean);
+        if (bean instanceof MatureFemaleAttributes) {
+            setAttributes((MatureFemaleAttributes) bean);
         }
     }
     
     @Override
-    public AdultFemaleAttributes getAttributes() {
+    public MatureFemaleAttributes getAttributes() {
         return attributes;
     }
     
     @Override
     public void setAttributes(LifeStageAttributesInterface newAtts) {
-        if (newAtts instanceof AdultFemaleAttributes) {
-            attributes = (AdultFemaleAttributes) newAtts;
+        if (newAtts instanceof MatureFemaleAttributes) {
+            attributes = (MatureFemaleAttributes) newAtts;
             czrStandardAttributes.setObject(attributes);
             Double d = null;
             jtfSize.setText(attributes.getValue(attributes.PROP_size,d).toString());

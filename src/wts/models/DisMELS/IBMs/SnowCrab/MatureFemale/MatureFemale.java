@@ -1,11 +1,11 @@
 /*
- * AdultFemale.java
+ * MatureFemale.java
  *
  * Created on September 26, 2017.
  *
  */
 
-package wts.models.DisMELS.IBMs.SnowCrab.AdultFemale;
+package wts.models.DisMELS.IBMs.SnowCrab.MatureFemale;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import java.util.ArrayList;
@@ -27,30 +27,30 @@ import wts.roms.model.LagrangianParticle;
  * @author William Stockhausen
  */
 @ServiceProvider(service=LifeStageInterface.class)
-public class AdultFemale extends AbstractLHS {
+public class MatureFemale extends AbstractLHS {
     
         //Static fields    
             //  Static fields new to this class
     /* flag to do debug operations */
     public static boolean debugOps = false;
     /* Class for attributes */
-    public static final String attributesClass = AdultFemaleAttributes.class.getName();
+    public static final String attributesClass = MatureFemaleAttributes.class.getName();
     /* Class for parameters */
-    public static final String parametersClass = AdultFemaleParameters.class.getName();
+    public static final String parametersClass = MatureFemaleParameters.class.getName();
     /* Class for feature type for point positions */
     public static final String pointFTClass = wts.models.DisMELS.framework.LHSPointFeatureType.class.getName();
 //            "wts.models.DisMELS.LHS.BenthicAdult.AdultStagePointFT";
     /* Classes for next LHS */
-    public static final String[] nextLHSClasses = new String[]{AdultFemale.class.getName()};
+    public static final String[] nextLHSClasses = new String[]{MatureFemale.class.getName()};
     /* Classes for spawned LHS */
     public static final String[] spawnedLHSClasses = new String[]{EggStage.class.getName()};
     
         //Instance fields
             //  Fields hiding ones from superclass
     /* lhs attributes */
-    protected AdultFemaleAttributes atts = null;
+    protected MatureFemaleAttributes atts = null;
     /* lhs parameters */
-    protected AdultFemaleParameters params = null;
+    protected MatureFemaleParameters params = null;
             //  Fields new to class
             //fields that reflect parameter values
     /** flag indicating instance is a super-individual */
@@ -123,13 +123,13 @@ public class AdultFemale extends AbstractLHS {
     /** flag to print debugging info */
     public static boolean debug = false;
     /** logger for class */
-    private static final Logger logger = Logger.getLogger(AdultFemale.class.getName());
+    private static final Logger logger = Logger.getLogger(MatureFemale.class.getName());
     
     /**
      * This constructor is provided only to facilitate the ServiceProvider functionality.
      * DO NOT USE IT!!
      */
-    public AdultFemale() {
+    public MatureFemale() {
         super("");
         super.atts = atts;
         super.params = params;
@@ -139,15 +139,15 @@ public class AdultFemale extends AbstractLHS {
      * Creates a new LHS instance with parameters based on the typeName and
      * "default" attributes.
      */
-    public AdultFemale(String typeName) 
+    public MatureFemale(String typeName) 
                 throws InstantiationException, IllegalAccessException {
         super(typeName);
-        atts   = new AdultFemaleAttributes(typeName);
+        atts   = new MatureFemaleAttributes(typeName);
         atts.setValue(LifeStageAttributesInterface.PROP_id,id);
         atts.setValue(LifeStageAttributesInterface.PROP_parentID,id);
         atts.setValue(LifeStageAttributesInterface.PROP_origID,id);
         setAttributesFromSubClass(atts);  //set object in the superclass
-        params = (AdultFemaleParameters) LHS_Factory.createParameters(typeName);
+        params = (MatureFemaleParameters) LHS_Factory.createParameters(typeName);
         setParametersFromSubClass(params);//set object in the superclass
         setParameters(params);
     }
@@ -166,10 +166,10 @@ public class AdultFemale extends AbstractLHS {
      * @throws java.lang.IllegalAccessException
      */
     @Override
-    public AdultFemale createInstance(String[] strv) 
+    public MatureFemale createInstance(String[] strv) 
                         throws InstantiationException, IllegalAccessException {
         LifeStageAttributesInterface theAtts = LHS_Factory.createAttributes(strv);
-        AdultFemale lhs = createInstance(theAtts);
+        MatureFemale lhs = createInstance(theAtts);
         return lhs;
     }
 
@@ -191,11 +191,11 @@ public class AdultFemale extends AbstractLHS {
      * @throws java.lang.IllegalAccessException
      */
     @Override
-    public AdultFemale createInstance(LifeStageAttributesInterface theAtts)
+    public MatureFemale createInstance(LifeStageAttributesInterface theAtts)
                         throws InstantiationException, IllegalAccessException {
-        AdultFemale lhs = null;
-        if (theAtts instanceof AdultFemaleAttributes) {
-            lhs = new AdultFemale(theAtts.getTypeName());
+        MatureFemale lhs = null;
+        if (theAtts instanceof MatureFemaleAttributes) {
+            lhs = new MatureFemale(theAtts.getTypeName());
             long newID = lhs.id;//save id of new instance
             lhs.setAttributes(theAtts);
             if (lhs.atts.getID()==-1) {
@@ -220,7 +220,7 @@ public class AdultFemale extends AbstractLHS {
      *  Returns the associated attributes.  
      */
     @Override
-    public AdultFemaleAttributes getAttributes() {
+    public MatureFemaleAttributes getAttributes() {
         return atts;
     }
 
@@ -275,8 +275,8 @@ public class AdultFemale extends AbstractLHS {
      */
     @Override
     public void setAttributes(LifeStageAttributesInterface newAtts) {
-        if (newAtts instanceof AdultFemaleAttributes) {
-            AdultFemaleAttributes spAtts = (AdultFemaleAttributes) newAtts;
+        if (newAtts instanceof MatureFemaleAttributes) {
+            MatureFemaleAttributes spAtts = (MatureFemaleAttributes) newAtts;
             for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
         } else {
             //TODO: should throw an error here
@@ -372,18 +372,18 @@ public class AdultFemale extends AbstractLHS {
      *  Returns the associated parameters.  
      */
     @Override
-    public AdultFemaleParameters getParameters() {
+    public MatureFemaleParameters getParameters() {
         return params;
     }
 
     /**
      * Sets the parameters for the instance to a cloned version of the input.
-     * @param newParams - should be instance of AdultFemaleParameters
+     * @param newParams - should be instance of MatureFemaleParameters
      */
     @Override
     public void setParameters(LifeStageParametersInterface newParams) {
-        if (newParams instanceof AdultFemaleParameters) {
-            params = (AdultFemaleParameters) newParams;
+        if (newParams instanceof MatureFemaleParameters) {
+            params = (MatureFemaleParameters) newParams;
             setParametersFromSubClass(params);
             setParameterValues();
             setIBMFunctions();
@@ -396,10 +396,10 @@ public class AdultFemale extends AbstractLHS {
      * Sets the IBM functions from the parameters object
      */
     private void setIBMFunctions(){
-        fcnGrowth         = params.getSelectedIBMFunctionForCategory(AdultFemaleParameters.FCAT_Growth);
-        fcnMortality      = params.getSelectedIBMFunctionForCategory(AdultFemaleParameters.FCAT_Mortality);
-        fcnMaturity       = params.getSelectedIBMFunctionForCategory(AdultFemaleParameters.FCAT_Maturity);
-        fcnFecundity      = params.getSelectedIBMFunctionForCategory(AdultFemaleParameters.FCAT_Fecundity);
+        fcnGrowth         = params.getSelectedIBMFunctionForCategory(MatureFemaleParameters.FCAT_Growth);
+        fcnMortality      = params.getSelectedIBMFunctionForCategory(MatureFemaleParameters.FCAT_Mortality);
+        fcnMaturity       = params.getSelectedIBMFunctionForCategory(MatureFemaleParameters.FCAT_Maturity);
+        fcnFecundity      = params.getSelectedIBMFunctionForCategory(MatureFemaleParameters.FCAT_Fecundity);
     }
     
     /*
@@ -441,11 +441,11 @@ public class AdultFemale extends AbstractLHS {
      */
     @Override
     public Object clone() {
-        AdultFemale clone = null;
+        MatureFemale clone = null;
         try {
-            clone       = (AdultFemale) super.clone();
-            clone.setAttributes((AdultFemaleAttributes) atts.clone());
-            clone.setParameters((AdultFemaleParameters) params.clone());
+            clone       = (MatureFemale) super.clone();
+            clone.setAttributes((MatureFemaleAttributes) atts.clone());
+            clone.setParameters((MatureFemaleParameters) params.clone());
             clone.lp    = (LagrangianParticle) lp.clone();
             clone.track = (ArrayList<Coordinate>) track.clone();
         } catch (CloneNotSupportedException ex) {
@@ -897,11 +897,11 @@ public class AdultFemale extends AbstractLHS {
     @Override
     protected void updateAttributes() {
         super.updateAttributes();
-        atts.setValue(AdultFemaleAttributes.PROP_gonadStage,gonadStage);
-        atts.setValue(AdultFemaleAttributes.PROP_size,size);
-        atts.setValue(AdultFemaleAttributes.PROP_weight,weight);
-        atts.setValue(AdultFemaleAttributes.PROP_salinity,salinity);
-        atts.setValue(AdultFemaleAttributes.PROP_temperature,temperature);
+        atts.setValue(MatureFemaleAttributes.PROP_gonadStage,gonadStage);
+        atts.setValue(MatureFemaleAttributes.PROP_size,size);
+        atts.setValue(MatureFemaleAttributes.PROP_weight,weight);
+        atts.setValue(MatureFemaleAttributes.PROP_salinity,salinity);
+        atts.setValue(MatureFemaleAttributes.PROP_temperature,temperature);
     }
 
     /**
@@ -910,9 +910,9 @@ public class AdultFemale extends AbstractLHS {
     @Override
     protected void updateVariables() {
         super.updateVariables();
-        gonadStage     = atts.getValue(AdultFemaleAttributes.PROP_gonadStage,gonadStage);
-        size    = atts.getValue(AdultFemaleAttributes.PROP_size,size);
-        weight     = atts.getValue(AdultFemaleAttributes.PROP_weight,weight);
+        gonadStage     = atts.getValue(MatureFemaleAttributes.PROP_gonadStage,gonadStage);
+        size    = atts.getValue(MatureFemaleAttributes.PROP_size,size);
+        weight     = atts.getValue(MatureFemaleAttributes.PROP_weight,weight);
         salinity    = atts.getValue(EggStageAttributes.PROP_salinity,salinity);
         temperature = atts.getValue(EggStageAttributes.PROP_temperature,temperature);
     }

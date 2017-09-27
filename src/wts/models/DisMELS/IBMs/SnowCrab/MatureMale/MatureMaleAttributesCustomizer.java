@@ -1,10 +1,10 @@
 /*
- * AdultMaleAttributesCustomizer.java
+ * MatureMaleAttributesCustomizer.java
  *
  * Created on September 26, 2017.
  */
 
-package wts.models.DisMELS.IBMs.SnowCrab.AdultMale;
+package wts.models.DisMELS.IBMs.SnowCrab.MatureMale;
 
 import wts.models.DisMELS.framework.LifeStageAttributesInterface;
 import wts.models.DisMELS.gui.AttributesCustomizer;
@@ -12,17 +12,17 @@ import wts.models.DisMELS.gui.AttributesCustomizer;
 /**
  * @author William Stockhausen
  */
-public class AdultMaleAttributesCustomizer extends AttributesCustomizer {
+public class MatureMaleAttributesCustomizer extends AttributesCustomizer {
 
     private boolean showHorizPos = true;
     private boolean showVertPos = true;
     
-    private AdultMaleAttributes attributes = null;
+    private MatureMaleAttributes attributes = null;
     
     /**
      * Creates new customizer EggStageAttributesCustomizer
      */
-    public AdultMaleAttributesCustomizer() {
+    public MatureMaleAttributesCustomizer() {
         initComponents();
     }
     
@@ -137,20 +137,20 @@ public class AdultMaleAttributesCustomizer extends AttributesCustomizer {
 
     @Override
     public void setObject(Object bean) {
-        if (bean instanceof AdultMaleAttributes) {
-            setAttributes((AdultMaleAttributes) bean);
+        if (bean instanceof MatureMaleAttributes) {
+            setAttributes((MatureMaleAttributes) bean);
         }
     }
     
     @Override
-    public AdultMaleAttributes getAttributes() {
+    public MatureMaleAttributes getAttributes() {
         return attributes;
     }
     
     @Override
     public void setAttributes(LifeStageAttributesInterface newAtts) {
-        if (newAtts instanceof AdultMaleAttributes) {
-            attributes = (AdultMaleAttributes) newAtts;
+        if (newAtts instanceof MatureMaleAttributes) {
+            attributes = (MatureMaleAttributes) newAtts;
             czrStandardAttributes.setObject(attributes);
             Double d = null;
             jtfSize.setText(attributes.getValue(attributes.PROP_size,d).toString());

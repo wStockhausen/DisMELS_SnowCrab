@@ -1,10 +1,10 @@
 /*
- * AdultMaleAttributesBeanInfo.java
+ * MatureFemaleAttributesBeanInfo.java
  *
  * Created on September 26, 2017.
  *
  */
-package wts.models.DisMELS.IBMs.SnowCrab.AdultMale;
+package wts.models.DisMELS.IBMs.SnowCrab.MatureFemale;
 
 import java.beans.*;
 
@@ -12,12 +12,12 @@ import java.beans.*;
  *
  * @author william.stockhausen
  */
-public class AdultMaleAttributesBeanInfo extends SimpleBeanInfo {
+public class MatureFemaleAttributesBeanInfo extends SimpleBeanInfo {
 
     // Bean descriptor//GEN-FIRST:BeanDescriptor
     /*lazy BeanDescriptor*/
     private static BeanDescriptor getBdescriptor(){
-        BeanDescriptor beanDescriptor = new BeanDescriptor  ( wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMaleAttributes.class , AdultMaleAttributesCustomizer.class ); // NOI18N//GEN-HEADEREND:BeanDescriptor
+        BeanDescriptor beanDescriptor = new BeanDescriptor  ( wts.models.DisMELS.IBMs.SnowCrab.MatureFemale.MatureFemaleAttributes.class , MatureFemaleAttributesCustomizer.class ); // NOI18N//GEN-HEADEREND:BeanDescriptor
 
         // Here you can add code for customizing the BeanDescriptor.
 
@@ -45,21 +45,21 @@ public class AdultMaleAttributesBeanInfo extends SimpleBeanInfo {
         PropertyDescriptor[] properties = new PropertyDescriptor[15];
     
         try {
-            properties[PROPERTY_active] = new PropertyDescriptor ( "active", wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMaleAttributes.class, "isActive", "setActive" ); // NOI18N
-            properties[PROPERTY_alive] = new PropertyDescriptor ( "alive", wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMaleAttributes.class, "isAlive", "setAlive" ); // NOI18N
-            properties[PROPERTY_arrayList] = new PropertyDescriptor ( "arrayList", wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMaleAttributes.class, "getArrayList", null ); // NOI18N
-            properties[PROPERTY_attributes] = new PropertyDescriptor ( "attributes", wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMaleAttributes.class, "getAttributes", null ); // NOI18N
-            properties[PROPERTY_classes] = new PropertyDescriptor ( "classes", wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMaleAttributes.class, "getClasses", null ); // NOI18N
-            properties[PROPERTY_CSV] = new PropertyDescriptor ( "CSV", wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMaleAttributes.class, "getCSV", null ); // NOI18N
-            properties[PROPERTY_CSVHeader] = new PropertyDescriptor ( "CSVHeader", wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMaleAttributes.class, "getCSVHeader", null ); // NOI18N
-            properties[PROPERTY_CSVHeaderShortNames] = new PropertyDescriptor ( "CSVHeaderShortNames", wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMaleAttributes.class, "getCSVHeaderShortNames", null ); // NOI18N
-            properties[PROPERTY_geometry] = new PropertyDescriptor ( "geometry", wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMaleAttributes.class, "getGeometry", "setGeometry" ); // NOI18N
-            properties[PROPERTY_ID] = new PropertyDescriptor ( "ID", wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMaleAttributes.class, "getID", null ); // NOI18N
-            properties[PROPERTY_keys] = new PropertyDescriptor ( "keys", wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMaleAttributes.class, "getKeys", null ); // NOI18N
-            properties[PROPERTY_shortNames] = new PropertyDescriptor ( "shortNames", wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMaleAttributes.class, "getShortNames", null ); // NOI18N
-            properties[PROPERTY_startTime] = new PropertyDescriptor ( "startTime", wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMaleAttributes.class, "getStartTime", "setStartTime" ); // NOI18N
-            properties[PROPERTY_typeName] = new PropertyDescriptor ( "typeName", wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMaleAttributes.class, "getTypeName", null ); // NOI18N
-            properties[PROPERTY_values] = new PropertyDescriptor ( "values", wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMaleAttributes.class, null, "setValues" ); // NOI18N
+            properties[PROPERTY_active] = new PropertyDescriptor ( "active", wts.models.DisMELS.IBMs.SnowCrab.MatureFemale.MatureFemaleAttributes.class, "isActive", "setActive" ); // NOI18N
+            properties[PROPERTY_alive] = new PropertyDescriptor ( "alive", wts.models.DisMELS.IBMs.SnowCrab.MatureFemale.MatureFemaleAttributes.class, "isAlive", "setAlive" ); // NOI18N
+            properties[PROPERTY_arrayList] = new PropertyDescriptor ( "arrayList", wts.models.DisMELS.IBMs.SnowCrab.MatureFemale.MatureFemaleAttributes.class, "getArrayList", null ); // NOI18N
+            properties[PROPERTY_attributes] = new PropertyDescriptor ( "attributes", wts.models.DisMELS.IBMs.SnowCrab.MatureFemale.MatureFemaleAttributes.class, "getAttributes", null ); // NOI18N
+            properties[PROPERTY_classes] = new PropertyDescriptor ( "classes", wts.models.DisMELS.IBMs.SnowCrab.MatureFemale.MatureFemaleAttributes.class, "getClasses", null ); // NOI18N
+            properties[PROPERTY_CSV] = new PropertyDescriptor ( "CSV", wts.models.DisMELS.IBMs.SnowCrab.MatureFemale.MatureFemaleAttributes.class, "getCSV", null ); // NOI18N
+            properties[PROPERTY_CSVHeader] = new PropertyDescriptor ( "CSVHeader", wts.models.DisMELS.IBMs.SnowCrab.MatureFemale.MatureFemaleAttributes.class, "getCSVHeader", null ); // NOI18N
+            properties[PROPERTY_CSVHeaderShortNames] = new PropertyDescriptor ( "CSVHeaderShortNames", wts.models.DisMELS.IBMs.SnowCrab.MatureFemale.MatureFemaleAttributes.class, "getCSVHeaderShortNames", null ); // NOI18N
+            properties[PROPERTY_geometry] = new PropertyDescriptor ( "geometry", wts.models.DisMELS.IBMs.SnowCrab.MatureFemale.MatureFemaleAttributes.class, "getGeometry", "setGeometry" ); // NOI18N
+            properties[PROPERTY_ID] = new PropertyDescriptor ( "ID", wts.models.DisMELS.IBMs.SnowCrab.MatureFemale.MatureFemaleAttributes.class, "getID", null ); // NOI18N
+            properties[PROPERTY_keys] = new PropertyDescriptor ( "keys", wts.models.DisMELS.IBMs.SnowCrab.MatureFemale.MatureFemaleAttributes.class, "getKeys", null ); // NOI18N
+            properties[PROPERTY_shortNames] = new PropertyDescriptor ( "shortNames", wts.models.DisMELS.IBMs.SnowCrab.MatureFemale.MatureFemaleAttributes.class, "getShortNames", null ); // NOI18N
+            properties[PROPERTY_startTime] = new PropertyDescriptor ( "startTime", wts.models.DisMELS.IBMs.SnowCrab.MatureFemale.MatureFemaleAttributes.class, "getStartTime", "setStartTime" ); // NOI18N
+            properties[PROPERTY_typeName] = new PropertyDescriptor ( "typeName", wts.models.DisMELS.IBMs.SnowCrab.MatureFemale.MatureFemaleAttributes.class, "getTypeName", null ); // NOI18N
+            properties[PROPERTY_values] = new PropertyDescriptor ( "values", wts.models.DisMELS.IBMs.SnowCrab.MatureFemale.MatureFemaleAttributes.class, null, "setValues" ); // NOI18N
         }
         catch(IntrospectionException e) {
             e.printStackTrace();
@@ -77,7 +77,7 @@ public class AdultMaleAttributesBeanInfo extends SimpleBeanInfo {
         EventSetDescriptor[] eventSets = new EventSetDescriptor[1];
     
         try {
-            eventSets[EVENT_propertyChangeListener] = new EventSetDescriptor ( wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMaleAttributes.class, "propertyChangeListener", java.beans.PropertyChangeListener.class, new String[] {"propertyChange"}, "addPropertyChangeListener", "removePropertyChangeListener" ); // NOI18N
+            eventSets[EVENT_propertyChangeListener] = new EventSetDescriptor ( wts.models.DisMELS.IBMs.SnowCrab.MatureFemale.MatureFemaleAttributes.class, "propertyChangeListener", java.beans.PropertyChangeListener.class, new String[] {"propertyChange"}, "addPropertyChangeListener", "removePropertyChangeListener" ); // NOI18N
         }
         catch(IntrospectionException e) {
             e.printStackTrace();
@@ -113,9 +113,9 @@ public class AdultMaleAttributesBeanInfo extends SimpleBeanInfo {
         MethodDescriptor[] methods = new MethodDescriptor[19];
     
         try {
-            methods[METHOD_clone0] = new MethodDescriptor(wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMaleAttributes.class.getMethod("clone", new Class[] {})); // NOI18N
+            methods[METHOD_clone0] = new MethodDescriptor(wts.models.DisMELS.IBMs.SnowCrab.MatureFemale.MatureFemaleAttributes.class.getMethod("clone", new Class[] {})); // NOI18N
             methods[METHOD_clone0].setDisplayName ( "" );
-            methods[METHOD_createInstance1] = new MethodDescriptor(wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMaleAttributes.class.getMethod("createInstance", new Class[] {java.lang.String[].class})); // NOI18N
+            methods[METHOD_createInstance1] = new MethodDescriptor(wts.models.DisMELS.IBMs.SnowCrab.MatureFemale.MatureFemaleAttributes.class.getMethod("createInstance", new Class[] {java.lang.String[].class})); // NOI18N
             methods[METHOD_createInstance1].setDisplayName ( "" );
             methods[METHOD_getValue2] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes2.class.getMethod("getValue", new Class[] {java.lang.String.class, java.lang.Boolean.class})); // NOI18N
             methods[METHOD_getValue2].setDisplayName ( "" );
@@ -137,7 +137,7 @@ public class AdultMaleAttributesBeanInfo extends SimpleBeanInfo {
             methods[METHOD_getValue10].setDisplayName ( "" );
             methods[METHOD_getValue11] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes2.class.getMethod("getValue", new Class[] {java.lang.String.class})); // NOI18N
             methods[METHOD_getValue11].setDisplayName ( "" );
-            methods[METHOD_getValueAsString12] = new MethodDescriptor(wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMaleAttributes.class.getMethod("getValueAsString", new Class[] {java.lang.String.class})); // NOI18N
+            methods[METHOD_getValueAsString12] = new MethodDescriptor(wts.models.DisMELS.IBMs.SnowCrab.MatureFemale.MatureFemaleAttributes.class.getMethod("getValueAsString", new Class[] {java.lang.String.class})); // NOI18N
             methods[METHOD_getValueAsString12].setDisplayName ( "" );
             methods[METHOD_setValue13] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes2.class.getMethod("setValue", new Class[] {java.lang.String.class, java.lang.Object.class})); // NOI18N
             methods[METHOD_setValue13].setDisplayName ( "" );
@@ -149,7 +149,7 @@ public class AdultMaleAttributesBeanInfo extends SimpleBeanInfo {
             methods[METHOD_setValue16].setDisplayName ( "" );
             methods[METHOD_setValue17] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes2.class.getMethod("setValue", new Class[] {java.lang.String.class, long.class})); // NOI18N
             methods[METHOD_setValue17].setDisplayName ( "" );
-            methods[METHOD_setValueFromString18] = new MethodDescriptor(wts.models.DisMELS.IBMs.SnowCrab.AdultMale.AdultMaleAttributes.class.getMethod("setValueFromString", new Class[] {java.lang.String.class, java.lang.String.class})); // NOI18N
+            methods[METHOD_setValueFromString18] = new MethodDescriptor(wts.models.DisMELS.IBMs.SnowCrab.MatureFemale.MatureFemaleAttributes.class.getMethod("setValueFromString", new Class[] {java.lang.String.class, java.lang.String.class})); // NOI18N
             methods[METHOD_setValueFromString18].setDisplayName ( "" );
         }
         catch( Exception e) {}//GEN-HEADEREND:Methods
