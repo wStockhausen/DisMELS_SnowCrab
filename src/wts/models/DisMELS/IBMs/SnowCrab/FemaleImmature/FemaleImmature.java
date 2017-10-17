@@ -1,11 +1,11 @@
 /*
- * MegalopaStage.java
+ * FemaleImmature.java
  *
- * Created on December 21, 2012.
+ * Created on September 26, 2017.
  *
  */
 
-package wts.models.DisMELS.IBMs.SnowCrab.Megalopa;
+package wts.models.DisMELS.IBMs.SnowCrab.FemaleImmature;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import java.util.ArrayList;
@@ -17,8 +17,7 @@ import wts.models.DisMELS.IBMFunctions.Growth.LinearGrowthFunction;
 import wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
-import wts.models.DisMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmature;
-import wts.models.DisMELS.IBMs.SnowCrab.MaleImmature.MaleImmature;
+import wts.models.DisMELS.IBMs.SnowCrab.FemalePrimiparous.FemalePrimiparous;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.models.utilities.DateTimeFunctions;
@@ -29,34 +28,32 @@ import wts.roms.model.LagrangianParticle;
  * @author William Stockhausen
  */
 @ServiceProvider(service=LifeStageInterface.class)
-public class MegalopaStage extends AbstractLHS {
+public class FemaleImmature extends AbstractLHS {
     
         //Static fields    
             //  Static fields new to this class
-    /* flag to do debug operations */
-    public static boolean debugOps = false;
     /** flag to print debugging info */
     public static boolean debug = false;
+    /* flag to do debug operations */
+    public static boolean debugOps = false;
     /* Class for attributes */
-    public static final String attributesClass = MegalopaStageAttributes.class.getName();
+    public static final String attributesClass = FemaleImmatureAttributes.class.getName();
     /* Class for parameters */
-    public static final String parametersClass = MegalopaStageParameters.class.getName();
+    public static final String parametersClass = FemaleImmatureParameters.class.getName();
     /* Class for feature type for point positions */
     public static final String pointFTClass = wts.models.DisMELS.framework.LHSPointFeatureType.class.getName();
-//            wts.models.DisMELS.IBMs.Arrowtooth.EggStage.EggStagePointFT.class.getName();
     /* Classes for next LHS */
-    public static final String[] nextLHSClasses = new String[]{MegalopaStage.class.getName(),
-                                                               FemaleImmature.class.getName(),
-                                                               MaleImmature.class.getName()};
+    public static final String[] nextLHSClasses = new String[]{FemaleImmature.class.getName(),
+                                                               FemalePrimiparous.class.getName()};
     /* Classes for spawned LHS */
     public static final String[] spawnedLHSClasses = new String[]{};
     
     //Instance fields
             //  Fields hiding ones from superclass
     /* life stage atrbutes object */
-    protected MegalopaStageAttributes atts = null;
+    protected FemaleImmatureAttributes atts = null;
     /* life stage parameters object */
-    protected MegalopaStageParameters params = null;
+    protected FemaleImmatureParameters params = null;
     
     //  Fields new to class
         //fields that reflect parameter values
@@ -72,10 +69,8 @@ public class MegalopaStage extends AbstractLHS {
     protected double minStageDuration;
     /** maximum stage duration (followed by death) */
     protected double maxStageDuration;
-    /** minimum settlement depth */
-    protected double minSettlementDepth;
-    /** maximum settlement depth */
-    protected double maxSettlementDepth;
+    /** minimum size before metamorphosis to next stage */
+    protected double minSize;
     /** initial size (mm) */
     protected double initialSize;
     /** initial weight (g) */
@@ -105,13 +100,11 @@ public class MegalopaStage extends AbstractLHS {
     private IBMFunctionInterface fcnGrowth = null; 
     /** IBM function selected for mortality */
     private IBMFunctionInterface fcnMort = null; 
-    /** IBM function selected for vertical movement */
-    private IBMFunctionInterface fcnVM = null; 
-    /** IBM function selected for vertical velocity */
-    private IBMFunctionInterface fcnVV = null; 
+    /** IBM function selected for horizontal velocity */
+    private IBMFunctionInterface fcnSS = null; 
     
     /** logger for class */
-    private static final Logger logger = Logger.getLogger(MegalopaStage.class.getName());
+    private static final Logger logger = Logger.getLogger(FemaleImmature.class.getName());
     
     /**
      * Creates a new instance of GenericLHS.  
@@ -119,7 +112,7 @@ public class MegalopaStage extends AbstractLHS {
      *  the class names of the associated classes.
      * DO NOT DELETE THIS CONSTRUCTOR!!
      */
-    public MegalopaStage() {
+    public FemaleImmature() {
         super("");
         super.atts = atts;
         super.params = params;
@@ -134,15 +127,15 @@ public class MegalopaStage extends AbstractLHS {
      * then initialize() should be called to initialize all instance variables.
      * DO NOT DELETE THIS CONSTRUCTOR!!
      */
-    public MegalopaStage(String typeName) 
+    public FemaleImmature(String typeName) 
                 throws InstantiationException, IllegalAccessException {
         super(typeName);
-        atts = new MegalopaStageAttributes(typeName);
+        atts = new FemaleImmatureAttributes(typeName);
         atts.setValue(LifeStageAttributesInterface.PROP_id,id);
         atts.setValue(LifeStageAttributesInterface.PROP_parentID,id);
         atts.setValue(LifeStageAttributesInterface.PROP_origID,id);
         setAttributesFromSubClass(atts);  //set object in the superclass
-        params = (MegalopaStageParameters) LHS_Factory.createParameters(typeName);
+        params = (FemaleImmatureParameters) LHS_Factory.createParameters(typeName);
         setParameters(params);
     }
 
@@ -160,10 +153,10 @@ public class MegalopaStage extends AbstractLHS {
      * @throws java.lang.IllegalAccessException
      */
     @Override
-    public MegalopaStage createInstance(String[] strv) 
+    public FemaleImmature createInstance(String[] strv) 
                         throws InstantiationException, IllegalAccessException {
         LifeStageAttributesInterface theAtts = LHS_Factory.createAttributes(strv);
-        MegalopaStage lhs = createInstance(theAtts);
+        FemaleImmature lhs = createInstance(theAtts);
         return lhs;
     }
 
@@ -185,11 +178,11 @@ public class MegalopaStage extends AbstractLHS {
      * @throws java.lang.IllegalAccessException
      */
     @Override
-    public MegalopaStage createInstance(LifeStageAttributesInterface theAtts)
+    public FemaleImmature createInstance(LifeStageAttributesInterface theAtts)
                         throws InstantiationException, IllegalAccessException {
-        MegalopaStage lhs = null;
-        if (theAtts instanceof MegalopaStageAttributes) {
-            lhs = new MegalopaStage(theAtts.getTypeName());
+        FemaleImmature lhs = null;
+        if (theAtts instanceof FemaleImmatureAttributes) {
+            lhs = new FemaleImmature(theAtts.getTypeName());
             long newID = lhs.id;//save id of new instance
             lhs.setAttributes(theAtts);
             if (lhs.atts.getID()==-1) {
@@ -214,7 +207,7 @@ public class MegalopaStage extends AbstractLHS {
      *  Returns the associated attributes.  
      */
     @Override
-    public MegalopaStageAttributes getAttributes() {
+    public FemaleImmatureAttributes getAttributes() {
         return atts;
     }
 
@@ -271,7 +264,6 @@ public class MegalopaStage extends AbstractLHS {
     public void setAttributes(LifeStageAttributesInterface newAtts) {
         //copy attributes, regardless of life stage associated w/ newAtts
         for (String key: newAtts.getKeys()) atts.setValue(key,newAtts.getValue(key));
-        //fill in missing attributes depending on class of newAtts
         id = atts.getValue(LifeStageAttributesInterface.PROP_id, id);
         updateVariables();
     }
@@ -359,7 +351,7 @@ public class MegalopaStage extends AbstractLHS {
      *  Returns the associated parameters.  
      */
     @Override
-    public MegalopaStageParameters getParameters() {
+    public FemaleImmatureParameters getParameters() {
         return params;
     }
 
@@ -369,8 +361,8 @@ public class MegalopaStage extends AbstractLHS {
      */
     @Override
     public void setParameters(LifeStageParametersInterface newParams) {
-        if (newParams instanceof MegalopaStageParameters) {
-            params = (MegalopaStageParameters) newParams;
+        if (newParams instanceof FemaleImmatureParameters) {
+            params = (FemaleImmatureParameters) newParams;
             setParametersFromSubClass(params);
             setParameterValues();
             setIBMFunctions();
@@ -383,10 +375,9 @@ public class MegalopaStage extends AbstractLHS {
      * Sets the IBM functions from the parameters object
      */
     private void setIBMFunctions(){
-        fcnGrowth  = params.getSelectedIBMFunctionForCategory(MegalopaStageParameters.FCAT_Growth);
-        fcnMort    = params.getSelectedIBMFunctionForCategory(MegalopaStageParameters.FCAT_Mortality);
-        fcnVM      = params.getSelectedIBMFunctionForCategory(MegalopaStageParameters.FCAT_VerticalMovement);
-        fcnVV      = params.getSelectedIBMFunctionForCategory(MegalopaStageParameters.FCAT_VerticalVelocity);
+        fcnGrowth  = params.getSelectedIBMFunctionForCategory(FemaleImmatureParameters.FCAT_Growth);
+        fcnMort    = params.getSelectedIBMFunctionForCategory(FemaleImmatureParameters.FCAT_Mortality);
+        fcnSS      = params.getSelectedIBMFunctionForCategory(FemaleImmatureParameters.FCAT_SwimmingSpeed);
     }
     
     /*
@@ -394,23 +385,21 @@ public class MegalopaStage extends AbstractLHS {
      */
     private void setParameterValues() {
         isSuperIndividual = 
-                params.getValue(MegalopaStageParameters.PARAM_isSuperIndividual,isSuperIndividual);
+                params.getValue(FemaleImmatureParameters.PARAM_isSuperIndividual,isSuperIndividual);
         horizRWP = 
-                params.getValue(MegalopaStageParameters.PARAM_horizRWP,horizRWP);
+                params.getValue(FemaleImmatureParameters.PARAM_horizRWP,horizRWP);
         initialSize = 
-                params.getValue(MegalopaStageParameters.PARAM_initialSize,initialSize);
+                params.getValue(FemaleImmatureParameters.PARAM_initialSize,initialSize);
         initialWeight = 
-                params.getValue(MegalopaStageParameters.PARAM_initialWeight,initialWeight);
+                params.getValue(FemaleImmatureParameters.PARAM_initialWeight,initialWeight);
         minStageDuration = 
-                params.getValue(MegalopaStageParameters.PARAM_minStageDuration,minStageDuration);
+                params.getValue(FemaleImmatureParameters.PARAM_minStageDuration,minStageDuration);
         maxStageDuration = 
-                params.getValue(MegalopaStageParameters.PARAM_maxStageDuration,maxStageDuration);
-        minSettlementDepth = 
-                params.getValue(MegalopaStageParameters.PARAM_minSettlementDepth,minSettlementDepth);
-        maxSettlementDepth = 
-                params.getValue(MegalopaStageParameters.PARAM_maxSettlementDepth,maxSettlementDepth);
+                params.getValue(FemaleImmatureParameters.PARAM_maxStageDuration,maxStageDuration);
+        minSize = 
+                params.getValue(FemaleImmatureParameters.PARAM_minSize,minSize);
         randomizeTransitions = 
-                params.getValue(MegalopaStageParameters.PARAM_randomizeTransitions,true);
+                params.getValue(FemaleImmatureParameters.PARAM_randomizeTransitions,true);
     }
     
     /**
@@ -420,9 +409,9 @@ public class MegalopaStage extends AbstractLHS {
      */
     @Override
     public Object clone() {
-        MegalopaStage clone = null;
+        FemaleImmature clone = null;
         try {
-            clone = (MegalopaStage) super.clone();
+            clone = (FemaleImmature) super.clone();
             clone.setAttributes(atts);//this clones atts
             clone.setParameters(params);//this clones params
             clone.lp      = (LagrangianParticle) lp.clone();
@@ -442,15 +431,14 @@ public class MegalopaStage extends AbstractLHS {
      */
     @Override
     public List<LifeStageInterface> getMetamorphosedIndividuals(double dt) {
+        double dtp = 0.25*(dt/DAY_SECS);//use 1/4 timestep (converted from sec to d)
         output.clear();
-        LifeStageInterface nLHS = null;
-        //if total depth is appropriate for settlement and 
-        //indiv is near the bottom, then settle and transform to next stage.
-        if (debugOps) logger.info("minDepth,totDepth,maxDepth,depth = "+minSettlementDepth+","+totalDepth+","+maxSettlementDepth+","+depth);
-        if ((minSettlementDepth<=totalDepth)&&(totalDepth<=maxSettlementDepth)&&
-                (depth>(totalDepth-5))) {
-            nLHS = createNextLHS();
-            if (nLHS!=null) output.add(nLHS);
+        LifeStageInterface nLHS;
+        if (((ageInStage+dtp)>=minStageDuration)&&(size>=minSize)) {
+            if ((numTrans>0)||!isSuperIndividual){
+                nLHS = createNextLHS();
+                if (nLHS!=null) output.add(nLHS);
+            }
         }
         return output;
     }
@@ -575,14 +563,16 @@ public class MegalopaStage extends AbstractLHS {
     @Override
     public void step(double dt) throws ArrayIndexOutOfBoundsException {
         double[] pos = lp.getIJK();
-        double[] uvw = calcUVW(pos,dt);//this also sets "attached" and may change pos[2] to 0
+        double[] uv = calcUV(pos,dt);//this also sets "attached".
+        //TODO: attached = TRUE always, at present
+        //salinity = totalDepth;//TODO: remove
         if (attached){
-            lp.setIJK(pos[0], pos[1], pos[2]);
+            lp.setIJK(pos[0], pos[1], 0.0);//make sure individual is on bottom
         } else {
             //do lagrangian particle tracking
-            lp.setU(uvw[0],lp.getN());
-            lp.setV(uvw[1],lp.getN());
-            lp.setW(uvw[2],lp.getN());
+            lp.setU(uv[0],lp.getN());
+            lp.setV(uv[1],lp.getN());
+            lp.setW(0.0,lp.getN());
             //now do predictor step
             lp.doPredictorStep();
             //assume same daytime status, but recalc depth and revise W 
@@ -590,9 +580,9 @@ public class MegalopaStage extends AbstractLHS {
             depth = -i3d.calcZfromK(pos[0],pos[1],pos[2]);
             if (debugOps) logger.info("Depth after predictor step = "+depth);
             //w = calcW(dt,lp.getNP1())+r; //set swimming rate for predicted position
-            lp.setU(uvw[0],lp.getNP1());
-            lp.setV(uvw[1],lp.getNP1());
-            lp.setW(uvw[2],lp.getNP1());
+            lp.setU(uv[0],lp.getNP1());
+            lp.setV(uv[1],lp.getNP1());
+            lp.setW(0.0,lp.getNP1());
             //now do corrector step
             lp.doCorrectorStep();
             pos = lp.getIJK();
@@ -620,78 +610,55 @@ public class MegalopaStage extends AbstractLHS {
      * @param dt - time step
      * @return 
      */
-    public double[] calcUVW(double[] pos, double dt) {
-        //compute vertical velocity
-        double w = 0;
-        //calculate the vertical movement rate
-        if (fcnVV instanceof wts.models.DisMELS.IBMFunctions.SwimmingBehavior.PowerLawSwimmingSpeedFunction) {
+    public double[] calcUV(double[] pos, double dt) {
+        //compute swimming speed
+        double s = 0;
+        if (fcnSS instanceof wts.models.DisMELS.IBMFunctions.SwimmingBehavior.PowerLawSwimmingSpeedFunction) {
             /**
             * @param vars - the inputs variables as a double[]{dt,z}.
             *      dt - [0] - integration time step
             *      z  - [1] - size of individual
             */
-            w = (Double) fcnVV.calculate(new double[]{dt,size});
+            s = (Double) fcnSS.calculate(new double[]{dt,size});
         } else
-        if (fcnVV instanceof wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunction) {
+        if (fcnSS instanceof wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunction) {
             /**
             * @param vars - double[]{dt}.
             * @return     - movement rate as a Double 
             */
-            w = (Double) fcnVV.calculate(new double[]{dt});
+            s = (Double) fcnSS.calculate(new double[]{dt});
         }
-        
-        if ((minSettlementDepth<=totalDepth)&&(totalDepth<=maxSettlementDepth)){
-            //individual will swim down to bottom to settle
-            w = -Math.abs(w);
-            attached = false;
-        } else
-        if (fcnVM instanceof wts.models.DisMELS.IBMFunctions.Movement.DielVerticalMigration_FixedDepthRanges) {            
-            /**
-            * Compute time of local sunrise, sunset and solar noon (in minutes, UTC) 
-            * for given lon, lat, and time (in Julian day-of-year).
-            *@param lon : longitude of position (deg Greenwich, prime meridian)
-            *@param lat : latitude of position (deg)
-            *@param time : day-of-year (1-366, fractional part indicates time-of-day)
-            *@return double[5] = [0] time of sunrise (min UTC from midnight)
-            *                    [1] time of sunset (min UTC from midnight)
-            *                    [2] time of solarnoon (min UTC from midnight)
-            *                    [3] solar declination angle (deg)
-            *                    [4] solar zenith angle (deg)
-            * If sunrise/sunset=NaN then its either 24-hr day or night 
-            * (if lat*declination>0, it's summer in the hemisphere, hence daytime). 
-            * Alternatively, if the solar zenith angle > 90.833 deg, then it is night.
-            */
-            double[] ss = DateTimeFunctions.computeSunriseSunset(lon,lat,globalInfo.getCalendar().getYearDay());
-            /**
-            * @param vars - the inputs variables as a double[] array with elements
-            *                  dt          - [0] - integration time step
-            *                  depth       - [1] - current depth of individual
-            *                  total depth - [2] - total depth at location
-            *                  w           - [3] - active vertical swimming speed outside preferred depth range
-            *                  lightLevel  - [4] - value >= 0 indicates daytime, otherwise night 
-            * @return     - double[] with elements
-            *              w        - individual active vertical movement velocity
-            *              attached - flag indicating whether individual is attached to bottom(< 0) or not (>0)
-            */
-            double[] res = (double[]) fcnVM.calculate(new double[]{dt,depth,totalDepth,w,90.833-ss[4]});
-            w = res[0];
-            attached = res[1]<0;
-            if (attached) pos[2] = 0;//set individual on bottom
-        }
+        /**
+        * Compute time of local sunrise, sunset and solar noon (in minutes, UTC) 
+        * for given lon, lat, and time (in Julian day-of-year).
+        *@param lon : longitude of position (deg Greenwich, prime meridian)
+        *@param lat : latitude of position (deg)
+        *@param time : day-of-year (1-366, fractional part indicates time-of-day)
+        *@return double[5] = [0] time of sunrise (min UTC from midnight)
+        *                    [1] time of sunset (min UTC from midnight)
+        *                    [2] time of solarnoon (min UTC from midnight)
+        *                    [3] solar declination angle (deg)
+        *                    [4] solar zenith angle (deg)
+        * If sunrise/sunset=NaN then its either 24-hr day or night 
+        * (if lat*declination>0, it's summer in the hemisphere, hence daytime). 
+        * Alternatively, if the solar zenith angle > 90.833 deg, then it is night.
+        */
+        double[] ss = DateTimeFunctions.computeSunriseSunset(lon,lat,globalInfo.getCalendar().getYearDay());
         
         //calculate horizontal movement
         double[] uv = {0.0,0.0};
+        attached = true;//no calc for atached, at present
         if (!attached){
             if ((horizRWP>0)&&(Math.abs(dt)>0)) {
                 double r = Math.sqrt(horizRWP/Math.abs(dt));
-                uv[0] += r*rng.computeNormalVariate(); //stochastic swimming rate
-                uv[1] += r*rng.computeNormalVariate(); //stochastic swimming rate
+                uv[0] = (s+r)*rng.computeNormalVariate(); //stochastic swimming rate
+                uv[1] = (s+r)*rng.computeNormalVariate(); //stochastic swimming rate
                 if (debugOps) logger.info("id: "+id+"; r, uv: "+r+", {"+uv[0]+", "+uv[1]+"}\n");
             }
         }
         
         //return the result
-        return new double[]{Math.signum(dt)*uv[0],Math.signum(dt)*uv[1],Math.signum(dt)*w};
+        return new double[]{Math.signum(dt)*uv[0],Math.signum(dt)*uv[1]};
     }
 
     /**
@@ -714,7 +681,16 @@ public class MegalopaStage extends AbstractLHS {
     private void updateSize(double dt) {
         if (fcnGrowth instanceof ExponentialGrowthFunction){
             /**
-             * @param vars - the inputs variables, dt (in days) and z0, as a double[].
+            * @param vars - the inputs variables, as a double[]:
+            *      dt - time step
+            *      z0 - initial weight in terms of protein
+            * @return - the function value (z[dt]) as a Double 
+             */
+            size = (Double)fcnGrowth.calculate(new double[]{dt/DAY_SECS,size});
+        } else
+        if (fcnGrowth instanceof ExponentialGrowthFunction){
+            /**
+             * @param vars - the inputs variables, z0 and dt, as a double[].
              * @return     - the function value (z[dt]) as a Double 
              */
             size = (Double)fcnGrowth.calculate(new double[]{dt/DAY_SECS,size});
@@ -866,10 +842,10 @@ public class MegalopaStage extends AbstractLHS {
     @Override
     protected void updateAttributes() {
         super.updateAttributes();
-        atts.setValue(MegalopaStageAttributes.PROP_size,size);
-        atts.setValue(MegalopaStageAttributes.PROP_weight,weight);
-        atts.setValue(MegalopaStageAttributes.PROP_salinity,salinity);
-        atts.setValue(MegalopaStageAttributes.PROP_temperature,temperature);
+        atts.setValue(FemaleImmatureAttributes.PROP_size,size);
+        atts.setValue(FemaleImmatureAttributes.PROP_weight,weight);
+        atts.setValue(FemaleImmatureAttributes.PROP_salinity,salinity);
+        atts.setValue(FemaleImmatureAttributes.PROP_temperature,temperature);
     }
 
     /**
@@ -878,10 +854,10 @@ public class MegalopaStage extends AbstractLHS {
     @Override
     protected void updateVariables() {
         super.updateVariables();
-        size        = atts.getValue(MegalopaStageAttributes.PROP_size,size);
-        weight      = atts.getValue(MegalopaStageAttributes.PROP_weight,weight);
-        salinity    = atts.getValue(MegalopaStageAttributes.PROP_salinity,salinity);
-        temperature = atts.getValue(MegalopaStageAttributes.PROP_temperature,temperature);
+        size        = atts.getValue(FemaleImmatureAttributes.PROP_size,size);
+        weight      = atts.getValue(FemaleImmatureAttributes.PROP_weight,weight);
+        salinity    = atts.getValue(FemaleImmatureAttributes.PROP_salinity,salinity);
+        temperature = atts.getValue(FemaleImmatureAttributes.PROP_temperature,temperature);
     }
 
 }
