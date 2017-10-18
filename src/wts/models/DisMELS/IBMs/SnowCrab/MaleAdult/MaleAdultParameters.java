@@ -38,27 +38,14 @@ public class MaleAdultParameters extends AbstractLHSParameters {
     public static final long serialVersionUID = 1L;
     
     /** the number of IBMParameter objects defined in the class */
-    public static final int numParams = 13;
+    public static final int numParams = 3;
     public static final String PARAM_isSuperIndividual     = "is a super-individual?";
     public static final String PARAM_horizRWP              = "horizontal random walk parameter [m^2]/[s]";
-    public static final String PARAM_minStageDuration      = "min stage duration [d]";
     public static final String PARAM_maxStageDuration      = "max stage duration [d]";
-    public static final String PARAM_minSizeAtTrans        = "min size at transition (cm)";
-    public static final String PARAM_meanStageTransDelay   = "mean stage transition delay (d)";
-    public static final String PARAM_randomizeTransitions  = "randomize stage transitions?";
-    public static final String PARAM_firstDaySpawning      = "first day-of-year for spawning";
-    public static final String PARAM_lengthSpawningSeason  = "length of spawning season (d)";
-    public static final String PARAM_isBatchSpawner        = "is batch spawner?";
-    public static final String PARAM_recoveryPeriod        = "recovery period after spawning (d)";
-    public static final String PARAM_meanTimeToSpawn       = "mean time to spawn after recory (d)?";
-    public static final String PARAM_randomizeSpawning     = "randomize spawning?";
     
     /** the number of IBMFunction categories defined in the class */
-    public static final int numFunctionCats = 4;
-    public static final String FCAT_Growth         = "growth";
-    public static final String FCAT_Mortality      = "mortality";
-    public static final String FCAT_Maturity       = "maturity";
-    public static final String FCAT_Fecundity      = "fecundity";
+    public static final int numFunctionCats   = 3;
+    public static final String FCAT_Mortality = "mortality";
     
     /** The 'keys' used to store the ibm functions */
     protected static final Set<String> setOfFunctionCategories = new LinkedHashSet<>(2*numFunctionCats);
@@ -98,33 +85,16 @@ public class MaleAdultParameters extends AbstractLHSParameters {
         String key;
         key = PARAM_isSuperIndividual;    setOfParamKeys.add(key); mapParams.put(key,new IBMParameterBoolean(key,key,false));
         key = PARAM_horizRWP;             setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
-        key = PARAM_minStageDuration;     setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
         key = PARAM_maxStageDuration;     setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,365.0));
-        key = PARAM_minSizeAtTrans;       setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
-        key = PARAM_meanStageTransDelay;  setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
-        key = PARAM_randomizeTransitions; setOfParamKeys.add(key); mapParams.put(key,new IBMParameterBoolean(key,key,false));
-        key = PARAM_firstDaySpawning;     setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
-        key = PARAM_lengthSpawningSeason; setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
-        key = PARAM_isBatchSpawner;       setOfParamKeys.add(key); mapParams.put(key,new IBMParameterBoolean(key,key,false));
-        key = PARAM_recoveryPeriod;       setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
-        key = PARAM_meanTimeToSpawn;      setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
-        key = PARAM_randomizeSpawning;    setOfParamKeys.add(key); mapParams.put(key,new IBMParameterBoolean(key,key,false));
     }
 
     @Override
     protected final void createMapToSelectedFunctions() {
         //create the set of function category keys for this class
-        setOfFunctionCategories.add(FCAT_Growth);
         setOfFunctionCategories.add(FCAT_Mortality);
-        setOfFunctionCategories.add(FCAT_Maturity);
-        setOfFunctionCategories.add(FCAT_Fecundity);
         
         //create the map from function categories to potential functions in each category
         String cat; Map<String,IBMFunctionInterface> mapOfPotentialFunctions; IBMFunctionInterface ifi;
-        cat = FCAT_Growth;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
-        ifi = new vonBertalanffyGrowthFunction(); mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
-        
         cat = FCAT_Mortality;  
         mapOfPotentialFunctions = new LinkedHashMap<>(4); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new ConstantFunction();  //generic function, so change defaults
@@ -140,34 +110,6 @@ public class MaleAdultParameters extends AbstractLHSParameters {
             ifi.setParameterDescription(PowerLawFunction.PARAM_exponent,"exponent (<0 for decreasing function of size)");
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
-        cat = FCAT_Maturity;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(4); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
-        ifi = new ConstantFunction(); 
-            ifi.setFunctionName("Constant fraction mature");
-            ifi.setDescription("constant fraction mature");
-            ifi.setParameterDescription(ConstantFunction.PARAM_constant,"constant fraction mature");
-            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
-        ifi = new LogisticFunction(); 
-            ifi.setFunctionName("Logistic maturity function");
-            ifi.setDescription("Logistic (ize-specific) maturity function");
-            ifi.setParameterDescription(LogisticFunction.PARAM_x50,"size at 50% maturity (cm)");
-            ifi.setParameterDescription(LogisticFunction.PARAM_slope,"slope at 50% maturity (1/cm)");
-            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
-        
-        cat = FCAT_Fecundity;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(4); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
-        ifi = new ConstantFunction(); 
-            ifi.setFunctionName("Constant fecundity");
-            ifi.setDescription("constant fecundity");
-            ifi.setParameterDescription(ConstantFunction.PARAM_constant,"constant fecundity");
-            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
-        ifi = new PowerLawFunction(); 
-            ifi.setFunctionName("Power law fecundity");
-            ifi.setDescription("power law fecundity");
-            ifi.setParameterDescription(PowerLawFunction.PARAM_stdVal,"fecundity at standard size (z0)");
-            ifi.setParameterDescription(PowerLawFunction.PARAM_stdX,"standard size z0 [cm]");
-            ifi.setParameterDescription(PowerLawFunction.PARAM_exponent,"exponent (>0 for increasing function of size)");
-            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);        
     }
     
     /**

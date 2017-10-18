@@ -7,6 +7,7 @@
 package wts.models.DisMELS.IBMs.SnowCrab.MaleAdult;
 
 import java.beans.*;
+import wts.models.DisMELS.IBMs.SnowCrab.AbstractBenthicStageAttributesCustomizer;
 
 /**
  *
@@ -17,7 +18,7 @@ public class MaleAdultAttributesBeanInfo extends SimpleBeanInfo {
     // Bean descriptor//GEN-FIRST:BeanDescriptor
     /*lazy BeanDescriptor*/
     private static BeanDescriptor getBdescriptor(){
-        BeanDescriptor beanDescriptor = new BeanDescriptor  ( wts.models.DisMELS.IBMs.SnowCrab.MaleAdult.MaleAdultAttributes.class , MaleAdultAttributesCustomizer.class ); // NOI18N//GEN-HEADEREND:BeanDescriptor
+        BeanDescriptor beanDescriptor = new BeanDescriptor  ( wts.models.DisMELS.IBMs.SnowCrab.MaleAdult.MaleAdultAttributes.class , AbstractBenthicStageAttributesCustomizer.class ); // NOI18N//GEN-HEADEREND:BeanDescriptor
 
         // Here you can add code for customizing the BeanDescriptor.
 

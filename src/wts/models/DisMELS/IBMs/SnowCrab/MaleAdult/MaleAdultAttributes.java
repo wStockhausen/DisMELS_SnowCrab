@@ -10,27 +10,20 @@ package wts.models.DisMELS.IBMs.SnowCrab.MaleAdult;
 import java.util.*;
 import java.util.logging.Logger;
 import org.openide.util.lookup.ServiceProvider;
-import wts.models.DisMELS.framework.AbstractLHSAttributes2;
+import wts.models.DisMELS.IBMs.SnowCrab.AbstractBenthicStageAttributes;
 import wts.models.DisMELS.framework.IBMAttributes.IBMAttribute;
-import wts.models.DisMELS.framework.IBMAttributes.IBMAttributeDouble;
 
 /**
- * DisMELS class representing attributes for snow crab adults.
+ * DisMELS class representing attributes for adult male snow crab.
  * 
  * @author William Stockhausen
  */
 @ServiceProvider(service=wts.models.DisMELS.framework.LifeStageAttributesInterface.class)
-public class MaleAdultAttributes extends AbstractLHSAttributes2 {
+public class MaleAdultAttributes extends AbstractBenthicStageAttributes {
     
     /** Number of attributes defined by this class (including typeName) */
-    public static final int numNewAttributes = 5;
-    
-    public static final String PROP_size        = "size (mm CW)";
-    public static final String PROP_weight      = "weight (g)";
-    public static final String PROP_gonadStage  = "gonad stage";
-    public static final String PROP_temperature = "temperature deg C";
-    public static final String PROP_salinity    = "salinity";
-    
+    public static final int numNewAttributes = 0;
+        
     protected static final Set<String> newKeys = new LinkedHashSet<>((int)(2*numNewAttributes));
     protected static final Set<String> allKeys = new LinkedHashSet<>((int)(2*(numAttributes+numNewAttributes)));
     protected static final Map<String,IBMAttribute> mapAllAttributes = new HashMap<>((int)(2*(numAttributes+numNewAttributes)));
@@ -86,14 +79,9 @@ public class MaleAdultAttributes extends AbstractLHSAttributes2 {
     private void finishInstantiation(){
         if (newKeys.isEmpty()){
             //set static field information
-            mapAllAttributes.putAll(AbstractLHSAttributes2.mapAttributes);//add from superclass
+            mapAllAttributes.putAll(AbstractBenthicStageAttributes.mapAttributes);//add from superclass
             String key;
-            key = PROP_size;       newKeys.add(key); mapAllAttributes.put(key,new IBMAttributeDouble(key,"size"));
-            key = PROP_weight;     newKeys.add(key); mapAllAttributes.put(key,new IBMAttributeDouble(key,"weight"));
-            key = PROP_gonadStage; newKeys.add(key); mapAllAttributes.put(key,new IBMAttributeDouble(key,"gonadStage"));
-            key = PROP_temperature;newKeys.add(key); mapAllAttributes.put(key,new IBMAttributeDouble(key,"temperature"));
-            key = PROP_salinity;   newKeys.add(key); mapAllAttributes.put(key,new IBMAttributeDouble(key,"salinity"));
-            allKeys.addAll(AbstractLHSAttributes2.keys);//add from superclass
+            allKeys.addAll(AbstractBenthicStageAttributes.keys);//add from superclass
             allKeys.addAll(newKeys);//add from this class
             Iterator<String> it = allKeys.iterator();
             int j = 0; it.next();//skip typeName
@@ -102,11 +90,6 @@ public class MaleAdultAttributes extends AbstractLHSAttributes2 {
         //set instance information
         Map<String,Object> tmpMapValues = new HashMap<>((int)(2*(numNewAttributes+numAttributes)));
         tmpMapValues.putAll(mapValues);//copy from super
-        tmpMapValues.put(PROP_size,       new Double(0));
-        tmpMapValues.put(PROP_weight,     new Double(0));
-        tmpMapValues.put(PROP_gonadStage, new Double(0));
-        tmpMapValues.put(PROP_temperature,new Double(-1));
-        tmpMapValues.put(PROP_salinity,   new Double(-1));
         mapValues = tmpMapValues;//assign to super
     }
 
@@ -129,7 +112,7 @@ public class MaleAdultAttributes extends AbstractLHSAttributes2 {
      */
     @Override
     public Object[] getAttributes() {
-        Object[] atts = new Object[numNewAttributes+AbstractLHSAttributes2.numAttributes-1];
+        Object[] atts = new Object[numNewAttributes+AbstractBenthicStageAttributes.numAttributes-1];
         int j = 0;
         Iterator<String> it = allKeys.iterator();
         it.next();//skip PROP_typeName
@@ -232,7 +215,7 @@ public class MaleAdultAttributes extends AbstractLHSAttributes2 {
     public void setValues(final String[] strv) {
         super.setValues(strv);//set the standard attribute values
         //set the values of the new attributes
-        int j = AbstractLHSAttributes2.numAttributes;
+        int j = AbstractBenthicStageAttributes.numAttributes;
         try {
             for (String key: newKeys) setValueFromString(key,strv[j++]);
         } catch (java.lang.IndexOutOfBoundsException ex) {

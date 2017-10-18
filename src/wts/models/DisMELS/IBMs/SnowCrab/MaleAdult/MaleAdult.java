@@ -12,10 +12,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import org.openide.util.lookup.ServiceProvider;
+import wts.models.DisMELS.IBMs.SnowCrab.AbstractBenthicStage;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.models.utilities.CalendarIF;
-import wts.models.utilities.DateTimeFunctions;
 import wts.roms.model.LagrangianParticle;
 
 
@@ -25,7 +25,7 @@ import wts.roms.model.LagrangianParticle;
  * @author William Stockhausen
  */
 @ServiceProvider(service=LifeStageInterface.class)
-public class MaleAdult extends AbstractLHS {
+public class MaleAdult extends AbstractBenthicStage {
     
         //Static fields    
             //  Static fields new to this class
@@ -37,7 +37,6 @@ public class MaleAdult extends AbstractLHS {
     public static final String parametersClass = MaleAdultParameters.class.getName();
     /* Class for feature type for point positions */
     public static final String pointFTClass = wts.models.DisMELS.framework.LHSPointFeatureType.class.getName();
-//            "wts.models.DisMELS.LHS.BenthicAdult.AdultStagePointFT";
     /* Classes for next LHS */
     public static final String[] nextLHSClasses = new String[]{MaleAdult.class.getName()};
     /* Classes for spawned LHS */
@@ -49,74 +48,28 @@ public class MaleAdult extends AbstractLHS {
     protected MaleAdultAttributes atts = null;
     /* lhs parameters */
     protected MaleAdultParameters params = null;
+    
             //  Fields new to class
             //fields that reflect parameter values
     /** flag indicating instance is a super-individual */
     protected boolean isSuperIndividual;
     /** horizontal random walk parameter */
     protected double horizRWP;
-    /** minimum stage duration before metamorphosis to next stage */
-    protected double minStageDuration;
     /** maximum stage duration (followed by death) */
-    protected double maxStageDuration;
-    /** minimum size (cm) before metamorphosis to next stage can occur */
-    protected double minSizeAtTrans;
-    /** mean delay before metamorphosis to next stage occurs (d) */
-    protected double meanStageTransDelay;
-    /** flag to use stochastic transitions */
-    protected boolean randomizeTransitions;
-    /** stage transition rate */
-    protected double stageTransRate;
-    /** day of year of first spawning */
-    protected double firstDayOfSpawning;
-    /** length of spawning season (d) */
-    protected double lengthOfSpawningSeason;
-    /** flag indicating batch spawning */
-    protected boolean isBatchSpawner;
-    /** min recovery period after spawning (d) */ 
-    protected double recoveryPeriod;
-    /** mean time to spawn after recovery (d)*/
-    protected double meanTimeToSpawn;
-    /** flag to randomize spawning */
-    protected boolean randomizeSpawning;
-    
+    protected double maxStageDuration;    
     
         //fields that reflect (new) attribute values
-    /** gonad stage */
-    protected double gonadStage = 0; 
-    /** size (cm) */
-    protected double size = 0;
-    /** weight (kg) */
-    protected double weight = 0;
-    /** fraction mature */
-    protected double maturity = 0;
-    /** elapsed time to spawn (days) */
-    protected double timeToSpawn = 366;
-    /** in situ temperature (deg C) */
-    protected double temperature = 0;
-    /** in situ salinity */
-    protected double salinity = 0;
     
             //other fields
     /** number of individuals transitioning to next stage */
     private double numTrans;  
      /** day of year */
     private double dayOfYear;
-     /** fecundity as number of spawned class objects to create */
-    private double fecundity;
-    /** spawning season flag */
-    private boolean isSpawningSeason;
-    /** flag to clean up after spawning */
-    private boolean doOnceAfterSpawningSeason = true;
    
     /** IBM function selected for growth */
     private IBMFunctionInterface fcnGrowth = null; 
     /** IBM function selected for mortality */
     private IBMFunctionInterface fcnMortality = null; 
-    /** IBM function selected for maturity */
-    private IBMFunctionInterface fcnMaturity = null; 
-    /** IBM function selected for fecundity */
-    private IBMFunctionInterface fcnFecundity = null; 
     
     /** flag to print debugging info */
     public static boolean debug = false;
@@ -355,7 +308,6 @@ public class MaleAdult extends AbstractLHS {
         atts.setValue(LifeStageAttributesInterface.PROP_ageInStage, 0.0); //reset age in stage
         atts.setValue(LifeStageAttributesInterface.PROP_active,true);     //set active to true
         atts.setValue(LifeStageAttributesInterface.PROP_alive,true);      //set alive to true
-        atts.setValue(LifeStageAttributesInterface.PROP_attached,true);   //set attached to true
             
         //copy LagrangianParticle information
         this.setLagrangianParticle(oldLHS.getLagrangianParticle());
@@ -394,10 +346,7 @@ public class MaleAdult extends AbstractLHS {
      * Sets the IBM functions from the parameters object
      */
     private void setIBMFunctions(){
-        fcnGrowth         = params.getSelectedIBMFunctionForCategory(MaleAdultParameters.FCAT_Growth);
         fcnMortality      = params.getSelectedIBMFunctionForCategory(MaleAdultParameters.FCAT_Mortality);
-        fcnMaturity       = params.getSelectedIBMFunctionForCategory(MaleAdultParameters.FCAT_Maturity);
-        fcnFecundity      = params.getSelectedIBMFunctionForCategory(MaleAdultParameters.FCAT_Fecundity);
     }
     
     /*
@@ -408,28 +357,8 @@ public class MaleAdult extends AbstractLHS {
                 params.getValue(params.PARAM_isSuperIndividual,true);
         horizRWP = 
                 params.getValue(params.PARAM_horizRWP,horizRWP);
-        minStageDuration = 
-                params.getValue(params.PARAM_minStageDuration,minStageDuration);
         maxStageDuration = 
                 params.getValue(params.PARAM_maxStageDuration,maxStageDuration);
-        minSizeAtTrans = 
-                params.getValue(params.PARAM_minSizeAtTrans,minSizeAtTrans);
-        meanStageTransDelay = 
-                params.getValue(params.PARAM_meanStageTransDelay,meanStageTransDelay);
-        randomizeTransitions = 
-                params.getValue(params.PARAM_randomizeTransitions,randomizeTransitions);
-        firstDayOfSpawning = 
-                params.getValue(params.PARAM_firstDaySpawning,firstDayOfSpawning);
-        lengthOfSpawningSeason = 
-                params.getValue(params.PARAM_lengthSpawningSeason,lengthOfSpawningSeason);
-        isBatchSpawner = 
-                params.getValue(params.PARAM_isBatchSpawner,true);
-        recoveryPeriod = 
-                params.getValue(params.PARAM_recoveryPeriod,recoveryPeriod);
-        meanTimeToSpawn = 
-                params.getValue(params.PARAM_meanTimeToSpawn,meanTimeToSpawn);
-        randomizeSpawning = 
-                params.getValue(params.PARAM_randomizeTransitions,true);
     }
     
     /**
@@ -457,13 +386,14 @@ public class MaleAdult extends AbstractLHS {
         double dtp = 0.25*(dt/DAY_SECS);//use 1/4 timestep (converted from sec to d)
         output.clear();
         LifeStageInterface nLHS;
-        if ((ageInStage+dtp>=minStageDuration)&&(size>=minSizeAtTrans)) {
+        if (false) {
             nLHS = createMetamorphosedIndividual();
             if (nLHS!=null) output.add(nLHS);
         }
         return output;
     }
 
+    // TODO: define what this means!
     private LifeStageInterface createMetamorphosedIndividual() {
         LifeStageInterface nLHS = null;
         try {
@@ -520,38 +450,11 @@ public class MaleAdult extends AbstractLHS {
         cal.setTimeOffset((long) time);
         dayOfYear = cal.getYearDay();
         
-        //set up spawning
-        isSpawningSeason = DateTimeFunctions.isBetweenDOY(dayOfYear,
-                                                          firstDayOfSpawning,
-                                                          firstDayOfSpawning+lengthOfSpawningSeason);        
-        if (!isSpawningSeason) {
-            //we're starting outside the spawning season, set up for next one
-            setupSpawningSeason();
-        } else {
-            //we're starting in the middle of a spawning season
-            doOnceAfterSpawningSeason = true;
-            if (isBatchSpawner) {
-                if (randomizeSpawning) {
-                    timeToSpawn = rng.computeUniformVariate(0.0, meanTimeToSpawn);
-                } else {
-                    timeToSpawn = meanTimeToSpawn;
-                }
-            } else {
-                //spawn once
-                if (randomizeSpawning) {
-                    timeToSpawn = rng.computeUniformVariate(0.0, lengthOfSpawningSeason-(dayOfYear-firstDayOfSpawning));
-                } else {
-                    timeToSpawn = (lengthOfSpawningSeason-(dayOfYear-firstDayOfSpawning))/2.0;
-                }
-            }
-        }
-        
         //reset calendar time to model time
         cal.setTimeOffset(modTime);
     }
 
     public void initialize() {
-//        atts.setValue(atts.PROP_id,id);
         updateVariables();//set instance variables to attribute values
         int hType,vType;
         hType=vType=-1;
@@ -602,42 +505,13 @@ public class MaleAdult extends AbstractLHS {
         updateVariables();//set instance variables to attribute values
     }
     
-    /**
-     * Set up variables for start of next spawning season.
-     */
-    private void setupSpawningSeason() {
-        doOnceAfterSpawningSeason = false;
-        //Set up time of first spawning
-        if (isBatchSpawner) {
-            if (randomizeSpawning) {
-                timeToSpawn = rng.computeUniformVariate(0.0, meanTimeToSpawn)*DAY_SECS;
-            } else {
-                timeToSpawn = meanTimeToSpawn;
-            }
-        } else {
-            if (randomizeSpawning) {
-                timeToSpawn = rng.computeUniformVariate(0.0, lengthOfSpawningSeason)*DAY_SECS;
-            } else {
-                timeToSpawn = (lengthOfSpawningSeason/2.0)*DAY_SECS;
-            }
-        }
-    }
-    
     @Override
     public void step(double dt) throws ArrayIndexOutOfBoundsException {
         //determine daytime/nighttime for vertical migration & calc indiv. W
         dayOfYear = globalInfo.getCalendar().getYearDay();
 //        isDaytime = DateTimeFunctions.isDaylight(lon,lat,dayOfYear);
-        isSpawningSeason = DateTimeFunctions.isBetweenDOY(dayOfYear,firstDayOfSpawning,firstDayOfSpawning+lengthOfSpawningSeason);
-        if (isSpawningSeason) {
-            timeToSpawn = timeToSpawn-dt;
-            doOnceAfterSpawningSeason = true;
-        } else {
-            if (doOnceAfterSpawningSeason) {
-                setupSpawningSeason();
-            }
-        }
-        //TODO: implement movement here
+        //movement here
+        //TODO: revise so no advection by currents!
         double[] pos;
             double[] uv = calcUV(dt);
             lp.setU(uv[0],lp.getN());
@@ -670,7 +544,7 @@ public class MaleAdult extends AbstractLHS {
     }
     
     /**
-     * Function to calculate horizontal swimming speeds.
+     * Function to calculate horizontal walking speeds.
      * 
      * @param dt - time step
      * @return   - double[]{u,v}
@@ -698,9 +572,8 @@ public class MaleAdult extends AbstractLHS {
     }
 
     private void updateSize(double dt) {
-        //The following works for
-        //  wts.models.DisMELS.IBMFunctions.Growth.vonBertalanffyGrowthFunction
-        size = (Double) fcnGrowth.calculate(new double[]{dt/DAY_SECS,size});
+        //do nothing: size doesn't change
+        //TODO: update weight?!
     }
 
     /**
@@ -713,13 +586,14 @@ public class MaleAdult extends AbstractLHS {
         //  wts.models.DisMELS.IBMFunctions.Miscellaneous.PowerLawFunction
         double mortalityRate = (Double)fcnMortality.calculate(size);//in unis of [days]^-1
         double totRate = mortalityRate;
-        if ((ageInStage>=minStageDuration)&&(size>=minSizeAtTrans)) {
-            totRate += stageTransRate;
-            //apply mortality rate to previous number transitioning and
-            //add in new transitioners
-            numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
-                    (stageTransRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
-        }
+        //TODO: add in stage transitions, if necessary
+//        if ((ageInStage>=minStageDuration)&&(size>=minSizeAtTrans)) {
+//            totRate += stageTransRate;
+//            //apply mortality rate to previous number transitioning and
+//            //add in new transitioners
+//            numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
+//                    (stageTransRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
+//        }
         number = number*Math.exp(-dt*totRate/DAY_SECS);
     }
 
@@ -819,11 +693,6 @@ public class MaleAdult extends AbstractLHS {
     @Override
     protected void updateAttributes() {
         super.updateAttributes();
-        atts.setValue(MaleAdultAttributes.PROP_gonadStage,gonadStage);
-        atts.setValue(MaleAdultAttributes.PROP_size,size);
-        atts.setValue(MaleAdultAttributes.PROP_weight,weight);
-        atts.setValue(MaleAdultAttributes.PROP_salinity,salinity);
-        atts.setValue(MaleAdultAttributes.PROP_temperature,temperature);
     }
 
     /**
@@ -832,10 +701,5 @@ public class MaleAdult extends AbstractLHS {
     @Override
     protected void updateVariables() {
         super.updateVariables();
-        gonadStage     = atts.getValue(MaleAdultAttributes.PROP_gonadStage,gonadStage);
-        size    = atts.getValue(MaleAdultAttributes.PROP_size,size);
-        weight     = atts.getValue(MaleAdultAttributes.PROP_weight,weight);
-        salinity    = atts.getValue(MaleAdultAttributes.PROP_salinity,salinity);
-        temperature = atts.getValue(MaleAdultAttributes.PROP_temperature,temperature);
     }
 }
