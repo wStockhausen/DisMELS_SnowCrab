@@ -385,17 +385,17 @@ public class MaleAdult extends AbstractBenthicStage {
     public List<LifeStageInterface> getMetamorphosedIndividuals(double dt) {
         double dtp = 0.25*(dt/DAY_SECS);//use 1/4 timestep (converted from sec to d)
         output.clear();
-        LifeStageInterface nLHS;
+        List<LifeStageInterface> nLHSs=null;
         if (false) {
-            nLHS = createMetamorphosedIndividual();
-            if (nLHS!=null) output.add(nLHS);
+            nLHSs = createNextLHSs();
+            if (nLHSs!=null) output.addAll(nLHSs);
         }
         return output;
     }
 
     // TODO: define what this means!
-    private LifeStageInterface createMetamorphosedIndividual() {
-        LifeStageInterface nLHS = null;
+    private List<LifeStageInterface> createNextLHSs() {
+        List<LifeStageInterface> nLHSs = null;
         try {
             //create LHS with "output" stage
             if (isSuperIndividual) {
@@ -409,7 +409,7 @@ public class MaleAdult extends AbstractBenthicStage {
                  *          5) set number in new LHS to numTrans for current LHS
                  *          6) reset numTrans in current LHS
                  */
-                nLHS = LHS_Factory.createNextLHSFromSuperIndividual(typeName,this,numTrans);
+                nLHSs = LHS_Factory.createNextLHSsFromSuperIndividual(typeName,this,numTrans);
                 numTrans = 0.0;//reset numTrans to zero
             } else {
                 /** 
@@ -423,14 +423,14 @@ public class MaleAdult extends AbstractBenthicStage {
                  *          4) copy current LHS origID to new LHS origID
                  *          5) kill current LHS
                  */
-                nLHS = LHS_Factory.createNextLHSFromIndividual(typeName,this);
+                nLHSs = LHS_Factory.createNextLHSsFromIndividual(typeName,this);
                 alive  = false; //allow only 1 transition, so kill this stage
                 active = false; //set stage inactive, also
             }
         } catch (IllegalAccessException | InstantiationException ex) {
             ex.printStackTrace();
         }
-        return nLHS;
+        return nLHSs;
     }
 
     @Override
