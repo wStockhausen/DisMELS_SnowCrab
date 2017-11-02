@@ -18,7 +18,7 @@ import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.models.utilities.CalendarIF;
 import wts.models.utilities.DateTimeFunctions;
 import wts.roms.model.LagrangianParticle;
-import wts.models.DisMELS.IBMs.SnowCrab.AbstractBenthicStage;
+
 
 /**
  * DisMELS class representing adolescent female snow crab.
@@ -26,7 +26,7 @@ import wts.models.DisMELS.IBMs.SnowCrab.AbstractBenthicStage;
  * @author William Stockhausen
  */
 @ServiceProvider(service=LifeStageInterface.class)
-public class FemalePrimiparous extends AbstractBenthicStage {
+public class FemalePrimiparous extends AbstractLHS {
     
         //Static fields    
             //  Static fields new to this class
