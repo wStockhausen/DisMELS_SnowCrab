@@ -17,7 +17,7 @@ import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.models.utilities.CalendarIF;
 import wts.roms.model.LagrangianParticle;
-
+import wts.models.DisMELS.IBMs.SnowCrab.AbstractBenthicStage;
 
 /**
  * DisMELS class representing snow crab adults.
