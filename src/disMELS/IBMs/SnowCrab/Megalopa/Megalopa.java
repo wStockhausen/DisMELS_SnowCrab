@@ -104,7 +104,7 @@ public class Megalopa extends AbstractPelagicStage {
     private static final Logger logger = Logger.getLogger(Megalopa.class.getName());
     
     /**
-     * Creates a new instance of GenericLHS.  
+     * Creates a new instance of Megalopa.  
      *  This constructor should be used ONLY to obtain
      *  the class names of the associated classes.
      * DO NOT DELETE THIS CONSTRUCTOR!!
@@ -116,7 +116,7 @@ public class Megalopa extends AbstractPelagicStage {
     }
     
     /**
-     * Creates a new instance of SimplePelagicLHS with the given typeName.
+     * Creates a new instance of Megalopa with the given typeName.
      * A new id number is calculated in the superclass and assigned to
      * the new instance's id, parentID, and origID. 
      * 
@@ -137,7 +137,7 @@ public class Megalopa extends AbstractPelagicStage {
     }
 
     /**
-     * Creates a new instance of LHS with type name and
+     * Creates a new instance of Megalopa with type name and
      * attribute values given by input String array.
      * 
      * Side effects:

@@ -134,7 +134,7 @@ public class Zooea1 extends AbstractPelagicStage {
     }
 
     /**
-     * Creates a new instance of LHS with type name and
+     * Creates a new instance of Zooea1 with type name and
      * attribute values given by input String array.
      * 
      * Side effects:
@@ -155,7 +155,7 @@ public class Zooea1 extends AbstractPelagicStage {
     }
 
     /**
-     * Creates a new instance of this LHS with attributes (including type name) 
+     * Creates a new instance of Zooea1 with attributes (including type name) 
      * corresponding to the input attributes instance.
      * 
      * Side effects:
@@ -445,6 +445,11 @@ public class Zooea1 extends AbstractPelagicStage {
         return output;
     }
 
+    /**
+     * Creates a list of objects representing individuals in the succeeding life stage.
+     * 
+     * @return 
+     */
     private List<LifeStageInterface> createNextLHSs() {
         List<LifeStageInterface> nLHSs = null;
         try {

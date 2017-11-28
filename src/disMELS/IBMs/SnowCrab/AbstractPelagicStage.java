@@ -23,6 +23,8 @@ import wts.roms.model.LagrangianParticle;
 public abstract class AbstractPelagicStage implements LifeStageInterface {
     
     //Static fields
+    /** boolean flag indicating no advection by currents (= false) */
+    public static final boolean noAdvection = false;
     /** ROMS 3d interpolator object */
     protected static Interpolator3D i3d;
     /** Random Number Generator */
@@ -71,7 +73,7 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     protected LagrangianParticle lp = new LagrangianParticle();;
     /** the spatial track in projected coordinates for the LHS */
     protected ArrayList<Coordinate> track = new ArrayList<>();
-    /** the spatial track in geopgraphic coordinates for the LHS */
+    /** the spatial track in geographic coordinates for the LHS */
     protected ArrayList<Coordinate> trackLL = new ArrayList<>();
     /** array list for output LHS instances */
     protected ArrayList<LifeStageInterface> output = new ArrayList<>();
@@ -122,11 +124,13 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     
     /**
      * Partially instantiates an instance of a class inheriting from AbstractPelagicStage
+     * 
+     * Importantly, this sets "NoAdvection" to FALSE for the associated LagrangianParticle object.
      */
     protected AbstractPelagicStage(String typeName) {
         this.typeName = typeName;
         id = LHS_Factory.getNewID();
-        lp.setNoAdvection(true);
+        lp.setNoAdvection(noAdvection);
         if (rng==null) rng = GlobalInfo.getInstance().getRandomNumberGenerator();
         if (i3d==null) i3d = GlobalInfo.getInstance().getInterpolator3D();
     }
@@ -173,15 +177,15 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     
     /**
      * Sets the lagrangian particle representation for the instance to a clone  
-     * of newLP. noAdvection is set to true on the cloned LP to ensure consistency
-     * with motion of benthic life stages.
+     * of newLP. noAdvection is set to FALSE on the cloned LP to ensure consistency
+     * with motion of pelagic life stages.
      * 
      * @param newLP - LagrangianParticle instance to be cloned.
      */
     @Override
     public void setLagrangianParticle(LagrangianParticle newLP) {
         lp = (LagrangianParticle) newLP.clone();
-        lp.setNoAdvection(true);
+        lp.setNoAdvection(noAdvection);
     }
     
     /**
