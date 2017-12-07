@@ -12,48 +12,9 @@ import wts.models.DisMELS.framework.GlobalInfo;
 import wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.models.DisMELS.framework.IBMFunctions.IBMGrowthFunctionInterface;
-
-/**
- * This class provides an implementation of the Wisconsin Bioenergetics Model
- * as an individual growth function.
- * Type: 
- *      Individual growth function
- * Parameters (by key):
-        pVal - Double - "realized fraction of max consumption"
+import org.apache.commons.math3.analysis.interpolation.LinearInterpolator;
+import org.apache.commons.math3.analysis.polynomials.PolynomialSplineFunction;
         
-        aC  - Double - "linear coefficient of weight-dependent max consumption"
-        bC  - Double - "exponent coefficient of weight-dependent max consumption"
-        cmT - Double - "max temperature at which consumption occurs"
-        coT - Double - "temperature at which consumption is maximized"
-        c1c - Double - "consumption coefficient"
-        
-        ACT  - Double - "respiration activity multiplier"
-        aR  - Double - "linear coefficient of weight-dependent respiration"
-        bR  - Double - "exponent coefficient of weight-dependent respiration"
-        rmT  - Double - "max temperature at which respiration occurs"
-        roT  - Double - "temperature at which respiration is maximized"
-        c1r  - Double - "respiration coefficient"
-        
-        FA   - Double - "fraction of consumption lost to egestion"
-        SDA  - Double - "fraction of assimilated energy lost to SDA"
-        UA   - Double - ???
-        
-        sigRt  - Double - "std. dev. in linear growth rate"
- * Variables:
- *      vars - double[]{dt,w0,T}.
- *      dt - double - time interval   ([time])
- *      w0 - double - weight at time t0 ([weight])
- *      T  - double - temperature (deg C)
- * Value:
- *      w(dt) - Double - weight at time t+dt
- * Calculation:
- *     ;
- * 
- * @author William.Stockhausen
- *  Citation:
- * Hanson, P.C., T.B. Johnson, D.E. Schindler, and J. F. Kitchell. 1997. 
- * Fish Bioenergetics 3.0. University of Wisconsin Sea Grant Institute, Madison, WI.
- */
 @ServiceProviders(value={
     @ServiceProvider(service=IBMGrowthFunctionInterface.class),
     @ServiceProvider(service=IBMFunctionInterface.class)}
@@ -69,12 +30,12 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
     /** full description */
     public static final String DEFAULT_fullDescr = 
             "\n\t**************************************************************************"+
-            "\n\t* This class provides an implementation of the Wisconsin Bioenergetics Model"+
-            "\n\t* as an individual growth function."+
+            "\n\t* This class provides an implementation of a crab bioenergetics growth function."+
+            "\n\t* "+
             "\n\t* Type: "+
             "\n\t*      Individual growth function"+
             "\n\t* Parameters (by key):"+
-            "\n\t       pVal - Double - realized fraction of max consumption"+
+            "\n\t       pVal - Double vector - realized fraction of max consumption"+
             "\n\t"+
             "\n\t       aC  - Double - linear coefficient of weight-dependent max consumption"+
             "\n\t       bC  - Double - exponent coefficient of weight-dependent max consumption"+
@@ -90,8 +51,10 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
             "\n\t       c1r  - Double - respiration coefficient"+
             "\n\t        "+
             "\n\t       FA   - Double - fraction of consumption lost to egestion"+
-            "\n\t       SDA  - Double - fraction of assimilated energy lost to SDA"+
-            "\n\t       UA   - Double - ???"+
+            "\n\t       aSDA  - Double - coefficient on weight of fraction of assimilated energy lost to SDA"+
+            "\n\t       bSDA  - Double - exponent on weight of fraction of assimilated energy lost to SDA"+
+            "\n\t       UA   - Double - weight-specific excretion coefficient"+
+            "\n\t       ex   - Double - amount of energy lost to exuviae cost daily "+
             "\n\t"+
             "\n\t       sigRt  - Double - std. dev. in linear growth rate"+
             "\n\t* Variables:"+
@@ -117,11 +80,11 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
             "\n\t**************************************************************************";
     /** random number generator */
     protected static final RandomNumberGenerator rng = GlobalInfo.getInstance().getRandomNumberGenerator();
-
+    public static final double secsPerDay = 8640;
     /** number of settable parameters */
     public static final int numParams = 16;
     /** number of sub-functions */
-    public static final int numSubFuncs = 0;
+    public static final int numSubFuncs = 1;
 
     /** key to set pVal parameter */
     public static final String PARAM_pVal = "pVal";
@@ -166,7 +129,9 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
     public static final String PARAM_wRat = "wRat";
     
     /** value of pVal parameter */
-    private double pVal = 0;
+    private double[][] pVal = new double[][]{
+    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
+    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
     
     /** value of aC parameter */
     private double aC = 0;
@@ -265,7 +230,7 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
         if (super.setParameterValue(param, value)){
             switch (param) {
                 case PARAM_pVal:
-                    pVal = ((Double) value).doubleValue();
+                    pVal = ((double[][]) value);
                     break;
                 case PARAM_aC:
                     aC = ((Double) value).doubleValue();
@@ -338,10 +303,14 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
         double[] lvars = (double[]) vars;//cast object to required double[]
         int i = 0;
         double dt = lvars[i++];
+        double cW = lvars[i++];
         double w0 = lvars[i++];
         double T   = lvars[i++];
         double maxC = aC*Math.pow(w0,bC-1.0);//max consumption
-        double c = maxC*pVal*calcF(T,cmT,coT,c1c);//realized weight-specific consumtion
+        LinearInterpolator li = new LinearInterpolator();
+        PolynomialSplineFunction interpPVal = li.interpolate(pVal[0], pVal[1]);
+        double p = interpPVal.value(cW);
+        double c = maxC*p*calcF(T,cmT,coT,c1c);//realized weight-specific consumption
         double maxR = aR*Math.pow(w0,bR-1.0);       //reference-level respiration
         double r = maxR*ACT*calcF(T,rmT,roT,c1r);
         double f = FA*c;     //weight-specific egestion
@@ -349,7 +318,7 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
         double m = r+s;       //weight-specific metabolic loss rate
         double e = UA*w0; //weight-specific excretion
         double w = f+e;       //weight-specific waste rate
-        double g = Math.log(((c-(m+w+ex))/calPerGram)/wRat);   //weight-specific total growth rate 
+        double g = Math.log(((c-(m+w+ex))/calPerGram)/wRat);   //weight-specific total instantaneous growth rate 
         if (sigRt>0) g += rng.computeNormalVariate()*sigRt; 
         Double res = new Double(w0*Math.exp(g*dt));
         return res;
@@ -363,5 +332,6 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
         double f = Math.pow(v,x)*Math.exp(x-(1-v));
         return f;
     }
+
 }
 
