@@ -103,6 +103,8 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
     protected double  age=0;
     /** age in life stage, in days */
     protected double  ageInStage=0;
+    /** age in instar, in days */
+    protected double ageInInstar=0;
     /** number of individuals represented */
     protected double  number=0;
     /** instar */
@@ -379,6 +381,7 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
             key = AbstractBenthicStageAttributes.PROP_weight;     atts.setValue(key,newAtts.getValue(key));
             key = AbstractBenthicStageAttributes.PROP_shellcond;  atts.setValue(key,newAtts.getValue(key));
             key = AbstractBenthicStageAttributes.PROP_shellthick; atts.setValue(key,newAtts.getValue(key));
+            key = AbstractBenthicStageAttributes.PROP_ageInInstar; atts.setValue(key,newAtts.getValue(key));
         }
         
         id = atts.getValue(LifeStageAttributesInterface.PROP_id, id);

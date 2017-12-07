@@ -85,6 +85,16 @@ public class MaleImmature extends AbstractBenthicStage {
     
     /** IBM function selected for mortality */
     private IBMFunctionInterface fcnMort = null; 
+     /** IBM function selected for growth (in weight)*/
+    private IBMFunctionInterface fcnGrowth = null; 
+    /** IBM function selected for molt */
+    private IBMFunctionInterface fcnMolt = null;
+        /** IBM function selected for molt time*/
+    private IBMFunctionInterface fcnMoltTime = null;
+    /** IBM function selected for maturity */
+    private IBMFunctionInterface fcnMaturity = null; 
+    /** IBM function selected for fecundity */
+    private IBMFunctionInterface fcnFecundity = null; 
     
     /** logger for class */
     private static final Logger logger = Logger.getLogger(MaleImmature.class.getName());
@@ -563,6 +573,7 @@ public class MaleImmature extends AbstractBenthicStage {
             pos = lp.getIJK();
         time = time+dt;
         updateSize(dt);
+        updateWeight(dt);
         updateNum(dt);
         updateAge(dt);
         updatePosition(pos);
@@ -615,7 +626,8 @@ public class MaleImmature extends AbstractBenthicStage {
      * @param dt - time step in seconds
      */
     private void updateSize(double dt) {
-        //TODO: implement!
+        double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+        size = (Double) fcnMolt.calculate(new double[]{dt,size});
     }
 
     /**
@@ -624,7 +636,7 @@ public class MaleImmature extends AbstractBenthicStage {
      * @param dt - time step in seconds
      */
     private void updateWeight(double dt) {
-        //TODO: implement!
+        weight = (Double) fcnGrowth.calculate(new double[]{dt/DAY_SECS,weight});
     }
 
     /**

@@ -7,6 +7,7 @@
 
 package disMELS.IBMs.SnowCrab.MaleImmature;
 
+import SnowCrabFunctions.CrabBioenergeticsGrowthFunction;
 import java.beans.PropertyChangeSupport;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -31,8 +32,7 @@ import wts.models.DisMELS.framework.IBMFunctions.IBMParameterDouble;
 import wts.models.DisMELS.framework.LifeStageParametersInterface;
 
 /**
- * DisMELS class representing parameters for arrowtooth flounder benthic juveniles
- * for the GOA IERP Modeling project.
+ * DisMELS class representing parameters for Bering Sea snow crab
  * 
  * This class uses the IBMParameters/IBMFunctions approach to specifying stage-specific parameters.
  * 
@@ -125,6 +125,8 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
         ifi = new ExponentialGrowthFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new LinearGrowthFunction();
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new CrabBioenergeticsGrowthFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new ConstantFunction();  //generic function, so change defaults
             ifi.setFunctionName("Constant growth rate"); 
@@ -253,7 +255,7 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
     /**
      * Returns the comma-delimited string corresponding to the parameters
      * to be used as a header for a csv file.  
-     * This should be overriden by subclasses that add additional parameters, 
+     * This should be overridden by subclasses that add additional parameters, 
      * possibly calling super.getCSVHeader() to get an initial header string 
      * to which additional field names could be appended.
      * Use getCSV() to get the string of actual parameter values.

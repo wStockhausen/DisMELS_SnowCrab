@@ -80,7 +80,6 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
             "\n\t**************************************************************************";
     /** random number generator */
     protected static final RandomNumberGenerator rng = GlobalInfo.getInstance().getRandomNumberGenerator();
-    public static final double secsPerDay = 8640;
     /** number of settable parameters */
     public static final int numParams = 16;
     /** number of sub-functions */
@@ -180,7 +179,7 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
     public CrabBioenergeticsGrowthFunction(){
         super(numParams,numSubFuncs,DEFAULT_type,DEFAULT_name,DEFAULT_descr,DEFAULT_fullDescr);
         String key; 
-        key = PARAM_pVal;addParameter(key,Double.class,"realized fraction of max consumption");
+        key = PARAM_pVal;addParameter(key,double[][].class,"realized fraction of max consumption");
         
         key = PARAM_aC; addParameter(key,Double.class,"linear coefficient of weight-dependent max consumption");
         key = PARAM_bC; addParameter(key,Double.class,"exponent coefficient of weight-dependent max consumption");
@@ -314,11 +313,11 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
         double maxR = aR*Math.pow(w0,bR-1.0);       //reference-level respiration
         double r = maxR*ACT*calcF(T,rmT,roT,c1r);
         double f = FA*c;     //weight-specific egestion
-        double s = aSDA*Math.exp(bSDA*T)*(c-f);//temperature-specific loss due to specific dynamic action
+        double s = (aSDA*Math.exp(bSDA*T)*(c-f))/w0;//temperature-specific loss due to specific dynamic action
         double m = r+s;       //weight-specific metabolic loss rate
-        double e = UA*w0; //weight-specific excretion
+        double e = UA; //weight-specific excretion
         double w = f+e;       //weight-specific waste rate
-        double g = Math.log(((c-(m+w+ex))/calPerGram)/wRat);   //weight-specific total instantaneous growth rate 
+        double g = Math.log(((c-(m+w+(ex/w0)))/calPerGram)/wRat);   //weight-specific total instantaneous growth rate 
         if (sigRt>0) g += rng.computeNormalVariate()*sigRt; 
         Double res = new Double(w0*Math.exp(g*dt));
         return res;
