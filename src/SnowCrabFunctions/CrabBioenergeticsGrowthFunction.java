@@ -3,7 +3,7 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package disMELS.IBMs.SnowCrab;
+package SnowCrabFunctions;
 
 import com.wtstockhausen.utils.RandomNumberGenerator;
 import org.openide.util.lookup.ServiceProvider;
@@ -59,7 +59,7 @@ import wts.models.DisMELS.framework.IBMFunctions.IBMGrowthFunctionInterface;
     @ServiceProvider(service=IBMFunctionInterface.class)}
 )
 
-public class CrabBioenergeticsGrowthFunction extends AbstractIBM Function implements IBMGrowthFunctionInterface{
+public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction implements IBMGrowthFunctionInterface{
     /** function classification */
     public static final String DEFAULT_type = "Individual growth";
     /** user-friendly function name */
@@ -157,10 +157,13 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBM Function implem
     public static final String PARAM_UA = "UA";
     /** key to set sigRate parameter */
     public static final String PARAM_sigRt = "std. dev.";
-       /** key to set aE parameter */
-    public static final String PARAM_aE = "aE";
-    /** key to set bE parameter */
-    public static final String PARAM_bE = "bE";
+       /** key to set ex parameter */
+    public static final String PARAM_ex = "ex";
+
+    
+    public static final String PARAM_calPerGram = "calPerGram";
+    
+    public static final String PARAM_wRat = "wRat";
     
     /** value of pVal parameter */
     private double pVal = 0;
@@ -191,13 +194,22 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBM Function implem
     
     /** value of FA parameter */
     private double FA = 0;
-    /** value of SDA parameter */
-    private double SDA = 0;
+    /** value of aSDA parameter */
+    private double aSDA = 0;
+        /** value of bSDA parameter */
+    private double bSDA = 0;
+    
     /** value of UA parameter */
     private double UA = 0;
     
     /** value of sigRate parameter */
     private double sigRt = 0;
+    
+    /**value of aE parameter */
+    private double ex = 0;
+    
+    private double wRat = 0;
+    private double calPerGram = 0;
     
     /** constructor for class */
     public CrabBioenergeticsGrowthFunction(){
@@ -219,10 +231,13 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBM Function implem
         key = PARAM_c1r;addParameter(key,Double.class,"respiration coefficient");
         
         key = PARAM_FA; addParameter(key,Double.class,"fraction of consumption lost to egestion");
-        key = PARAM_SDA;addParameter(key,Double.class,"fraction of assimilated energy lost to SDA");
-        key = PARAM_UA; addParameter(key,Double.class,"std. dev. in linear growth rate");
-        
+        key = PARAM_aSDA; addParameter(key,Double.class,"coefficient of fraction of assimilated energy lost to SDA");
+        key = PARAM_bSDA; addParameter(key,Double.class,"exponent of fraction of assimilated energy lost to SDA");
+        key = PARAM_UA; addParameter(key,Double.class,"excretion fraction");
+        key = PARAM_ex; addParameter(key, Double.class, "daily cost of exuviae");
         key = PARAM_sigRt;addParameter(key,Double.class,"std. dev. in linear growth rate");
+        key = PARAM_wRat; addParameter(key, Double.class, "dry to wet weight ratio of crab");
+        key = PARAM_calPerGram; addParameter(key, Double.class, "calories per gram of crab tissue");
     }
     
     @Override
@@ -288,14 +303,23 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBM Function implem
                 case PARAM_FA:
                     FA = ((Double) value).doubleValue();
                     break;
-                case PARAM_SDA:
-                    SDA = ((Double) value).doubleValue();
+                case PARAM_aSDA:
+                    aSDA = ((Double) value).doubleValue();
+                    break;
+                case PARAM_bSDA:
+                    bSDA = ((Double) value).doubleValue();
                     break;
                 case PARAM_UA:
                     UA = ((Double) value).doubleValue();
                     break;
                 case PARAM_sigRt:
                     sigRt = ((Double) value).doubleValue();
+                    break;
+                case PARAM_calPerGram:
+                    calPerGram = ((Double) value).doubleValue();
+                    break;
+                case PARAM_wRat:
+                    wRat = ((Double) value).doubleValue();
                     break;
             }
         }
@@ -321,11 +345,11 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBM Function implem
         double maxR = aR*Math.pow(w0,bR-1.0);       //reference-level respiration
         double r = maxR*ACT*calcF(T,rmT,roT,c1r);
         double f = FA*c;     //weight-specific egestion
-        double s = SDA*(c-f);//weight-specific loss due to specific dynamic ocean (TODO:is this correct?!)
+        double s = aSDA*Math.exp(bSDA*T)*(c-f);//temperature-specific loss due to specific dynamic action
         double m = r+s;       //weight-specific metabolic loss rate
-        double e = UA*(c-f); //weight-specific excretion
+        double e = UA*w0; //weight-specific excretion
         double w = f+e;       //weight-specific waste rate
-        double g = c-(m+w);   //weight-specific total growth rate 
+        double g = Math.log(((c-(m+w+ex))/calPerGram)/wRat);   //weight-specific total growth rate 
         if (sigRt>0) g += rng.computeNormalVariate()*sigRt; 
         Double res = new Double(w0*Math.exp(g*dt));
         return res;
@@ -333,9 +357,9 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBM Function implem
 
     private double calcF(double T, double Tm, double T0, double a){
         double v = (Tm-T)/(Tm-T0);
-        double x = (Math.pow(w,2)*Math.pow(1+Math.pow((1+40/y),0.5),2))/400;
         double w = Math.log(a)*(Tm-T0);
         double y = Math.log(a)*(Tm-T0+2);
+        double x = (Math.pow(w,2)*Math.pow(1+Math.pow((1+40/y),0.5),2))/400;
         double f = Math.pow(v,x)*Math.exp(x-(1-v));
         return f;
     }
