@@ -38,7 +38,8 @@ public abstract class AbstractBenthicStageAttributes implements LifeStageAttribu
     public static final String PROP_salinity    = "salinity";
     /** the property key for the in situ pH at the individual's location */
     public static final String PROP_ph          = "pH";
-    
+    /** the property key for the age in instar of the individual */
+    public static final String PROP_ageInInstar  = "ageInInstar";
     /** Number of attributes defined by this class (including typeName) */
     public static final int numAttributes = LifeStageAttributesInterface.PROP_NumAtts+PROP_NumNewAtts;
     
