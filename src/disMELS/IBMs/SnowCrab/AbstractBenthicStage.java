@@ -404,6 +404,7 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
         atts.setValue(AbstractBenthicStageAttributes.PROP_gridCellID,gridCellID);
         atts.setValue(AbstractBenthicStageAttributes.PROP_age,age);
         atts.setValue(AbstractBenthicStageAttributes.PROP_ageInStage,ageInStage);
+        atts.setValue(AbstractBenthicStageAttributes.PROP_ageInInstar,ageInInstar);
         atts.setValue(AbstractBenthicStageAttributes.PROP_number,number);
         atts.setValue(AbstractBenthicStageAttributes.PROP_instar,instar);
         atts.setValue(AbstractBenthicStageAttributes.PROP_size,size);
@@ -431,6 +432,7 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
         gridCellID = atts.getValue(AbstractBenthicStageAttributes.PROP_gridCellID,gridCellID);
         age        = atts.getValue(AbstractBenthicStageAttributes.PROP_age,age);
         ageInStage = atts.getValue(AbstractBenthicStageAttributes.PROP_ageInStage,ageInStage);
+        ageInInstar = atts.getValue(AbstractBenthicStageAttributes.PROP_ageInInstar,ageInInstar);
         number     = atts.getValue(AbstractBenthicStageAttributes.PROP_number,number);
         instar      = atts.getValue(AbstractBenthicStageAttributes.PROP_instar,instar);
         size        = atts.getValue(AbstractBenthicStageAttributes.PROP_size,size);

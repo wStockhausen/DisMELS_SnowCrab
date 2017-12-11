@@ -614,6 +614,7 @@ public class MaleImmature extends AbstractBenthicStage {
     private void updateAge(double dt) {
         age        = age+dt/DAY_SECS;
         ageInStage = ageInStage+dt/DAY_SECS;
+        ageInInstar = ageInInstar+dt/DAY_SECS;
         if (ageInStage>maxStageDuration) {
             alive = false;
             active = false;
@@ -627,8 +628,9 @@ public class MaleImmature extends AbstractBenthicStage {
      */
     private void updateSize(double dt) {
         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
-        if((time+dt)>D){
-        size = (Double) fcnMolt.calculate(new double[]{dt/DAY_SECS,size});
+        if((ageInInstar+dt)>D){
+            size = (Double) fcnMolt.calculate(new double[]{dt/DAY_SECS, size});
+            instar += 1;
         }
     }
 

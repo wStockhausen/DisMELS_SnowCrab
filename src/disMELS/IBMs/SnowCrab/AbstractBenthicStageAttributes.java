@@ -21,10 +21,12 @@ public abstract class AbstractBenthicStageAttributes implements LifeStageAttribu
     
     // attributes in addition to those from LisfeStageAttributesInterface
     /** the number of new attributes defined by this class */
-    public static final int PROP_NumNewAtts = 8;
+    public static final int PROP_NumNewAtts = 9;
     /** the property key for the instar of the individual */
     public static final String PROP_instar      = "instar";
-    /** the property key for the size (carapace width) of the individual */
+        /** the property key for the age in instar of the individual */
+    public static final String PROP_ageInInstar  = "ageInInstar";
+        /** the property key for the size (carapace width) of the individual */
     public static final String PROP_size        = "size (mm CW)";
     /** the property key for the size (carapace width) of the individual */
     public static final String PROP_weight      = "weight (g)";
@@ -38,15 +40,13 @@ public abstract class AbstractBenthicStageAttributes implements LifeStageAttribu
     public static final String PROP_salinity    = "salinity";
     /** the property key for the in situ pH at the individual's location */
     public static final String PROP_ph          = "pH";
-    /** the property key for the age in instar of the individual */
-    public static final String PROP_ageInInstar  = "ageInInstar";
     /** Number of attributes defined by this class (including typeName) */
     public static final int numAttributes = LifeStageAttributesInterface.PROP_NumAtts+PROP_NumNewAtts;
     
-    protected static final Set<String> keys = new LinkedHashSet<>(32);
+    protected static final Set<String> keys = new LinkedHashSet<>(36);
     
     /** map to attributes values */
-    protected static final Map<String,IBMAttribute> mapAttributes = new HashMap<>(32);
+    protected static final Map<String,IBMAttribute> mapAttributes = new HashMap<>(36);
     
     /* LHS type name assigned to instance*/
     protected String typeName;
@@ -91,6 +91,7 @@ public abstract class AbstractBenthicStageAttributes implements LifeStageAttribu
             key = PROP_alive;      keys.add(key); mapAttributes.put(key,new IBMAttributeBoolean(key,"alive"));
             key = PROP_age;        keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"age"));
             key = PROP_ageInStage; keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"ageInStage"));
+            key = PROP_ageInInstar; keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"ageInInstar"));
             key = PROP_number;     keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"number"));
             key = PROP_instar;     keys.add(key); mapAttributes.put(key,new IBMAttributeInteger(key,"instar"));
             key = PROP_size;       keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"size"));
@@ -118,7 +119,8 @@ public abstract class AbstractBenthicStageAttributes implements LifeStageAttribu
         mapValues.put(PROP_active,    false);
         mapValues.put(PROP_alive,     true);
         mapValues.put(PROP_age,       new Double(0));
-        mapValues.put(PROP_ageInStage,new Double(0));
+        mapValues.put(PROP_ageInStage, new Double(0));
+        mapValues.put(PROP_ageInInstar, new Double(0));
         mapValues.put(PROP_number,    new Double(1));
         mapValues.put(PROP_instar,     new Integer(0));
         mapValues.put(PROP_size,       new Double(0));
@@ -185,6 +187,7 @@ public abstract class AbstractBenthicStageAttributes implements LifeStageAttribu
      *  alive
      *  age
      *  ageInStage
+     *  ageInInstar
      *  number
      *  instar
      *  size
@@ -194,6 +197,7 @@ public abstract class AbstractBenthicStageAttributes implements LifeStageAttribu
      *  temperature
      *  salinity
      *  ph
+     *  
      * 
      * @param strv - String[] of attribute values.
      */

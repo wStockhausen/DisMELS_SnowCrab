@@ -64,6 +64,8 @@ public class AbstractBenthicStageAttributesCustomizer extends AttributesCustomiz
         jLabel10 = new javax.swing.JLabel();
         jtfShellCond = new javax.swing.JTextField();
         jtfShellThick = new javax.swing.JTextField();
+        jtfAgeInInstar = new javax.swing.JTextField();
+        jLabel11 = new javax.swing.JLabel();
 
         setLayout(new java.awt.BorderLayout());
 
@@ -276,13 +278,22 @@ public class AbstractBenthicStageAttributesCustomizer extends AttributesCustomiz
             }
         });
 
+        jtfAgeInInstar.setText("0.0");
+        jtfAgeInInstar.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jtfAgeInInstarActionPerformed(evt);
+            }
+        });
+
+        jLabel11.setText("age in instar");
+
         org.jdesktop.layout.GroupLayout jPanel6Layout = new org.jdesktop.layout.GroupLayout(jPanel6);
         jPanel6.setLayout(jPanel6Layout);
         jPanel6Layout.setHorizontalGroup(
             jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
             .add(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
-                .add(jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                .add(jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING, false)
                     .add(jPanel6Layout.createSequentialGroup()
                         .add(jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jtfAge, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 80, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
@@ -306,12 +317,19 @@ public class AbstractBenthicStageAttributesCustomizer extends AttributesCustomiz
                         .add(jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jLabel10)
                             .add(jtfSize, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 80, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jtfWeight, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 80, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                        .add(jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
+                            .add(jPanel6Layout.createSequentialGroup()
+                                .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                                .add(jtfWeight, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 80, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
+                            .add(jPanel6Layout.createSequentialGroup()
+                                .add(6, 6, 6)
+                                .add(jLabel11))))
                     .add(jPanel6Layout.createSequentialGroup()
                         .add(jtfShellCond, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 80, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
-                        .add(jtfShellThick, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 80, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                        .add(jtfShellThick, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 80, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(jtfAgeInInstar)))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
@@ -339,11 +357,13 @@ public class AbstractBenthicStageAttributesCustomizer extends AttributesCustomiz
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jLabel10)
-                    .add(jLabel9))
+                    .add(jLabel9)
+                    .add(jLabel11))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
                     .add(jtfShellCond, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jtfShellThick, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
+                    .add(jtfShellThick, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jtfAgeInInstar, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
         );
 
         org.jdesktop.layout.GroupLayout jPanel1Layout = new org.jdesktop.layout.GroupLayout(jPanel1);
@@ -355,7 +375,7 @@ public class AbstractBenthicStageAttributesCustomizer extends AttributesCustomiz
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jPanel6, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jpHoriz, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .add(org.jdesktop.layout.GroupLayout.LEADING, jpVert, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 307, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                    .add(jpTime, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, 0, Short.MAX_VALUE))
+                    .add(jpTime, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 0, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -472,6 +492,11 @@ public class AbstractBenthicStageAttributesCustomizer extends AttributesCustomiz
         attributes.setValue(AbstractBenthicStageAttributes.PROP_instar,n);
     }//GEN-LAST:event_jtfInstarActionPerformed
 
+    private void jtfAgeInInstarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfAgeInInstarActionPerformed
+        Double n = new Double(jtfAgeInInstar.getText());
+        attributes.setValue(AbstractBenthicStageAttributes.PROP_ageInInstar,n);
+    }//GEN-LAST:event_jtfAgeInInstarActionPerformed
+
     @Override
     public void setObject(Object bean) {
         if (bean instanceof AbstractBenthicStageAttributes) {
@@ -499,6 +524,7 @@ public class AbstractBenthicStageAttributesCustomizer extends AttributesCustomiz
             jtfZ.setText(attributes.getValue(AbstractBenthicStageAttributes.PROP_vertPos,d).toString());
             jtfAge.setText(attributes.getValue(AbstractBenthicStageAttributes.PROP_age,d).toString());
             jtfAgeInStage.setText(attributes.getValue(AbstractBenthicStageAttributes.PROP_ageInStage,d).toString());
+            jtfAgeInInstar.setText(attributes.getValue(AbstractBenthicStageAttributes.PROP_ageInInstar,d).toString());
             jtfNumber.setText(attributes.getValue(AbstractBenthicStageAttributes.PROP_number,d).toString());
             jtfInstar.setText(attributes.getValue(AbstractBenthicStageAttributes.PROP_instar,i).toString());
             jtfSize.setText(attributes.getValue(AbstractBenthicStageAttributes.PROP_size,d).toString());
@@ -523,6 +549,7 @@ public class AbstractBenthicStageAttributesCustomizer extends AttributesCustomiz
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel10;
+    private javax.swing.JLabel jLabel11;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
@@ -539,6 +566,7 @@ public class AbstractBenthicStageAttributesCustomizer extends AttributesCustomiz
     private javax.swing.JPanel jpTime;
     private javax.swing.JPanel jpVert;
     private javax.swing.JTextField jtfAge;
+    private javax.swing.JTextField jtfAgeInInstar;
     private javax.swing.JTextField jtfAgeInStage;
     private javax.swing.JTextField jtfInstar;
     private javax.swing.JTextField jtfNumber;
