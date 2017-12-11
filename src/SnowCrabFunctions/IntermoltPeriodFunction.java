@@ -31,19 +31,19 @@ public class IntermoltPeriodFunction extends AbstractIBMFunction implements IBMF
             "\n\t* Type: "+
             "\n\t*      intermolt period function"+
             "\n\t* Parameters (by key):"+
-            "\n\t*      aK  - Double  - temperature coefficient"+
-            "\n\t*      bK- Boolean - flag to use nominal temperature (instead of in situ T)"+
-            "\n\t*      aAlpha    - Double  - nominal temperature to use"+
-            "\n\t*      bAlpha - Double  - std. deviation in random component to development"+
+            "\n\t*      aK  - Double  - asymptote to calculate K"+
+            "\n\t*      bK- Double - exponential coefficient to calculate K"+
+            "\n\t*      aAlpha    - Double  - asymptote to calculate alpha"+
+            "\n\t*      bAlpha - Double  - exponential coefficient to calculate alpha"+
             "\n\t* Variables:"+
             "\n\t*      vars - double[]{cW, T}."+
-            "\n\t*      cW - carapace width (mm)"+
+            "\n\t*      size - carapace width (mm)"+
             "\n\t*      T  - double - environmental temperature"+
             "\n\t* Value:"+
             "\n\t*      IM(T) - length of intermolt period at temperature T"+
             "\n\t* Calculation:"+
-            "\n\t*      K = aK*(1-Math.exp(bK*cW));"+
-            "\n\t*      double alpha = aAlpha*(1-Math.exp(bAlpha*cW))"+
+            "\n\t*      K = aK*(1-Math.exp(bK*size));"+
+            "\n\t*      double alpha = aAlpha*(1-Math.exp(bAlpha*size))"+
             "\n\t*      D = (K/T-alpha);"+
             "\n\t* "+
             "\n\t* author: Christine Stawitz"+
