@@ -290,6 +290,7 @@ public class MaleImmature extends AbstractBenthicStage {
         //start track at last position of oldLHS track
         this.startTrack(oldLHS.getLastPosition(COORDINATE_TYPE_PROJECTED),COORDINATE_TYPE_PROJECTED);
         this.startTrack(oldLHS.getLastPosition(COORDINATE_TYPE_GEOGRAPHIC),COORDINATE_TYPE_GEOGRAPHIC);
+        
         //update local variables to capture changes made here
         updateVariables();
     }
@@ -369,6 +370,9 @@ public class MaleImmature extends AbstractBenthicStage {
      */
     private void setIBMFunctions(){
         fcnMort    = params.getSelectedIBMFunctionForCategory(MaleImmatureParameters.FCAT_Mortality);
+        fcnGrowth    = params.getSelectedIBMFunctionForCategory(MaleImmatureParameters.FCAT_Growth);
+        fcnMolt    = params.getSelectedIBMFunctionForCategory(MaleImmatureParameters.FCAT_Molt);
+        fcnMoltTime    = params.getSelectedIBMFunctionForCategory(MaleImmatureParameters.FCAT_MoltTiming);
     }
     
     /*

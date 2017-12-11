@@ -8,6 +8,8 @@
 package disMELS.IBMs.SnowCrab.MaleImmature;
 
 import SnowCrabFunctions.CrabBioenergeticsGrowthFunction;
+import SnowCrabFunctions.IntermoltPeriodFunction;
+import SnowCrabFunctions.MoltIncrementFunction;
 import java.beans.PropertyChangeSupport;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -30,7 +32,6 @@ import wts.models.DisMELS.framework.IBMFunctions.IBMParameter;
 import wts.models.DisMELS.framework.IBMFunctions.IBMParameterBoolean;
 import wts.models.DisMELS.framework.IBMFunctions.IBMParameterDouble;
 import wts.models.DisMELS.framework.LifeStageParametersInterface;
-
 /**
  * DisMELS class representing parameters for Bering Sea snow crab
  * 
@@ -57,10 +58,12 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
     
     
     /** the number of IBMFunction categories defined in the class */
-    public static final int numFunctionCats = 3;
+    public static final int numFunctionCats = 5;
     public static final String FCAT_Growth             = "growth";
     public static final String FCAT_Mortality          = "mortality";
     public static final String FCAT_SwimmingSpeed      = "swimming speed";
+    public static final String FCAT_Molt                = "molt increment";
+    public static final String FCAT_MoltTiming      = "intermolt period";
     
     /** The 'keys' used to store the ibm functions */
     protected static final Set<String> setOfFunctionCategories = new LinkedHashSet<>(2*numFunctionCats);
@@ -113,13 +116,15 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
     protected final void createMapToSelectedFunctions() {
         //create the set of function category keys for this class
         setOfFunctionCategories.add(FCAT_Growth);
+        setOfFunctionCategories.add(FCAT_Molt);
+        setOfFunctionCategories.add(FCAT_MoltTiming);
         setOfFunctionCategories.add(FCAT_Mortality);
         setOfFunctionCategories.add(FCAT_SwimmingSpeed);
         
         //create the map from function categories to potential functions in each category
         String cat; Map<String,IBMFunctionInterface> mapOfPotentialFunctions; IBMFunctionInterface ifi;
         cat = FCAT_Growth;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(8); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        mapOfPotentialFunctions = new LinkedHashMap<>(10); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new vonBertalanffyGrowthFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new ExponentialGrowthFunction();
@@ -147,6 +152,16 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new ConstantMovementRateFunction(); 
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+            
+       cat = FCAT_Molt;
+       mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+       ifi = new MoltIncrementFunction();
+               mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+               
+       cat = FCAT_MoltTiming;
+       mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+       ifi = new IntermoltPeriodFunction();
+               mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
     }
     
     /**
