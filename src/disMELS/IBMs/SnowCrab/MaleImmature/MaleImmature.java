@@ -627,7 +627,9 @@ public class MaleImmature extends AbstractBenthicStage {
      */
     private void updateSize(double dt) {
         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
-        size = (Double) fcnMolt.calculate(new double[]{dt,size});
+        if((time+dt)>D){
+        size = (Double) fcnMolt.calculate(new double[]{dt/DAY_SECS,size});
+        }
     }
 
     /**
