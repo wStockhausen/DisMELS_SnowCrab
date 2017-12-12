@@ -644,7 +644,12 @@ public class MaleImmature extends AbstractBenthicStage {
      * @param dt - time step in seconds
      */
     private void updateWeight(double dt) {
-        weight = (Double) fcnGrowth.calculate(new double[]{dt/DAY_SECS,weight});
+        double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+        double exPerDay = 0;
+        if((D-ageInInstar)<sCost){
+            exPerDay = fcnExCost.calculate(size)/sCost;
+        }
+        weight = (Double) fcnGrowth.calculate(new double[]{dt/DAY_SECS,instar, weight, temperature, exPerDay});
     }
 
     /**

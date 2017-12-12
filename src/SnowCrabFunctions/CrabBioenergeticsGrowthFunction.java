@@ -60,6 +60,7 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
             "\n\t* Variables:"+
             "\n\t*      vars - double[]{dt,w0,T}."+
             "\n\t*      dt - double - time interval   ([time])"+
+            "\n\t*      instar - int - which instar the crab is in"+
             "\n\t*      w0 - double - weight at time t0 ([weight])"+
             "\n\t*      T  - double - temperature (deg C)"+
             "\n\t* Value:"+
@@ -128,52 +129,48 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
     public static final String PARAM_wRat = "wRat";
     
     /** value of pVal parameter */
-    private double[][] pVal = new double[][]{
-    {0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0},
-    {1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1}};
+    private static final double[] pVal = new double[]{
+    1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0, 1.0};
     
     /** value of aC parameter */
-    private double aC = 0;
+    private double aC = 18.08;
     /** value of bC parameter */
-    private double bC = 0;
+    private double bC = .75;
     /** value of cmT parameter */
-    private double cmT = 0;
+    private double cmT = 14;
     /** value of coT parameter */
-    private double coT = 0;
+    private double coT = 5;
     /** value of c1c parameter */
-    private double c1c = 0;
+    private double c1c = 5.5;
     
     /** value of aR parameter */
-    private double ACT = 0;
+    private double ACT = 1.46;
     /** value of aR parameter */
-    private double aR = 0;
+    private double aR = Math.exp(3.966);
     /** value of bR parameter */
-    private double bR = 0;
+    private double bR = .722;
     /** value of rmT parameter */
-    private double rmT = 0;
+    private double rmT = 13.32;
     /** value of roT parameter */
-    private double roT = 0;
+    private double roT = 8.04;
     /** value of c1r parameter */
-    private double c1r = 0;
+    private double c1r = 2.2;
     
     /** value of FA parameter */
-    private double FA = 0;
+    private double FA = .11;
     /** value of aSDA parameter */
-    private double aSDA = 0;
+    private double aSDA = 0.019;
         /** value of bSDA parameter */
-    private double bSDA = 0;
+    private double bSDA = .17;
     
     /** value of UA parameter */
-    private double UA = 0;
+    private double UA = 2.95;
     
     /** value of sigRate parameter */
     private double sigRt = 0;
     
-    /**value of aE parameter */
-    private double ex = 0;
-    
-    private double wRat = 0;
-    private double calPerGram = 0;
+    private double wRat = .136;
+    private double calPerGram = 3900;
     
     /** constructor for class */
     public CrabBioenergeticsGrowthFunction(){
@@ -228,9 +225,6 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
         //the following sets the value in the parameter map AND in the local variable
         if (super.setParameterValue(param, value)){
             switch (param) {
-                case PARAM_pVal:
-                    pVal = ((double[][]) value);
-                    break;
                 case PARAM_aC:
                     aC = ((Double) value).doubleValue();
                     break;
@@ -302,13 +296,12 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
         double[] lvars = (double[]) vars;//cast object to required double[]
         int i = 0;
         double dt = lvars[i++];
-        double cW = lvars[i++];
+        int instar = (int) lvars[i++];
         double w0 = lvars[i++];
         double T   = lvars[i++];
+        double ex = lvars[i++];
         double maxC = aC*Math.pow(w0,bC-1.0);//max consumption
-        LinearInterpolator li = new LinearInterpolator();
-        PolynomialSplineFunction interpPVal = li.interpolate(pVal[0], pVal[1]);
-        double p = interpPVal.value(cW);
+        double p = pVal[instar-1];
         double c = maxC*p*calcF(T,cmT,coT,c1c);//realized weight-specific consumption
         double maxR = aR*Math.pow(w0,bR-1.0);       //reference-level respiration
         double r = maxR*ACT*calcF(T,rmT,roT,c1r);
