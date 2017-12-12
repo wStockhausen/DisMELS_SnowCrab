@@ -24,7 +24,7 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
     /** function classification */
     public static final String DEFAULT_type = "Individual growth";
     /** user-friendly function name */
-    public static final String DEFAULT_name = "Constant linear growth";
+    public static final String DEFAULT_name = "Crab Bioenergetics Model";
     /** function description */
     public static final String DEFAULT_descr = "Crab Bioenergetics Model";
     /** full description */
