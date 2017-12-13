@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 package SnowCrabFunctions;
-
+import wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunctionPersistenceDelegate;
 import java.beans.*;
 
 /**
@@ -18,7 +18,7 @@ public class ExCostFunctionBeanInfo extends SimpleBeanInfo {
     private static BeanDescriptor getBdescriptor(){
         BeanDescriptor beanDescriptor = new BeanDescriptor  ( SnowCrabFunctions.ExCostFunction.class , null ); // NOI18N//GEN-HEADEREND:BeanDescriptor
         // Here you can add code for customizing the BeanDescriptor.
-
+        beanDescriptor.setValue("persistenceDelegate",new AbstractIBMFunctionPersistenceDelegate());    
         return beanDescriptor;     }//GEN-LAST:BeanDescriptor
 
 
@@ -41,43 +41,41 @@ public class ExCostFunctionBeanInfo extends SimpleBeanInfo {
         return properties;     }//GEN-LAST:Properties
 
     // EventSet identifiers//GEN-FIRST:Events
-    private static final int EVENT_propertyChangeListener = 0;
 
     // EventSet array
     /*lazy EventSetDescriptor*/
     private static EventSetDescriptor[] getEdescriptor(){
-        EventSetDescriptor[] eventSets = new EventSetDescriptor[1];
-    
-        try {
-            eventSets[EVENT_propertyChangeListener] = new EventSetDescriptor ( SnowCrabFunctions.ExCostFunction.class, "propertyChangeListener", java.beans.PropertyChangeListener.class, new String[] {"propertyChange"}, "addPropertyChangeListener", "removePropertyChangeListener" ); // NOI18N
-        }
-        catch(IntrospectionException e) {
-            e.printStackTrace();
-        }//GEN-HEADEREND:Events
+        EventSetDescriptor[] eventSets = new EventSetDescriptor[0];//GEN-HEADEREND:Events
         // Here you can add code for customizing the event sets array.
 
         return eventSets;     }//GEN-LAST:Events
 
     // Method identifiers//GEN-FIRST:Methods
-    private static final int METHOD_calculate0 = 0;
-    private static final int METHOD_clone1 = 1;
+    private static final int METHOD_getParameter0 = 0;
+    private static final int METHOD_getSubfunction1 = 1;
     private static final int METHOD_hasParameters2 = 2;
-    private static final int METHOD_setParameterValue3 = 3;
+    private static final int METHOD_hasSubfunctions3 = 3;
+    private static final int METHOD_setParameterValue4 = 4;
+    private static final int METHOD_setSubfunction5 = 5;
 
     // Method array 
     /*lazy MethodDescriptor*/
     private static MethodDescriptor[] getMdescriptor(){
-        MethodDescriptor[] methods = new MethodDescriptor[4];
+        MethodDescriptor[] methods = new MethodDescriptor[6];
     
         try {
-            methods[METHOD_calculate0] = new MethodDescriptor(SnowCrabFunctions.ExCostFunction.class.getMethod("calculate", new Class[] {java.lang.Object.class})); // NOI18N
-            methods[METHOD_calculate0].setDisplayName ( "" );
-            methods[METHOD_clone1] = new MethodDescriptor(SnowCrabFunctions.ExCostFunction.class.getMethod("clone", new Class[] {})); // NOI18N
-            methods[METHOD_clone1].setDisplayName ( "" );
+            methods[METHOD_getParameter0] = new MethodDescriptor(wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction.class.getMethod("getParameter", new Class[] {java.lang.String.class})); // NOI18N
+            methods[METHOD_getParameter0].setDisplayName ( "" );
+            methods[METHOD_getSubfunction1] = new MethodDescriptor(wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction.class.getMethod("getSubfunction", new Class[] {java.lang.String.class})); // NOI18N
+            methods[METHOD_getSubfunction1].setDisplayName ( "" );
             methods[METHOD_hasParameters2] = new MethodDescriptor(wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction.class.getMethod("hasParameters", new Class[] {})); // NOI18N
             methods[METHOD_hasParameters2].setDisplayName ( "" );
-            methods[METHOD_setParameterValue3] = new MethodDescriptor(SnowCrabFunctions.ExCostFunction.class.getMethod("setParameterValue", new Class[] {java.lang.String.class, java.lang.Object.class})); // NOI18N
-            methods[METHOD_setParameterValue3].setDisplayName ( "" );
+            methods[METHOD_hasSubfunctions3] = new MethodDescriptor(wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction.class.getMethod("hasSubfunctions", new Class[] {})); // NOI18N
+            methods[METHOD_hasSubfunctions3].setDisplayName ( "" );
+            methods[METHOD_setParameterValue4] = new MethodDescriptor(SnowCrabFunctions.ExCostFunction.class.getMethod("setParameterValue", new Class[] {java.lang.String.class, java.lang.Object.class})); // NOI18N
+            methods[METHOD_setParameterValue4].setDisplayName ( "" );
+            methods[METHOD_setSubfunction5] = new MethodDescriptor(wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction.class.getMethod("setSubfunction", new Class[] {java.lang.String.class, wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface.class})); // NOI18N
+            methods[METHOD_setSubfunction5].setDisplayName ( "" );
         }
         catch( Exception e) {}//GEN-HEADEREND:Methods
         // Here you can add code for customizing the methods array.
