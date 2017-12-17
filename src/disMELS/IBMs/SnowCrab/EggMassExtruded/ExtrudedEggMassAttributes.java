@@ -6,7 +6,7 @@ package disMELS.IBMs.SnowCrab.EggMassExtruded;
 import java.util.*;
 import java.util.logging.Logger;
 import org.openide.util.lookup.ServiceProvider;
-import wts.models.DisMELS.framework.AbstractLHSAttributes2;
+import wts.models.DisMELS.framework.AbstractLHSAttributes;
 import wts.models.DisMELS.framework.IBMAttributes.IBMAttribute;
 import wts.models.DisMELS.framework.IBMAttributes.IBMAttributeDouble;
 
@@ -17,7 +17,7 @@ import wts.models.DisMELS.framework.IBMAttributes.IBMAttributeDouble;
  * When the egg mass develops, it hatches into 1st-stage zooea.
  */
 @ServiceProvider(service=wts.models.DisMELS.framework.LifeStageAttributesInterface.class)
-public class ExtrudedEggMassAttributes extends AbstractLHSAttributes2 {
+public class ExtrudedEggMassAttributes extends AbstractLHSAttributes {
     
     /** Number of attributes defined by this class (including typeName) */
     public static final int numNewAttributes = 4;
@@ -82,13 +82,13 @@ public class ExtrudedEggMassAttributes extends AbstractLHSAttributes2 {
     private void finishInstantiation(){
         if (newKeys.isEmpty()){
             //set static field information
-            mapAllAttributes.putAll(AbstractLHSAttributes2.mapAttributes);//add from superclass
+            mapAllAttributes.putAll(AbstractLHSAttributes.mapAttributes);//add from superclass
             String key;
             key = PROP_devStage;   newKeys.add(key); mapAllAttributes.put(key,new IBMAttributeDouble(key,"devStage"));
             key = PROP_temperature;newKeys.add(key); mapAllAttributes.put(key,new IBMAttributeDouble(key,"temperature"));
             key = PROP_salinity;   newKeys.add(key); mapAllAttributes.put(key,new IBMAttributeDouble(key,"salinity"));
             key = PROP_pH;        newKeys.add(key); mapAllAttributes.put(key,new IBMAttributeDouble(key,"rho"));
-            allKeys.addAll(AbstractLHSAttributes2.keys);//add from superclass
+            allKeys.addAll(AbstractLHSAttributes.keys);//add from superclass
             allKeys.addAll(newKeys);//add from this class
             Iterator<String> it = allKeys.iterator();
             int j = 0; it.next();//skip typeName
