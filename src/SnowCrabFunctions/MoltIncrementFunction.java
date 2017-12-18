@@ -17,7 +17,7 @@ import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
  */
 public class MoltIncrementFunction extends AbstractIBMFunction implements IBMFunctionInterface {
      /** function classification */
-    public static final String DEFAULT_type = "molt increment function";
+    public static final String DEFAULT_type = "generic";
     /** user-friendly function name */
     public static final String DEFAULT_name = "Snow crab molt increment function";
     /** function description */

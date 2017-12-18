@@ -16,7 +16,7 @@ import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
  */
 public class ExCostFunction extends AbstractIBMFunction implements IBMFunctionInterface{
      /** function classification */
-    public static final String DEFAULT_type = "exuviae cost function";
+    public static final String DEFAULT_type = "generic";
     /** user-friendly function name */
     public static final String DEFAULT_name = "Snow crab function to calculate exuviae cost";
     /** function description */

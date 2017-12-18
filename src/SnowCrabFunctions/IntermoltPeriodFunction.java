@@ -18,7 +18,7 @@ import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
  */
 public class IntermoltPeriodFunction extends AbstractIBMFunction implements IBMFunctionInterface {
     /** function classification */
-    public static final String DEFAULT_type = "intermolt period function";
+    public static final String DEFAULT_type = "generic";
     /** user-friendly function name */
     public static final String DEFAULT_name = "Snow crab intermolt period function";
     /** function description */

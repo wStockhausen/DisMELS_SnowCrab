@@ -18,7 +18,7 @@ import org.apache.commons.math3.distribution.BinomialDistribution;
  */
 public class MaturityOgiveFunction extends AbstractIBMFunction implements IBMFunctionInterface{
      /** function classification */
-    public static final String DEFAULT_type = "maturity ogive function";
+    public static final String DEFAULT_type = "generic";
     /** user-friendly function name */
     public static final String DEFAULT_name = "Snow crab maturity ogive function";
     /** function description */
