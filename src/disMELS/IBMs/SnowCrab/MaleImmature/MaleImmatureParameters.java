@@ -55,15 +55,17 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
     public static final String PARAM_randomizeTransitions   = "randomize transitions?";
     public static final String PARAM_initialSize            = "initial size in stage (mm)";
     public static final String PARAM_initialWeight          = "initial weight in stage (g)";
+    public static final String PARAM_sCost                  = "number of days of exuviae cost";
     
     
     /** the number of IBMFunction categories defined in the class */
-    public static final int numFunctionCats = 5;
+    public static final int numFunctionCats = 6;
     public static final String FCAT_Growth             = "growth";
     public static final String FCAT_Mortality          = "mortality";
     public static final String FCAT_SwimmingSpeed      = "swimming speed";
     public static final String FCAT_Molt                = "molt increment";
     public static final String FCAT_MoltTiming      = "intermolt period";
+    public static final String FCAT_ExCost = "exuviae cost";
     
     /** The 'keys' used to store the ibm functions */
     protected static final Set<String> setOfFunctionCategories = new LinkedHashSet<>(2*numFunctionCats);
@@ -110,6 +112,7 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
         key = PARAM_minSize;              setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
         key = PARAM_minWeight;            setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
         key = PARAM_randomizeTransitions; setOfParamKeys.add(key); mapParams.put(key,new IBMParameterBoolean(key,key,false));
+        key = PARAM_sCost; setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,30.0));
     }
 
     @Override
@@ -120,6 +123,7 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
         setOfFunctionCategories.add(FCAT_MoltTiming);
         setOfFunctionCategories.add(FCAT_Mortality);
         setOfFunctionCategories.add(FCAT_SwimmingSpeed);
+        setOfFunctionCategories.add(FCAT_ExCost);
         
         //create the map from function categories to potential functions in each category
         String cat; Map<String,IBMFunctionInterface> mapOfPotentialFunctions; IBMFunctionInterface ifi;
@@ -162,6 +166,9 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
        mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
        ifi = new IntermoltPeriodFunction();
                mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+               
+       cat = FCAT_ExCost;
+       mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
     }
     
     /**

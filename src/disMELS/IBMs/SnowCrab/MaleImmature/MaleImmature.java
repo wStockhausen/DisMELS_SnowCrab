@@ -74,6 +74,7 @@ public class MaleImmature extends AbstractBenthicStage {
     /** stage transition rate */
     protected double stageTransRate;
     
+    protected double sCost;
         //fields that reflect (new) attribute values
     //none
     
@@ -95,6 +96,7 @@ public class MaleImmature extends AbstractBenthicStage {
     private IBMFunctionInterface fcnMaturity = null; 
     /** IBM function selected for fecundity */
     private IBMFunctionInterface fcnFecundity = null; 
+    private IBMFunctionInterface fcnExCost = null;
     
     /** logger for class */
     private static final Logger logger = Logger.getLogger(MaleImmature.class.getName());
@@ -373,6 +375,7 @@ public class MaleImmature extends AbstractBenthicStage {
         fcnGrowth    = params.getSelectedIBMFunctionForCategory(MaleImmatureParameters.FCAT_Growth);
         fcnMolt    = params.getSelectedIBMFunctionForCategory(MaleImmatureParameters.FCAT_Molt);
         fcnMoltTime    = params.getSelectedIBMFunctionForCategory(MaleImmatureParameters.FCAT_MoltTiming);
+        fcnExCost = params.getSelectedIBMFunctionForCategory(MaleImmatureParameters.FCAT_ExCost);
     }
     
     /*
@@ -395,6 +398,7 @@ public class MaleImmature extends AbstractBenthicStage {
                 params.getValue(MaleImmatureParameters.PARAM_minSize,minSize);
         randomizeTransitions = 
                 params.getValue(MaleImmatureParameters.PARAM_randomizeTransitions,true);
+        sCost = params.getValue(MaleImmatureParameters.PARAM_sCost, sCost);
     }
     
     /**
@@ -647,9 +651,10 @@ public class MaleImmature extends AbstractBenthicStage {
         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
         double exPerDay = 0;
         if((D-ageInInstar)<sCost){
-            exPerDay = fcnExCost.calculate(size)/sCost;
+            double exTot = (Double) fcnExCost.calculate(size);
+            exPerDay = exTot/sCost;
         }
-        weight = (Double) fcnGrowth.calculate(new double[]{dt/DAY_SECS,instar, weight, temperature, exPerDay});
+        weight = (Double) fcnGrowth.calculate(new double[]{dt/DAY_SECS, instar, weight, temperature, exPerDay});
     }
 
     /**
