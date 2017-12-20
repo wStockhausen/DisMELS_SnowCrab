@@ -33,7 +33,7 @@ public class InternalEggMassAttributesCustomizer extends AttributesCustomizer {
     private void initComponents() {
 
         jPanel1 = new javax.swing.JPanel();
-        czrStandardAttributes = new wts.models.DisMELS.gui.AbstractLHSAttributes2Customizer();
+        czrStandardAttributes = new wts.models.DisMELS.gui.AbstractLHSAttributesCustomizer();
         jPanel2 = new javax.swing.JPanel();
         jtfDevStage = new javax.swing.JTextField();
         jLabel1 = new javax.swing.JLabel();
@@ -118,7 +118,7 @@ public class InternalEggMassAttributesCustomizer extends AttributesCustomizer {
     }
     
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private wts.models.DisMELS.gui.AbstractLHSAttributes2Customizer czrStandardAttributes;
+    private wts.models.DisMELS.gui.AbstractLHSAttributesCustomizer czrStandardAttributes;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
