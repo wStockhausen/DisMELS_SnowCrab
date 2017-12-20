@@ -10,6 +10,7 @@ package disMELS.IBMs.SnowCrab.MaleImmature;
 import SnowCrabFunctions.CrabBioenergeticsGrowthFunction;
 import SnowCrabFunctions.IntermoltPeriodFunction;
 import SnowCrabFunctions.MoltIncrementFunction;
+import SnowCrabFunctions.ExCostFunction;
 import java.beans.PropertyChangeSupport;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -169,6 +170,8 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
                
        cat = FCAT_ExCost;
        mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+       ifi = new ExCostFunction();
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
     }
     
     /**
