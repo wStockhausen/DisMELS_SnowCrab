@@ -87,7 +87,7 @@ public class ExtrudedEggMassAttributes extends AbstractLHSAttributes {
             key = PROP_devStage;   newKeys.add(key); mapAllAttributes.put(key,new IBMAttributeDouble(key,"devStage"));
             key = PROP_temperature;newKeys.add(key); mapAllAttributes.put(key,new IBMAttributeDouble(key,"temperature"));
             key = PROP_salinity;   newKeys.add(key); mapAllAttributes.put(key,new IBMAttributeDouble(key,"salinity"));
-            key = PROP_pH;        newKeys.add(key); mapAllAttributes.put(key,new IBMAttributeDouble(key,"rho"));
+            key = PROP_pH;         newKeys.add(key); mapAllAttributes.put(key,new IBMAttributeDouble(key,"pH"));
             allKeys.addAll(AbstractLHSAttributes.keys);//add from superclass
             allKeys.addAll(newKeys);//add from this class
             Iterator<String> it = allKeys.iterator();
