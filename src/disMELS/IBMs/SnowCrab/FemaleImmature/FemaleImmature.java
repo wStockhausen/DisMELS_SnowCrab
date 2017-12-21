@@ -72,9 +72,20 @@ public class FemaleImmature extends AbstractBenthicStage {
     protected double initialWeight;
     /** flag to use stochastic transitions */
     protected boolean randomizeTransitions;
-    /** stage transition rate */
-    protected double stageTransRate;
-    
+        /** IBM function selected for mortality */
+    private IBMFunctionInterface fcnMort = null; 
+     /** IBM function selected for growth (in weight)*/
+    private IBMFunctionInterface fcnGrowth = null; 
+    /** IBM function selected for molt */
+    private IBMFunctionInterface fcnMolt = null;
+        /** IBM function selected for molt time*/
+    private IBMFunctionInterface fcnMoltTime = null;
+    /** IBM function selected for maturity */
+    private IBMFunctionInterface fcnMaturity = null; 
+    /** IBM function selected for fecundity */
+    private IBMFunctionInterface fcnFecundity = null; 
+    private IBMFunctionInterface fcnExCost = null;
+ 
         //fields that reflect (new) attribute values
     //none
             //other fields
@@ -83,10 +94,7 @@ public class FemaleImmature extends AbstractBenthicStage {
     /** day of year */
     private double dayOfYear;
     
-    /** IBM function selected for development */
-    private IBMFunctionInterface fcnGrowth = null; 
-    /** IBM function selected for mortality */
-    private IBMFunctionInterface fcnMort = null; 
+    private double sCost;
     
     /** logger for class */
     private static final Logger logger = Logger.getLogger(FemaleImmature.class.getName());
@@ -362,6 +370,10 @@ public class FemaleImmature extends AbstractBenthicStage {
     private void setIBMFunctions(){
         fcnGrowth  = params.getSelectedIBMFunctionForCategory(FemaleImmatureParameters.FCAT_Growth);
         fcnMort    = params.getSelectedIBMFunctionForCategory(FemaleImmatureParameters.FCAT_Mortality);
+        fcnExCost  = params.getSelectedIBMFunctionForCategory(FemaleImmatureParameters.FCAT_ExCost);
+        fcnMaturity    = params.getSelectedIBMFunctionForCategory(FemaleImmatureParameters.FCAT_Maturity);
+        fcnMolt  = params.getSelectedIBMFunctionForCategory(FemaleImmatureParameters.FCAT_Molt);
+        fcnMoltTime    = params.getSelectedIBMFunctionForCategory(FemaleImmatureParameters.FCAT_MoltTiming);
     }
     
     /*
@@ -384,6 +396,8 @@ public class FemaleImmature extends AbstractBenthicStage {
                 params.getValue(FemaleImmatureParameters.PARAM_minSize,minSize);
         randomizeTransitions = 
                 params.getValue(FemaleImmatureParameters.PARAM_randomizeTransitions,true);
+        sCost =
+                params.getValue(FemaleImmatureParameters.PARAM_randomizeTransitions,30.0);
     }
     
     /**
@@ -566,6 +580,7 @@ public class FemaleImmature extends AbstractBenthicStage {
             lp.doCorrectorStep();
             pos = lp.getIJK();
         time = time+dt;
+        updateWeight(dt);
         updateSize(dt);
         updateNum(dt);
         updateAge(dt);
@@ -608,6 +623,7 @@ public class FemaleImmature extends AbstractBenthicStage {
     private void updateAge(double dt) {
         age        = age+dt/DAY_SECS;
         ageInStage = ageInStage+dt/DAY_SECS;
+        ageInInstar = ageInInstar+dt/DAY_SECS;
         if (ageInStage>maxStageDuration) {
             alive = false;
             active = false;
@@ -619,7 +635,15 @@ public class FemaleImmature extends AbstractBenthicStage {
      * @param dt - time step in seconds
      */
     private void updateSize(double dt) {
-        //TODO: implement!
+         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+        if((ageInInstar+dt)>D){
+            size = (Double) fcnMolt.calculate(new double[]{dt/DAY_SECS, size});
+            instar += 1;
+            boolean mat = (Boolean) fcnMaturity.calculate(new double[]{size,temperature});
+            if(mat){
+                numTrans +=1;
+            }
+        }
     }
 
     /**
@@ -628,7 +652,14 @@ public class FemaleImmature extends AbstractBenthicStage {
      * @param dt - time step in seconds
      */
     private void updateWeight(double dt) {
-        //TODO: implement!
+        double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+        double exPerDay = 0;
+        if((D-ageInInstar)<sCost){
+            double exTot = (Double) fcnExCost.calculate(size);
+            exPerDay = exTot/sCost;
+        }
+        weight = (Double) fcnGrowth.calculate(new double[]{dt/DAY_SECS, instar, weight, temperature, exPerDay});
+ 
     }
 
     /**
@@ -653,11 +684,14 @@ public class FemaleImmature extends AbstractBenthicStage {
         }
         double totRate = mortalityRate;
         if ((ageInStage>=minStageDuration)) {
-            totRate += stageTransRate;
+            double matRate = number/numTrans;
+            double instMatRate = -Math.log(1-matRate);
+            totRate += instMatRate;
             //apply mortality rate to previous number transitioning and
             //add in new transitioners
-            numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
-                    (stageTransRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
+            
+                    numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
+                    (instMatRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
         }
         number = number*Math.exp(-dt*totRate/DAY_SECS);
     }
@@ -766,8 +800,13 @@ public class FemaleImmature extends AbstractBenthicStage {
         //update superclass attributes
         super.updateAttributes();
         //update new attributes
-//        //no new attributes, but would look like:
-//        atts.setValue(FemaleImmatureAttributes.PROP_size,size);
+        atts.setValue(FemaleImmatureAttributes.PROP_size,size);
+        atts.setValue(FemaleImmatureAttributes.PROP_weight,weight);
+        atts.setValue(FemaleImmatureAttributes.PROP_ageInInstar,ageInInstar);
+        atts.setValue(FemaleImmatureAttributes.PROP_instar,instar);
+        atts.setValue(FemaleImmatureAttributes.PROP_salinity,salinity);
+        atts.setValue(FemaleImmatureAttributes.PROP_temperature,temperature);
+        atts.setValue(FemaleImmatureAttributes.PROP_ph,ph);
     }
 
     /**
@@ -778,8 +817,13 @@ public class FemaleImmature extends AbstractBenthicStage {
         //update superclass variables
         super.updateVariables();
         //update new variables
-//        //no new variables, but would look like:
-//        size        = atts.getValue(FemaleImmatureAttributes.PROP_size,size);
+       size        = atts.getValue(FemaleImmatureAttributes.PROP_size,size);
+       weight      = atts.getValue(FemaleImmatureAttributes.PROP_weight, weight);
+       ageInInstar = atts.getValue(FemaleImmatureAttributes.PROP_ageInInstar, ageInInstar);
+       instar      = atts.getValue(FemaleImmatureAttributes.PROP_instar, instar);
+       salinity    = atts.getValue(FemaleImmatureAttributes.PROP_salinity,salinity);
+       temperature = atts.getValue(FemaleImmatureAttributes.PROP_temperature,temperature);
+       ph        = atts.getValue(FemaleImmatureAttributes.PROP_ph,ph);
     }
 
 }

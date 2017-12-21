@@ -71,9 +71,7 @@ public class MaleImmature extends AbstractBenthicStage {
     protected double initialWeight;
     /** flag to use stochastic transitions */
     protected boolean randomizeTransitions;
-    /** stage transition rate */
-    protected double stageTransRate;
-    
+
     protected double sCost;
         //fields that reflect (new) attribute values
     //none
@@ -582,8 +580,8 @@ public class MaleImmature extends AbstractBenthicStage {
             lp.doCorrectorStep();
             pos = lp.getIJK();
         time = time+dt;
-        updateSize(dt);
         updateWeight(dt);
+        updateSize(dt);
         updateNum(dt);
         updateAge(dt);
         updatePosition(pos);

@@ -47,7 +47,7 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
     public static final long serialVersionUID = 1L;
     
     /** the number of IBMParameter objects defined in the class */
-    public static final int numParams = 9;
+    public static final int numParams = 10;
     public static final String PARAM_isSuperIndividual      = "is a super-individual?";
     public static final String PARAM_horizRWP               = "horizontal random walk parameter [m^2]/[s]";
     public static final String PARAM_minStageDuration       = "min stage duration [d]";
@@ -61,7 +61,7 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
     
     
     /** the number of IBMFunction categories defined in the class */
-    public static final int numFunctionCats = 6;
+    public static final int numFunctionCats = 7;
     public static final String FCAT_Growth             = "growth";
     public static final String FCAT_Mortality          = "mortality";
     public static final String FCAT_SwimmingSpeed      = "swimming speed";

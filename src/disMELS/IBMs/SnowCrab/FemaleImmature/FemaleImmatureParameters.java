@@ -23,6 +23,13 @@ import wts.models.DisMELS.framework.IBMFunctions.IBMParameter;
 import wts.models.DisMELS.framework.IBMFunctions.IBMParameterBoolean;
 import wts.models.DisMELS.framework.IBMFunctions.IBMParameterDouble;
 import wts.models.DisMELS.framework.LifeStageParametersInterface;
+import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunction;
+import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.PowerLawSwimmingSpeedFunction;
+import SnowCrabFunctions.CrabBioenergeticsGrowthFunction;
+import SnowCrabFunctions.ExCostFunction;
+import SnowCrabFunctions.MaturityOgiveFunction;
+import SnowCrabFunctions.MoltIncrementFunction;
+import SnowCrabFunctions.IntermoltPeriodFunction;
 
 /**
  * Class encapsulating parameters for immature female snow crab.
@@ -37,7 +44,7 @@ public class FemaleImmatureParameters extends AbstractLHSParameters {
     public static final long serialVersionUID = 1L;
     
     /** the number of IBMParameter objects defined in the class */
-    public static final int numParams = 9;
+    public static final int numParams = 10;
     public static final String PARAM_isSuperIndividual      = "is a super-individual?";
     public static final String PARAM_horizRWP               = "horizontal random walk parameter [m^2]/[s]";
     public static final String PARAM_minStageDuration       = "min stage duration [d]";
@@ -47,12 +54,18 @@ public class FemaleImmatureParameters extends AbstractLHSParameters {
     public static final String PARAM_randomizeTransitions   = "randomize transitions?";
     public static final String PARAM_initialSize            = "initial size in stage (mm)";
     public static final String PARAM_initialWeight          = "initial weight in stage (g)";
+    public static final String PARAM_sCost          = "how long molt cost is spent [d]";
     
     
     /** the number of IBMFunction categories defined in the class */
-    public static final int numFunctionCats = 2;
+    public static final int numFunctionCats = 7;
     public static final String FCAT_Growth             = "growth";
     public static final String FCAT_Mortality          = "mortality";
+    public static final String FCAT_SwimmingSpeed      = "swimming speed";
+    public static final String FCAT_Molt                = "molt increment";
+    public static final String FCAT_MoltTiming      = "intermolt period";
+    public static final String FCAT_ExCost = "exuviae cost";
+    public static final String FCAT_Maturity = "maturity";
     
     /** The 'keys' used to store the ibm functions */
     protected static final Set<String> setOfFunctionCategories = new LinkedHashSet<>(2*numFunctionCats);
@@ -104,18 +117,26 @@ public class FemaleImmatureParameters extends AbstractLHSParameters {
     @Override
     protected final void createMapToSelectedFunctions() {
         //create the set of function category keys for this class
+                //create the set of function category keys for this class
         setOfFunctionCategories.add(FCAT_Growth);
+        setOfFunctionCategories.add(FCAT_Molt);
+        setOfFunctionCategories.add(FCAT_MoltTiming);
         setOfFunctionCategories.add(FCAT_Mortality);
+        setOfFunctionCategories.add(FCAT_SwimmingSpeed);
+        setOfFunctionCategories.add(FCAT_ExCost);
+        setOfFunctionCategories.add(FCAT_Maturity);
         
         //create the map from function categories to potential functions in each category
         String cat; Map<String,IBMFunctionInterface> mapOfPotentialFunctions; IBMFunctionInterface ifi;
         cat = FCAT_Growth;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(8); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        mapOfPotentialFunctions = new LinkedHashMap<>(10); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new vonBertalanffyGrowthFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new ExponentialGrowthFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new LinearGrowthFunction();
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new CrabBioenergeticsGrowthFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new ConstantFunction();  //generic function, so change defaults
             ifi.setFunctionName("Constant growth rate"); 
@@ -128,6 +149,33 @@ public class FemaleImmatureParameters extends AbstractLHSParameters {
         ifi = new ConstantMortalityRate(); 
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new TemperatureDependentMortalityRate_Houde1989(); 
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        
+        cat = FCAT_SwimmingSpeed;  
+        mapOfPotentialFunctions = new LinkedHashMap<>(4); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        ifi = new PowerLawSwimmingSpeedFunction();
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new ConstantMovementRateFunction(); 
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+            
+       cat = FCAT_Molt;
+       mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+       ifi = new MoltIncrementFunction();
+               mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+               
+       cat = FCAT_MoltTiming;
+       mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+       ifi = new IntermoltPeriodFunction();
+               mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+               
+       cat = FCAT_ExCost;
+       mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+       ifi = new ExCostFunction();
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+            
+       cat = FCAT_Maturity;
+       mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+       ifi = new MaturityOgiveFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
     }
     
