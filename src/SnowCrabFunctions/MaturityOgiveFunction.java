@@ -95,10 +95,10 @@ public class MaturityOgiveFunction extends AbstractIBMFunction implements IBMFun
         String key; 
         key = PARAM_aCW;addParameter(key,Double.class,"intercept of molt increment");
         key = PARAM_bCW;addParameter(key,Double.class,"exponent of molt increment");
-        key = PARAM_aQ1;addParameter(key,Boolean.class,"slope of temperature maturity relationship for .01 quantile");
-        key = PARAM_bQ1;addParameter(key,Boolean.class,"intercept of temp-maturity relationship for .01 quantile");
-        key = PARAM_aQ99;addParameter(key,Boolean.class,"slope of temperature maturity relationship for .99 quantile");
-        key = PARAM_bQ99;addParameter(key,Boolean.class,"intercept of temperature maturity relationship for .99 quantile");
+        key = PARAM_aQ1;addParameter(key,Double.class,"slope of temperature maturity relationship for .01 quantile");
+        key = PARAM_bQ1;addParameter(key,Double.class,"intercept of temp-maturity relationship for .01 quantile");
+        key = PARAM_aQ99;addParameter(key,Double.class,"slope of temperature maturity relationship for .99 quantile");
+        key = PARAM_bQ99;addParameter(key,Double.class,"intercept of temperature maturity relationship for .99 quantile");
     }
     
      @Override
@@ -145,8 +145,8 @@ public class MaturityOgiveFunction extends AbstractIBMFunction implements IBMFun
         int i = 0;
         double size = lvars[i++];
         double T = lvars[i++];
-        double q1 = aQ1*Math.log(T+2.0)+bQ1;
-        double q99 = aQ99*Math.log(T+2.0)+bQ99;
+        double q1 = Math.exp(aQ1*Math.log(T+2.0)+bQ1);
+        double q99 = Math.exp(aQ99*Math.log(T+2.0)+bQ99);
         NormalDistribution stdNorm = new NormalDistribution();
         double phi1 = stdNorm.inverseCumulativeProbability(.01);
         double phi99 = stdNorm.inverseCumulativeProbability(.99);
