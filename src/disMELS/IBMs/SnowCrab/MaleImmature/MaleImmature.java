@@ -97,6 +97,7 @@ public class MaleImmature extends AbstractBenthicStage {
     /** IBM function selected for fecundity */
     private IBMFunctionInterface fcnFecundity = null; 
     private IBMFunctionInterface fcnExCost = null;
+ 
     
     /** logger for class */
     private static final Logger logger = Logger.getLogger(MaleImmature.class.getName());
@@ -376,6 +377,7 @@ public class MaleImmature extends AbstractBenthicStage {
         fcnMolt    = params.getSelectedIBMFunctionForCategory(MaleImmatureParameters.FCAT_Molt);
         fcnMoltTime    = params.getSelectedIBMFunctionForCategory(MaleImmatureParameters.FCAT_MoltTiming);
         fcnExCost = params.getSelectedIBMFunctionForCategory(MaleImmatureParameters.FCAT_ExCost);
+        fcnMaturity = params.getSelectedIBMFunctionForCategory(MaleImmatureParameters.FCAT_Maturity);
     }
     
     /*
@@ -792,8 +794,13 @@ public class MaleImmature extends AbstractBenthicStage {
         //update superclass attributes
         super.updateAttributes();
         //update new attributes
-//        //no new attributes, but would look like:
-//        atts.setValue(MaleImmatureAttributes.PROP_size,size);
+        atts.setValue(MaleImmatureAttributes.PROP_size,size);
+        atts.setValue(MaleImmatureAttributes.PROP_weight,weight);
+        atts.setValue(MaleImmatureAttributes.PROP_ageInInstar,ageInInstar);
+        atts.setValue(MaleImmatureAttributes.PROP_instar,instar);
+        atts.setValue(MaleImmatureAttributes.PROP_salinity,salinity);
+        atts.setValue(MaleImmatureAttributes.PROP_temperature,temperature);
+        atts.setValue(MaleImmatureAttributes.PROP_ph,ph);
     }
 
     /**
@@ -804,8 +811,13 @@ public class MaleImmature extends AbstractBenthicStage {
         //update superclass variables
         super.updateVariables();
         //update new variables
-//        //no new variables, but would look like:
-//        size        = atts.getValue(FemaleImmatureAttributes.PROP_size,size);
+       size        = atts.getValue(MaleImmatureAttributes.PROP_size,size);
+       weight      = atts.getValue(MaleImmatureAttributes.PROP_weight, weight);
+       ageInInstar = atts.getValue(MaleImmatureAttributes.PROP_ageInInstar, ageInInstar);
+       instar      = atts.getValue(MaleImmatureAttributes.PROP_instar, instar);
+       salinity    = atts.getValue(MaleImmatureAttributes.PROP_salinity,salinity);
+       temperature = atts.getValue(MaleImmatureAttributes.PROP_temperature,temperature);
+       ph        = atts.getValue(MaleImmatureAttributes.PROP_ph,ph);
     }
 
 }
