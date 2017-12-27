@@ -115,7 +115,7 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
         key = PARAM_minSize;              setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
         key = PARAM_minWeight;            setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
         key = PARAM_randomizeTransitions; setOfParamKeys.add(key); mapParams.put(key,new IBMParameterBoolean(key,key,false));
-        key = PARAM_sCost; setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,30.0));
+        key = PARAM_sCost; setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
     }
 
     @Override

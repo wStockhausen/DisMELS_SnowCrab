@@ -397,7 +397,7 @@ public class FemaleImmature extends AbstractBenthicStage {
         randomizeTransitions = 
                 params.getValue(FemaleImmatureParameters.PARAM_randomizeTransitions,true);
         sCost =
-                params.getValue(FemaleImmatureParameters.PARAM_randomizeTransitions,30.0);
+                params.getValue(FemaleImmatureParameters.PARAM_sCost,sCost);
     }
     
     /**
