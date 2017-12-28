@@ -81,6 +81,7 @@ public class MaleImmature extends AbstractBenthicStage {
     private double numTrans;  
     /** day of year */
     private double dayOfYear;
+    private double starvationMort;
     
     /** IBM function selected for mortality */
     private IBMFunctionInterface fcnMort = null; 
@@ -459,6 +460,7 @@ public class MaleImmature extends AbstractBenthicStage {
                  */
                 nLHSs = LHS_Factory.createNextLHSsFromSuperIndividual(typeName,this,numTrans);
                 numTrans = 0.0;//reset numTrans to zero
+                starvationMort = 0.0;
             } else {
                 /** 
                  * Since this is a single individual making a transition, we should
@@ -502,6 +504,7 @@ public class MaleImmature extends AbstractBenthicStage {
         zPos       = atts.getValue(LifeStageAttributesInterface.PROP_vertPos,zPos);
         time       = startTime;
         numTrans   = 0.0; //set numTrans to zero
+        starvationMort = 0.0;
         if (debug) {
             logger.info("\n---------------Setting initial position------------");
             logger.info(hType+cc+vType+cc+startTime+cc+xPos+cc+yPos+cc+zPos);
@@ -562,6 +565,7 @@ public class MaleImmature extends AbstractBenthicStage {
     public void step(double dt) throws ArrayIndexOutOfBoundsException {
         //determine daytime/nighttime
         dayOfYear = globalInfo.getCalendar().getYearDay();
+        starvationMort = 0.0;
         //movement here
         //TODO: revise so no advection by currents!
         double[] pos;
@@ -655,7 +659,12 @@ public class MaleImmature extends AbstractBenthicStage {
         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
         double exTot = (Double) fcnExCost.calculate(size);
         double exPerDay = exTot/D;
-        weight = (Double) fcnGrowth.calculate(new double[]{dt/DAY_SECS, instar, weight, temperature, exPerDay});
+        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
+        if(growthRate>0){
+            weight = weight*Math.exp(Math.log(growthRate)*(dt/DAY_SECS));
+        } else{
+            starvationMort = -(growthRate/weight);
+        }
     }
 
     /**
@@ -678,7 +687,7 @@ public class MaleImmature extends AbstractBenthicStage {
              */
             mortalityRate = (Double)fcnMort.calculate(temperature);//using temperature as covariate for mortality
         }
-        double totRate = mortalityRate;
+        double totRate = mortalityRate+starvationMort;
         if ((ageInStage>=minStageDuration)) {
             double matRate = number/numTrans;
             double instMatRate = -Math.log(1-matRate);
