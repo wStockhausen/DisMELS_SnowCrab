@@ -663,7 +663,8 @@ public class MaleImmature extends AbstractBenthicStage {
         if(growthRate>0){
             weight = weight*Math.exp(Math.log(growthRate)*(dt/DAY_SECS));
         } else{
-            starvationMort = -(growthRate/weight);
+            double totRate = Math.max(-1.221,-growthRate/weight);
+            starvationMort = Math.log(-totRate)*(dt/DAY_SECS);
         }
     }
 
