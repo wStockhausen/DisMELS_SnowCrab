@@ -109,11 +109,11 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
         key = PARAM_isSuperIndividual;    setOfParamKeys.add(key); mapParams.put(key,new IBMParameterBoolean(key,key,false));
         key = PARAM_horizRWP;             setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
         key = PARAM_initialSize;          setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,4.4));
-        key = PARAM_initialWeight;        setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
+        key = PARAM_initialWeight;        setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.01));
         key = PARAM_minStageDuration;     setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
         key = PARAM_maxStageDuration;     setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,365.0));
-        key = PARAM_minSize;              setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
-        key = PARAM_minWeight;            setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
+        key = PARAM_minSize;              setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,3.2));
+        key = PARAM_minWeight;            setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.001));
         key = PARAM_randomizeTransitions; setOfParamKeys.add(key); mapParams.put(key,new IBMParameterBoolean(key,key,false));
         key = PARAM_sCost; setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
     }

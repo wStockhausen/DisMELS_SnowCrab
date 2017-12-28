@@ -135,7 +135,7 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
     /** value of aC parameter */
     private double aC = 18.08;
     /** value of bC parameter */
-    private double bC = .75;
+    private double bC = 1.75;
     /** value of cmT parameter */
     private double cmT = 14;
     /** value of coT parameter */
@@ -148,7 +148,7 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
     /** value of aR parameter */
     private double aR = Math.exp(3.966);
     /** value of bR parameter */
-    private double bR = .722;
+    private double bR = 1.722;
     /** value of rmT parameter */
     private double rmT = 13.32;
     /** value of roT parameter */
@@ -164,7 +164,7 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
     private double bSDA = .17;
     
     /** value of UA parameter */
-    private double UA = 2.95;
+    private double UA = .018;
     
     /** value of sigRate parameter */
     private double sigRt = 0;
@@ -296,17 +296,17 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
         double[] lvars = (double[]) vars;//cast object to required double[]
         int i = 0;
         double dt = lvars[i++];
-        int instar = (int) lvars[i++];
+        int instar = Math.max((int) lvars[i++],1);
         double w0 = lvars[i++];
         double T   = lvars[i++];
         double ex = lvars[i++];
         double maxC = aC*Math.pow(w0,bC-1.0);//max consumption
         double p = pVal[instar-1];
         double c = maxC*p*calcF(T,cmT,coT,c1c);//realized weight-specific consumption
-        double maxR = aR*Math.pow(w0,bR-1.0);       //reference-level respiration
+        double maxR = aR*Math.pow(w0,bR-1.0)*.00463*24.0;       //reference-level respiration
         double r = maxR*ACT*calcF(T,rmT,roT,c1r);
         double f = FA*c;     //weight-specific egestion
-        double s = (aSDA*Math.exp(bSDA*T)*(c-f))/w0;//temperature-specific loss due to specific dynamic action
+        double s = (aSDA*Math.exp(bSDA*T)*(c-f)*24.0)/(w0*1000.0);//temperature-specific loss due to specific dynamic action
         double m = r+s;       //weight-specific metabolic loss rate
         double e = UA; //weight-specific excretion
         double w = f+e;       //weight-specific waste rate
@@ -321,7 +321,7 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
         double w = Math.log(a)*(Tm-T0);
         double y = Math.log(a)*(Tm-T0+2);
         double x = (Math.pow(w,2)*Math.pow(1+Math.pow((1+40/y),0.5),2))/400;
-        double f = Math.pow(v,x)*Math.exp(x-(1-v));
+        double f = Math.pow(v,x)*Math.exp(x*(1-v));
         return f;
     }
 

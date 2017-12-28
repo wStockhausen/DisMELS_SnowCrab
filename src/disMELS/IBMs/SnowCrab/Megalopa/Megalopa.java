@@ -463,7 +463,7 @@ public class Megalopa extends AbstractPelagicStage {
                 nLHSs = LHS_Factory.createNextLHSsFromSuperIndividual(typeName,this,numTrans);
                 numTrans = 0.0;//reset numTrans to zero
             } else {
-                /** 
+                /**  
                  * Since this is a single individual making a transition, we should
                  * "kill" the current LHS.  Also, the various IDs should remain
                  * the same in the new LHS since it's the same individual. Thus, 

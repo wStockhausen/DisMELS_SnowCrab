@@ -15,6 +15,7 @@ import disMELS.IBMs.SnowCrab.AbstractBenthicStage;
 import disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescent;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
+import static wts.models.DisMELS.framework.LifeStageInterface.DAY_SECS;
 import wts.roms.model.LagrangianParticle;
 
 /**
@@ -653,13 +654,9 @@ public class FemaleImmature extends AbstractBenthicStage {
      */
     private void updateWeight(double dt) {
         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
-        double exPerDay = 0;
-        if((D-ageInInstar)<sCost){
-            double exTot = (Double) fcnExCost.calculate(size);
-            exPerDay = exTot/sCost;
-        }
+        double exTot = (Double) fcnExCost.calculate(size);
+        double exPerDay = exTot/D;
         weight = (Double) fcnGrowth.calculate(new double[]{dt/DAY_SECS, instar, weight, temperature, exPerDay});
- 
     }
 
     /**
