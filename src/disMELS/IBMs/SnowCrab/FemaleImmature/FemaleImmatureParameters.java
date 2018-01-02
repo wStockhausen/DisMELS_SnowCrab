@@ -58,14 +58,13 @@ public class FemaleImmatureParameters extends AbstractLHSParameters {
     
     
     /** the number of IBMFunction categories defined in the class */
-    public static final int numFunctionCats = 7;
+    public static final int numFunctionCats = 6;
     public static final String FCAT_Growth             = "growth";
     public static final String FCAT_Mortality          = "mortality";
     public static final String FCAT_SwimmingSpeed      = "swimming speed";
     public static final String FCAT_Molt                = "molt increment";
     public static final String FCAT_MoltTiming      = "intermolt period";
     public static final String FCAT_ExCost = "exuviae cost";
-    public static final String FCAT_Maturity = "maturity";
     
     /** The 'keys' used to store the ibm functions */
     protected static final Set<String> setOfFunctionCategories = new LinkedHashSet<>(2*numFunctionCats);
@@ -125,7 +124,6 @@ public class FemaleImmatureParameters extends AbstractLHSParameters {
         setOfFunctionCategories.add(FCAT_Mortality);
         setOfFunctionCategories.add(FCAT_SwimmingSpeed);
         setOfFunctionCategories.add(FCAT_ExCost);
-        setOfFunctionCategories.add(FCAT_Maturity);
         
         //create the map from function categories to potential functions in each category
         String cat; Map<String,IBMFunctionInterface> mapOfPotentialFunctions; IBMFunctionInterface ifi;
@@ -173,11 +171,7 @@ public class FemaleImmatureParameters extends AbstractLHSParameters {
        mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
        ifi = new ExCostFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
-            
-       cat = FCAT_Maturity;
-       mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
-       ifi = new MaturityOgiveFunction();
-            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+           
     }
     
     /**

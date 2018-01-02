@@ -81,8 +81,7 @@ public class FemaleImmature extends AbstractBenthicStage {
     private IBMFunctionInterface fcnMolt = null;
         /** IBM function selected for molt time*/
     private IBMFunctionInterface fcnMoltTime = null;
-    /** IBM function selected for maturity */
-    private IBMFunctionInterface fcnMaturity = null; 
+
     /** IBM function selected for fecundity */
     private IBMFunctionInterface fcnFecundity = null; 
     private IBMFunctionInterface fcnExCost = null;
@@ -373,7 +372,6 @@ public class FemaleImmature extends AbstractBenthicStage {
         fcnGrowth  = params.getSelectedIBMFunctionForCategory(FemaleImmatureParameters.FCAT_Growth);
         fcnMort    = params.getSelectedIBMFunctionForCategory(FemaleImmatureParameters.FCAT_Mortality);
         fcnExCost  = params.getSelectedIBMFunctionForCategory(FemaleImmatureParameters.FCAT_ExCost);
-        fcnMaturity    = params.getSelectedIBMFunctionForCategory(FemaleImmatureParameters.FCAT_Maturity);
         fcnMolt  = params.getSelectedIBMFunctionForCategory(FemaleImmatureParameters.FCAT_Molt);
         fcnMoltTime    = params.getSelectedIBMFunctionForCategory(FemaleImmatureParameters.FCAT_MoltTiming);
     }
@@ -643,9 +641,8 @@ public class FemaleImmature extends AbstractBenthicStage {
         if((ageInInstar+dt/DAY_SECS)>D){
             size = (Double) fcnMolt.calculate(size);
             instar += 1;
-            boolean mat = (Boolean) fcnMaturity.calculate(new double[]{size,temperature});
             ageInInstar = 0.0;
-            if(mat){
+            if(size>60.0){
                 numTrans +=1;
             }
         }

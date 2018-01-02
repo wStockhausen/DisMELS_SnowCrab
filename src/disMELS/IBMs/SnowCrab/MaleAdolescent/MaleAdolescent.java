@@ -70,11 +70,20 @@ public class MaleAdolescent extends AbstractBenthicStage {
     private double numTrans;  
      /** day of year */
     private double dayOfYear;
+    private double starvationMort;
    
     /** IBM function selected for growth */
     private IBMFunctionInterface fcnGrowth = null; 
     /** IBM function selected for mortality */
     private IBMFunctionInterface fcnMortality = null; 
+      /** IBM function selected for growth */
+    private IBMFunctionInterface fcnExCost = null; 
+    /** IBM function selected for mortality */
+    private IBMFunctionInterface fcnMolt = null; 
+    private IBMFunctionInterface fcnMoltTime = null;
+    private IBMFunctionInterface fcnMort = null;
+    private IBMFunctionInterface fcnMaturity = null;
+    
     
     /** flag to print debugging info */
     public static boolean debug = false;
@@ -350,8 +359,12 @@ public class MaleAdolescent extends AbstractBenthicStage {
      * Sets the IBM functions from the parameters object
      */
     private void setIBMFunctions(){
-        fcnGrowth         = params.getSelectedIBMFunctionForCategory(MaleAdolescentParameters.FCAT_Growth);
-        fcnMortality      = params.getSelectedIBMFunctionForCategory(MaleAdolescentParameters.FCAT_Mortality);
+        fcnMort    = params.getSelectedIBMFunctionForCategory(MaleAdolescentParameters.FCAT_Mortality);
+        fcnGrowth    = params.getSelectedIBMFunctionForCategory(MaleAdolescentParameters.FCAT_Growth);
+        fcnMolt    = params.getSelectedIBMFunctionForCategory(MaleAdolescentParameters.FCAT_Molt);
+        fcnMoltTime    = params.getSelectedIBMFunctionForCategory(MaleAdolescentParameters.FCAT_MoltTiming);
+        fcnExCost = params.getSelectedIBMFunctionForCategory(MaleAdolescentParameters.FCAT_ExCost);
+        fcnMaturity = params.getSelectedIBMFunctionForCategory(MaleAdolescentParameters.FCAT_Maturity);
     }
     
     /*
@@ -543,6 +556,7 @@ public class MaleAdolescent extends AbstractBenthicStage {
         updateSize(dt);
         updateNum(dt);
         updateAge(dt);
+        updateWeight(dt);
         updatePosition(pos);
         interpolateEnvVars(pos);
         //check for exiting grid
@@ -584,9 +598,30 @@ public class MaleAdolescent extends AbstractBenthicStage {
     }
 
     private void updateSize(double dt) {
-        //The following works for
-        //  wts.models.DisMELS.IBMFunctions.Growth.vonBertalanffyGrowthFunction
-        size = (Double) fcnGrowth.calculate(new double[]{dt/DAY_SECS,size});
+        double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+        if((ageInInstar+dt/DAY_SECS)>D){
+            size = (Double) fcnMolt.calculate(size);
+            instar += 1;
+            ageInInstar = 0.0;
+            boolean mat = (Boolean) fcnMaturity.calculate(new double[]{size,temperature});
+            ageInInstar = 0.0;
+            if(mat){
+                numTrans +=1;
+            }
+        }
+    }
+    
+    private void updateWeight(double dt){
+        double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+        double exTot = (Double) fcnExCost.calculate(size);
+        double exPerDay = exTot/D;
+        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
+        if(growthRate>0){
+            weight = weight*Math.exp(-Math.log(growthRate)*(dt/DAY_SECS));
+        } else{
+            double totRate = Math.max(-1.0,growthRate/weight);
+            starvationMort = -Math.log(-totRate)*(dt/DAY_SECS);
+        } 
     }
 
     /**

@@ -18,12 +18,26 @@ import wts.models.DisMELS.IBMFunctions.Growth.vonBertalanffyGrowthFunction;
 import wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction;
 import wts.models.DisMELS.IBMFunctions.Miscellaneous.LogisticFunction;
 import wts.models.DisMELS.IBMFunctions.Miscellaneous.PowerLawFunction;
+import wts.models.DisMELS.IBMFunctions.Growth.ExponentialGrowthFunction;
+import wts.models.DisMELS.IBMFunctions.Growth.LinearGrowthFunction;
+import wts.models.DisMELS.IBMFunctions.Growth.vonBertalanffyGrowthFunction;
+import wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction;
+import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
+import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
+import wts.models.DisMELS.IBMFunctions.Movement.DielVerticalMigration_FixedDepthRanges;
+import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunction;
+import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.PowerLawSwimmingSpeedFunction;
 import wts.models.DisMELS.framework.AbstractLHSParameters;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.models.DisMELS.framework.IBMFunctions.IBMParameter;
 import wts.models.DisMELS.framework.IBMFunctions.IBMParameterBoolean;
 import wts.models.DisMELS.framework.IBMFunctions.IBMParameterDouble;
 import wts.models.DisMELS.framework.LifeStageParametersInterface;
+import SnowCrabFunctions.CrabBioenergeticsGrowthFunction;
+import SnowCrabFunctions.ExCostFunction;
+import SnowCrabFunctions.IntermoltPeriodFunction;
+import SnowCrabFunctions.MoltIncrementFunction;
+import SnowCrabFunctions.MaturityOgiveFunction;
 
 /**
  * DisMELS class representing parameters for adolescent male snow crab.
@@ -48,9 +62,15 @@ public class MaleAdolescentParameters extends AbstractLHSParameters {
     public static final String PARAM_randomizeTransitions  = "randomize stage transitions?";
     
     /** the number of IBMFunction categories defined in the class */
-    public static final int numFunctionCats = 2;
-    public static final String FCAT_Growth         = "growth";
-    public static final String FCAT_Mortality      = "mortality";
+    public static final int numFunctionCats = 7;
+    public static final String FCAT_Growth             = "growth";
+    public static final String FCAT_Mortality          = "mortality";
+    public static final String FCAT_SwimmingSpeed      = "swimming speed";
+    public static final String FCAT_Molt                = "molt increment";
+    public static final String FCAT_MoltTiming      = "intermolt period";
+    public static final String FCAT_ExCost = "exuviae cost";
+    public static final String FCAT_Maturity = "maturity";
+    
     
     /** The 'keys' used to store the ibm functions */
     protected static final Set<String> setOfFunctionCategories = new LinkedHashSet<>(2*numFunctionCats);
@@ -100,29 +120,61 @@ public class MaleAdolescentParameters extends AbstractLHSParameters {
     @Override
     protected final void createMapToSelectedFunctions() {
         //create the set of function category keys for this class
-        setOfFunctionCategories.add(FCAT_Growth);
+       setOfFunctionCategories.add(FCAT_Growth);
+        setOfFunctionCategories.add(FCAT_Molt);
+        setOfFunctionCategories.add(FCAT_MoltTiming);
         setOfFunctionCategories.add(FCAT_Mortality);
+        setOfFunctionCategories.add(FCAT_SwimmingSpeed);
+        setOfFunctionCategories.add(FCAT_ExCost);
+        setOfFunctionCategories.add(FCAT_Maturity);
         
         //create the map from function categories to potential functions in each category
         String cat; Map<String,IBMFunctionInterface> mapOfPotentialFunctions; IBMFunctionInterface ifi;
         cat = FCAT_Growth;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
-        ifi = new vonBertalanffyGrowthFunction(); mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        mapOfPotentialFunctions = new LinkedHashMap<>(10); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        ifi = new vonBertalanffyGrowthFunction();
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new ExponentialGrowthFunction();
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new LinearGrowthFunction();
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new CrabBioenergeticsGrowthFunction();
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new ConstantFunction();  //generic function, so change defaults
+            ifi.setFunctionName("Constant growth rate"); 
+            ifi.setDescription("Constant growth rate [mm/day]"); 
+            ifi.setParameterDescription(ConstantFunction.PARAM_constant,"Constant growth rate [mm/day]");
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_Mortality;  
         mapOfPotentialFunctions = new LinkedHashMap<>(4); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
-        ifi = new ConstantFunction();  //generic function, so change defaults
-            ifi.setFunctionName("Constant mortality rate"); 
-            ifi.setDescription("Constant mortality rate [1/day]"); 
-            ifi.setParameterDescription(ConstantFunction.PARAM_constant,"Constant mortality rate [1/day]");
+        ifi = new ConstantMortalityRate(); 
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
-        ifi = new PowerLawFunction(); //generic function, so change defaults
-            ifi.setFunctionName("Size-specific mortality function");
-            ifi.setDescription("size-specific mortality function [1/day]");
-            ifi.setParameterDescription(PowerLawFunction.PARAM_stdVal,"mortality rate at standard size (z0) [1/day]");
-            ifi.setParameterDescription(PowerLawFunction.PARAM_stdX,"standard size z0 [cm]");
-            ifi.setParameterDescription(PowerLawFunction.PARAM_exponent,"exponent (<0 for decreasing function of size)");
-            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);        
+        ifi = new TemperatureDependentMortalityRate_Houde1989(); 
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        
+        cat = FCAT_SwimmingSpeed;  
+        mapOfPotentialFunctions = new LinkedHashMap<>(4); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        ifi = new PowerLawSwimmingSpeedFunction();
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new ConstantMovementRateFunction(); 
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+            
+       cat = FCAT_Molt;
+       mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+       ifi = new MoltIncrementFunction();
+               mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+               
+       cat = FCAT_MoltTiming;
+       mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+       ifi = new IntermoltPeriodFunction();
+               mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+               
+       cat = FCAT_ExCost;
+       mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+       ifi = new ExCostFunction();
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+            
     }
     
     /**

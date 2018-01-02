@@ -81,6 +81,11 @@ public class FemaleAdolescent extends AbstractBenthicStage {
    
     /** IBM function selected for mortality */
     private IBMFunctionInterface fcnMort = null; 
+    private IBMFunctionInterface fcnGrowth = null;
+    private IBMFunctionInterface fcnExCost = null;
+    private IBMFunctionInterface fcnMoltTime = null;
+    private IBMFunctionInterface fcnMolt = null;
+    private IBMFunctionInterface fcnMaturity = null;
     
     /** flag to print debugging info */
     public static boolean debug = false;
@@ -357,6 +362,11 @@ public class FemaleAdolescent extends AbstractBenthicStage {
      */
     private void setIBMFunctions(){
         fcnMort = params.getSelectedIBMFunctionForCategory(FemaleAdolescentParameters.FCAT_Mortality);
+        fcnGrowth = params.getSelectedIBMFunctionForCategory(FemaleAdolescentParameters.FCAT_Growth);
+        fcnMaturity = params.getSelectedIBMFunctionForCategory(FemaleAdolescentParameters.FCAT_Maturity);
+        fcnExCost = params.getSelectedIBMFunctionForCategory(FemaleAdolescentParameters.FCAT_ExCost);  
+        fcnMolt = params.getSelectedIBMFunctionForCategory(FemaleAdolescentParameters.FCAT_Molt);
+        fcnMoltTime = params.getSelectedIBMFunctionForCategory(FemaleAdolescentParameters.FCAT_MoltTiming);
     }
     
     /*
