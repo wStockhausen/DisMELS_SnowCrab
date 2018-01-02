@@ -130,7 +130,7 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
     
     /** value of pVal parameter */
     private static final double[] pVal = new double[]{
-    1.22, 1.1, 1.02, 1.02, 0.97, 0.95, 0.94, 0.94, 0.96, 1.00, 1.05, 1.11, 1.19};
+    1.5, 1.1, 1.02, 1.02, 0.97, 0.95, 0.94, 0.94, 0.96, 1.00, 1.05, 1.11, 1.19};
     
     /** value of aC parameter */
     private double aC = 18.08;
@@ -309,7 +309,7 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
         double m = r+s;       //weight-specific metabolic loss rate
         double e = UA; //weight-specific excretion
         double w = f+e;       //weight-specific waste rate
-        double g = ((c-(m+w+(ex/w0)))/calPerGram)/wRat;   //weight-specific total instantaneous growth rate 
+        double g = ((c-(m+w+(ex/w0)))/calPerGram)/wRat;   //weight-specific total daily growth rate / weight 
         if (sigRt>0) g += rng.computeNormalVariate()*sigRt; 
         return g;
     }

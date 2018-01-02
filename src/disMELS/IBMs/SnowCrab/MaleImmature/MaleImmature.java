@@ -640,10 +640,11 @@ public class MaleImmature extends AbstractBenthicStage {
      */
     private void updateSize(double dt) {
         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
-        if((ageInInstar+dt)>D){
-            size = (Double) fcnMolt.calculate(new double[]{dt/DAY_SECS, size});
+        if((ageInInstar+dt/DAY_SECS)>D){
+            size = (Double) fcnMolt.calculate(size);
             instar += 1;
             boolean mat = (Boolean) fcnMaturity.calculate(new double[]{size,temperature});
+            ageInInstar = 0.0;
             if(mat){
                 numTrans +=1;
             }
@@ -661,11 +662,11 @@ public class MaleImmature extends AbstractBenthicStage {
         double exPerDay = exTot/D;
         double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
         if(growthRate>0){
-            weight = weight*Math.exp(Math.log(growthRate)*(dt/DAY_SECS));
+            weight = weight*Math.exp(-Math.log(growthRate)*(dt/DAY_SECS));
         } else{
-            double totRate = Math.max(-1.221,-growthRate/weight);
-            starvationMort = Math.log(-totRate)*(dt/DAY_SECS);
-        }
+            double totRate = Math.max(-1.0,growthRate/weight);
+            starvationMort = -Math.log(-totRate)*(dt/DAY_SECS);
+        } 
     }
 
     /**
@@ -690,7 +691,7 @@ public class MaleImmature extends AbstractBenthicStage {
         }
         double totRate = mortalityRate+starvationMort;
         if ((ageInStage>=minStageDuration)) {
-            double matRate = number/numTrans;
+            double matRate = numTrans/number;
             double instMatRate = -Math.log(1-matRate);
             totRate += instMatRate;
             //apply mortality rate to previous number transitioning and
