@@ -108,7 +108,7 @@ public class ExCostFunction extends AbstractIBMFunction implements IBMFunctionIn
         double lvars = (Double) vars;//cast object to required double[]
         double size = lvars;
         Double exuviae;
-        if(mat){
+        if(!mat){
             exuviae = new Double(a*Math.pow(size,b));
         } else{
             exuviae = new Double(a+b*size);
