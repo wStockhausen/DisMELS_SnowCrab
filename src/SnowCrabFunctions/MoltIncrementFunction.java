@@ -32,6 +32,8 @@ public class MoltIncrementFunction extends AbstractIBMFunction implements IBMFun
             "\n\t* Parameters (by key):"+
             "\n\t*      a  - Double  - intercept of molt increment"+
             "\n\t*      b- Double - exponent of molt increment"+
+            "\n\t*      aS  - Double  - intercept of small molt increment"+
+            "\n\t*      bS - Double - exponent of small molt increment"+
             "\n\t*      mat - Boolean - true if crab is mature"+
             "\n\t* Variables:"+
             "\n\t*      vars - double[]{cW, T}."+
@@ -48,13 +50,17 @@ public class MoltIncrementFunction extends AbstractIBMFunction implements IBMFun
             "\n\t* author: Christine Stawitz"+
             "\n\t**************************************************************************";
     /** number of settable parameters */
-    public static final int numParams = 3;
+    public static final int numParams = 5;
     /** number of sub-functions */
     public static final int numSubFuncs = 0;
         
     public static final String PARAM_a = "a";
 
     public static final String PARAM_b = "b";
+    
+    public static final String PARAM_aS = "aS";
+
+    public static final String PARAM_bS = "bS";
 
     public static final String PARAM_mat = "mat";
 
@@ -62,6 +68,10 @@ public class MoltIncrementFunction extends AbstractIBMFunction implements IBMFun
     private double a = 0;
 
     private double b = 0;
+    
+    private double aS = 0;
+
+    private double bS = 0;
 
     private boolean mat = false;
 
@@ -71,6 +81,8 @@ public class MoltIncrementFunction extends AbstractIBMFunction implements IBMFun
         String key; 
         key = PARAM_a;addParameter(key,Double.class,"intercept of molt increment");
         key = PARAM_b;addParameter(key,Double.class,"exponent of molt increment");
+        key = PARAM_aS;addParameter(key,Double.class,"intercept of small molt increment");
+        key = PARAM_bS;addParameter(key,Double.class,"exponent of small molt increment");
         key = PARAM_mat;addParameter(key,Boolean.class,"if crab is mature");
     }
     
@@ -96,6 +108,12 @@ public class MoltIncrementFunction extends AbstractIBMFunction implements IBMFun
                 case PARAM_b:
                     b = ((Double) value).doubleValue();
                     break;
+                case PARAM_aS:
+                    aS = ((Double) value).doubleValue();
+                    break;
+                case PARAM_bS:
+                    bS = ((Double) value).doubleValue();
+                    break;
                 case PARAM_mat:
                     mat = ((Boolean) value).booleanValue();
                     break;
@@ -106,12 +124,16 @@ public class MoltIncrementFunction extends AbstractIBMFunction implements IBMFun
     
     @Override
     public Double calculate(Object vars) {
-        double[] lvars = (double[]) vars;//cast object to required double[]
-        int i = 0;
-        double size = lvars[i++];
+        double lvars = (double) vars;//cast object to required double[]
+        double size = lvars;
         Double new_size;
-        if(mat){
-            new_size = new Double(a*Math.pow(size,b));
+        if(!mat){
+            if(size<9){
+              new_size = new Double(aS*Math.pow(size,bS));
+            } else{
+              new_size = new Double(a*Math.pow(size,b));
+            }
+
         } else{
             new_size = new Double(a+b*size);
         }  
