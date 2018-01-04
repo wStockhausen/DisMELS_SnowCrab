@@ -258,6 +258,8 @@ public class MaleImmature extends AbstractBenthicStage {
         //copy attributes, regardless of life stage associated w/ newAtts
         for (String key: newAtts.getKeys()) atts.setValue(key,newAtts.getValue(key));
         id = atts.getValue(LifeStageAttributesInterface.PROP_id, id);
+        size = params.getValue(MaleImmatureParameters.PARAM_initialSize, size);
+        atts.setValue(MaleImmatureAttributes.PROP_size, size);
         updateVariables();
     }
     
