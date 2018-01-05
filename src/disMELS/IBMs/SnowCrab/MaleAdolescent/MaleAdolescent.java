@@ -11,6 +11,7 @@ import java.util.logging.Logger;
 import org.openide.util.lookup.ServiceProvider;
 import disMELS.IBMs.SnowCrab.AbstractBenthicStage;
 import disMELS.IBMs.SnowCrab.MaleAdult.MaleAdult;
+import disMELS.IBMs.SnowCrab.MaleImmature.MaleImmatureAttributes;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.models.utilities.CalendarIF;
@@ -74,8 +75,6 @@ public class MaleAdolescent extends AbstractBenthicStage {
    
     /** IBM function selected for growth */
     private IBMFunctionInterface fcnGrowth = null; 
-    /** IBM function selected for mortality */
-    private IBMFunctionInterface fcnMortality = null; 
       /** IBM function selected for growth */
     private IBMFunctionInterface fcnExCost = null; 
     /** IBM function selected for mortality */
@@ -243,6 +242,14 @@ public class MaleAdolescent extends AbstractBenthicStage {
         if (newAtts instanceof MaleAdolescentAttributes) {
             MaleAdolescentAttributes spAtts = (MaleAdolescentAttributes) newAtts;
             for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
+        } else if(newAtts instanceof MaleImmatureAttributes) {
+            MaleImmatureAttributes spAtts = (MaleImmatureAttributes) newAtts;
+            String key = MaleImmatureAttributes.PROP_size; atts.setValue(key, spAtts.getValue(key));
+            key = MaleImmatureAttributes.PROP_weight; atts.setValue(key, spAtts.getValue(key));
+            key = MaleImmatureAttributes.PROP_instar; atts.setValue(key, spAtts.getValue(key));
+            key = MaleImmatureAttributes.PROP_age; atts.setValue(key, spAtts.getValue(key));
+            key = MaleImmatureAttributes.PROP_shellcond; atts.setValue(key, spAtts.getValue(key));
+            key = MaleImmatureAttributes.PROP_shellthick; atts.setValue(key, spAtts.getValue(key));
         } else {
             //TODO: should throw an error here
             logger.info("AdultStage.setAttributes(): no match for attributes type");
@@ -553,10 +560,11 @@ public class MaleAdolescent extends AbstractBenthicStage {
             lp.doCorrectorStep();
             pos = lp.getIJK();
         time = time+dt;
+        
+        updateWeight(dt);
         updateSize(dt);
         updateNum(dt);
         updateAge(dt);
-        updateWeight(dt);
         updatePosition(pos);
         interpolateEnvVars(pos);
         //check for exiting grid
@@ -632,8 +640,8 @@ public class MaleAdolescent extends AbstractBenthicStage {
         //The following works for
         //  wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction
         //  wts.models.DisMELS.IBMFunctions.Miscellaneous.PowerLawFunction
-        double mortalityRate = (Double)fcnMortality.calculate(size);//in unis of [days]^-1
-        double totRate = mortalityRate;
+        double mortalityRate = (Double)fcnMort.calculate(size);//in unis of [days]^-1
+        double totRate = mortalityRate + starvationMort;
         if ((ageInStage>=minStageDuration)&&(size>=minSizeAtTrans)) {
             totRate += stageTransRate;
             //apply mortality rate to previous number transitioning and
@@ -742,6 +750,13 @@ public class MaleAdolescent extends AbstractBenthicStage {
         //update superclass attributes
         super.updateAttributes();
         //update new attributes
+        atts.setValue(MaleAdolescentAttributes.PROP_size,size);
+        atts.setValue(MaleAdolescentAttributes.PROP_weight,weight);
+        atts.setValue(MaleAdolescentAttributes.PROP_ageInInstar,ageInInstar);
+        atts.setValue(MaleAdolescentAttributes.PROP_instar,instar);
+        atts.setValue(MaleAdolescentAttributes.PROP_salinity,salinity);
+        atts.setValue(MaleAdolescentAttributes.PROP_temperature,temperature);
+        atts.setValue(MaleAdolescentAttributes.PROP_ph,ph);
     }
 
     /**
@@ -752,5 +767,12 @@ public class MaleAdolescent extends AbstractBenthicStage {
         //update superclass variables
         super.updateVariables();
         //update new variables
+       size        = atts.getValue(MaleAdolescentAttributes.PROP_size,size);
+       weight      = atts.getValue(MaleAdolescentAttributes.PROP_weight, weight);
+       ageInInstar = atts.getValue(MaleAdolescentAttributes.PROP_ageInInstar, ageInInstar);
+       instar      = atts.getValue(MaleAdolescentAttributes.PROP_instar, instar);
+       salinity    = atts.getValue(MaleAdolescentAttributes.PROP_salinity,salinity);
+       temperature = atts.getValue(MaleAdolescentAttributes.PROP_temperature,temperature);
+       ph        = atts.getValue(MaleAdolescentAttributes.PROP_ph,ph);
     }
 }

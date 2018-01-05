@@ -12,7 +12,10 @@ import org.openide.util.lookup.ServiceProvider;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
 import disMELS.IBMs.SnowCrab.AbstractBenthicStage;
+import disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes;
 import disMELS.IBMs.SnowCrab.MaleAdolescent.MaleAdolescent;
+import disMELS.IBMs.SnowCrab.MaleAdolescent.MaleAdolescentAttributes;
+import disMELS.IBMs.SnowCrab.Megalopa.MegalopaAttributes;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.roms.model.LagrangianParticle;
@@ -256,7 +259,21 @@ public class MaleImmature extends AbstractBenthicStage {
     @Override
     public void setAttributes(LifeStageAttributesInterface newAtts) {
         //copy attributes, regardless of life stage associated w/ newAtts
-        for (String key: newAtts.getKeys()) atts.setValue(key,newAtts.getValue(key));
+        if(newAtts instanceof MaleImmatureAttributes){            
+            MaleImmatureAttributes spAtts = (MaleImmatureAttributes) newAtts;
+            for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
+        } else if(newAtts instanceof MegalopaAttributes){
+            MegalopaAttributes spAtts = (MegalopaAttributes) newAtts;
+            String key = MegalopaAttributes.PROP_weight; atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_age; atts.setValue(key, spAtts.getValue(key));
+                    size = params.getValue(MaleImmatureParameters.PARAM_initialSize, size);
+            instar = 1;
+            atts.setValue(MaleImmatureAttributes.PROP_size, size);
+            atts.setValue(MaleImmatureAttributes.PROP_instar, instar);
+        } else {
+            //TODO: should throw an error here
+            logger.info("AdultStage.setAttributes(): no match for attributes type");
+        }
         id = atts.getValue(LifeStageAttributesInterface.PROP_id, id);
         updateVariables();
     }

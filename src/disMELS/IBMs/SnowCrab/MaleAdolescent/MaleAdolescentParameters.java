@@ -175,6 +175,12 @@ public class MaleAdolescentParameters extends AbstractLHSParameters {
        ifi = new ExCostFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
             
+       cat = FCAT_Maturity;
+       mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+       ifi = new MaturityOgiveFunction();
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+            
+            
     }
     
     /**

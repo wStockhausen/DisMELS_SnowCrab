@@ -139,7 +139,7 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_Maturity;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(4); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        mapOfPotentialFunctions = new LinkedHashMap<>(6); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new ConstantFunction(); 
             ifi.setFunctionName("Constant fraction mature");
             ifi.setDescription("constant fraction mature");
@@ -150,6 +150,8 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
             ifi.setDescription("Logistic (ize-specific) maturity function");
             ifi.setParameterDescription(LogisticFunction.PARAM_x50,"size at 50% maturity (cm)");
             ifi.setParameterDescription(LogisticFunction.PARAM_slope,"slope at 50% maturity (1/cm)");
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+       ifi = new MaturityOgiveFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_Fecundity;  
@@ -165,12 +167,7 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
             ifi.setParameterDescription(PowerLawFunction.PARAM_stdVal,"fecundity at standard size (z0)");
             ifi.setParameterDescription(PowerLawFunction.PARAM_stdX,"standard size z0 [cm]");
             ifi.setParameterDescription(PowerLawFunction.PARAM_exponent,"exponent (>0 for increasing function of size)");
-            
-        cat = FCAT_Maturity;
-       mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
-       ifi = new MaturityOgiveFunction();
-            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
-            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);  
+
             
                         
        cat = FCAT_Molt;

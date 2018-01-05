@@ -13,6 +13,7 @@ import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
 import disMELS.IBMs.SnowCrab.AbstractBenthicStage;
 import disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescent;
+import disMELS.IBMs.SnowCrab.Megalopa.MegalopaAttributes;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import static wts.models.DisMELS.framework.LifeStageInterface.DAY_SECS;
@@ -257,7 +258,17 @@ public class FemaleImmature extends AbstractBenthicStage {
     @Override
     public void setAttributes(LifeStageAttributesInterface newAtts) {
         //copy attributes, regardless of life stage associated w/ newAtts
-        for (String key: newAtts.getKeys()) atts.setValue(key,newAtts.getValue(key));
+    if(newAtts instanceof FemaleImmatureAttributes){            
+            FemaleImmatureAttributes spAtts = (FemaleImmatureAttributes) newAtts;
+            for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
+        } else if(newAtts instanceof MegalopaAttributes){
+            MegalopaAttributes spAtts = (MegalopaAttributes) newAtts;
+            String key = MegalopaAttributes.PROP_weight; atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_age; atts.setValue(key, spAtts.getValue(key));
+        } else {
+            //TODO: should throw an error here
+            logger.info("AdultStage.setAttributes(): no match for attributes type");
+        }
         id = atts.getValue(LifeStageAttributesInterface.PROP_id, id);
         updateVariables();
     }
