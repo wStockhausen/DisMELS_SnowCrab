@@ -50,7 +50,7 @@ public class MoltIncrementFunction extends AbstractIBMFunction implements IBMFun
             "\n\t* author: Christine Stawitz"+
             "\n\t**************************************************************************";
     /** number of settable parameters */
-    public static final int numParams = 5;
+    public static final int numParams = 4;
     /** number of sub-functions */
     public static final int numSubFuncs = 0;
         
@@ -62,8 +62,6 @@ public class MoltIncrementFunction extends AbstractIBMFunction implements IBMFun
 
     public static final String PARAM_bS = "bS";
 
-    public static final String PARAM_mat = "mat";
-
 
     private double a = 0;
 
@@ -73,8 +71,6 @@ public class MoltIncrementFunction extends AbstractIBMFunction implements IBMFun
 
     private double bS = 0;
 
-    private boolean mat = false;
-
 
     public MoltIncrementFunction(){
         super(numParams,numSubFuncs,DEFAULT_type,DEFAULT_name,DEFAULT_descr,DEFAULT_fullDescr);
@@ -83,7 +79,6 @@ public class MoltIncrementFunction extends AbstractIBMFunction implements IBMFun
         key = PARAM_b;addParameter(key,Double.class,"exponent of molt increment");
         key = PARAM_aS;addParameter(key,Double.class,"intercept of small molt increment");
         key = PARAM_bS;addParameter(key,Double.class,"exponent of small molt increment");
-        key = PARAM_mat;addParameter(key,Boolean.class,"if crab is mature");
     }
     
      @Override
@@ -114,9 +109,6 @@ public class MoltIncrementFunction extends AbstractIBMFunction implements IBMFun
                 case PARAM_bS:
                     bS = ((Double) value).doubleValue();
                     break;
-                case PARAM_mat:
-                    mat = ((Boolean) value).booleanValue();
-                    break;
             }
         }
         return false;
@@ -127,16 +119,11 @@ public class MoltIncrementFunction extends AbstractIBMFunction implements IBMFun
         double lvars = (double) vars;//cast object to required double[]
         double size = lvars;
         Double new_size;
-        if(!mat){
             if(size<9){
-              new_size = new Double(aS*Math.pow(size,bS));
+              new_size = new Double(aS+bS*size);
             } else{
-              new_size = new Double(a*Math.pow(size,b));
+              new_size = new Double(a+b*size);
             }
-
-        } else{
-            new_size = new Double(a+b*size);
-        }  
         return new_size;
     }
 }

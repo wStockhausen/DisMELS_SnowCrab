@@ -121,7 +121,8 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
         String cat; Map<String,IBMFunctionInterface> mapOfPotentialFunctions; IBMFunctionInterface ifi;
         cat = FCAT_Growth;  
         mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
-        ifi = new CrabBioenergeticsGrowthFunction(); mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new CrabBioenergeticsGrowthFunction(); 
+        mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_Mortality;  
         mapOfPotentialFunctions = new LinkedHashMap<>(4); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);

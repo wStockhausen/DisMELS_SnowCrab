@@ -95,6 +95,7 @@ public class FemaleImmature extends AbstractBenthicStage {
     /** day of year */
     private double dayOfYear;
     private double starvationMort;
+    private boolean molted;
     
     private double sCost;
     
@@ -265,6 +266,10 @@ public class FemaleImmature extends AbstractBenthicStage {
             MegalopaAttributes spAtts = (MegalopaAttributes) newAtts;
             String key = MegalopaAttributes.PROP_weight; atts.setValue(key, spAtts.getValue(key));
             key = MegalopaAttributes.PROP_age; atts.setValue(key, spAtts.getValue(key));
+                    size = params.getValue(FemaleImmatureParameters.PARAM_initialSize, size);
+            instar = 1;
+            atts.setValue(FemaleImmatureAttributes.PROP_size, size);
+            atts.setValue(FemaleImmatureAttributes.PROP_instar, instar);
         } else {
             //TODO: should throw an error here
             logger.info("AdultStage.setAttributes(): no match for attributes type");
@@ -574,6 +579,7 @@ public class FemaleImmature extends AbstractBenthicStage {
         //determine daytime/nighttime for vertical migration & calc indiv. W
         dayOfYear = globalInfo.getCalendar().getYearDay();
         starvationMort = 0.0;
+        molted = false;
 //        isDaytime = DateTimeFunctions.isDaylight(lon,lat,dayOfYear);
         //movement here
         //TODO: revise so no advection by currents!
@@ -593,8 +599,8 @@ public class FemaleImmature extends AbstractBenthicStage {
             lp.doCorrectorStep();
             pos = lp.getIJK();
         time = time+dt;
-        updateWeight(dt);
         updateSize(dt);
+        updateWeight(dt);
         updateNum(dt);
         updateAge(dt);
         updatePosition(pos);
@@ -653,6 +659,7 @@ public class FemaleImmature extends AbstractBenthicStage {
             size = (Double) fcnMolt.calculate(size);
             instar += 1;
             ageInInstar = 0.0;
+            molted = true;
             if(size>60.0){
                 numTrans +=1;
             }
@@ -670,7 +677,7 @@ public class FemaleImmature extends AbstractBenthicStage {
         double exPerDay = exTot/D;
         double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
         if(growthRate>0){
-            weight = weight*Math.exp(-Math.log(growthRate)*(dt/DAY_SECS));
+            weight = weight*Math.exp(Math.log(1.0+growthRate)*(dt/DAY_SECS));
         } else{
             double totRate = Math.max(-1.0,growthRate/weight);
             starvationMort = -Math.log(-totRate)*(dt/DAY_SECS);
@@ -720,7 +727,7 @@ public class FemaleImmature extends AbstractBenthicStage {
     }
     
     private void interpolateEnvVars(double[] pos) {
-        temperature = i3d.interpolateTemperature(pos);
+        temperature = 5.0;
         salinity    = i3d.interpolateSalinity(pos);
     }
 

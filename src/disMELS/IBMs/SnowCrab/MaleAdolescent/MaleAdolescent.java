@@ -255,6 +255,10 @@ public class MaleAdolescent extends AbstractBenthicStage {
             logger.info("AdultStage.setAttributes(): no match for attributes type");
         }
         id = atts.getValue(LifeStageAttributesInterface.PROP_id, id);
+        atts.setValue(MaleAdolescentAttributes.PROP_size, size);//reset age in stage
+        atts.setValue(MaleAdolescentAttributes.PROP_weight,weight);    //set active to true
+        atts.setValue(MaleAdolescentAttributes.PROP_instar,instar);     //set alive to true
+        atts.setValue(MaleAdolescentAttributes.PROP_ageInInstar,0.0);     //set alive to true
         updateVariables();
     }
     
@@ -281,6 +285,7 @@ public class MaleAdolescent extends AbstractBenthicStage {
         atts.setValue(LifeStageAttributesInterface.PROP_ageInStage, 0.0);//reset age in stage
         atts.setValue(LifeStageAttributesInterface.PROP_active,true);    //set active to true
         atts.setValue(LifeStageAttributesInterface.PROP_alive,true);     //set alive to true
+
         id = atts.getID(); //reset id for current LHS to one from old LHS
 
         //copy LagrangianParticle information
@@ -625,7 +630,7 @@ public class MaleAdolescent extends AbstractBenthicStage {
         double exPerDay = exTot/D;
         double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
         if(growthRate>0){
-            weight = weight*Math.exp(-Math.log(growthRate)*(dt/DAY_SECS));
+            weight = weight*Math.exp(Math.log(1.0+growthRate)*(dt/DAY_SECS));
         } else{
             double totRate = Math.max(-1.0,growthRate/weight);
             starvationMort = -Math.log(-totRate)*(dt/DAY_SECS);

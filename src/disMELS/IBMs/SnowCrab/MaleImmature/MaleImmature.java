@@ -85,6 +85,8 @@ public class MaleImmature extends AbstractBenthicStage {
     /** day of year */
     private double dayOfYear;
     private double starvationMort;
+    private boolean molted;
+    private double exTot;
     
     /** IBM function selected for mortality */
     private IBMFunctionInterface fcnMort = null; 
@@ -519,6 +521,7 @@ public class MaleImmature extends AbstractBenthicStage {
         time       = startTime;
         numTrans   = 0.0; //set numTrans to zero
         starvationMort = 0.0;
+        molted = false;
         if (debug) {
             logger.info("\n---------------Setting initial position------------");
             logger.info(hType+cc+vType+cc+startTime+cc+xPos+cc+yPos+cc+zPos);
@@ -598,8 +601,8 @@ public class MaleImmature extends AbstractBenthicStage {
             lp.doCorrectorStep();
             pos = lp.getIJK();
         time = time+dt;
-        updateWeight(dt);
         updateSize(dt);
+        updateWeight(dt);
         updateNum(dt);
         updateAge(dt);
         updatePosition(pos);
@@ -658,6 +661,8 @@ public class MaleImmature extends AbstractBenthicStage {
             size = (Double) fcnMolt.calculate(size);
             instar += 1;
             ageInInstar = 0.0;
+            molted = true;
+            exTot = (Double) fcnExCost.calculate(size);
             if(size>35){
                 numTrans +=1;
             }
@@ -671,15 +676,14 @@ public class MaleImmature extends AbstractBenthicStage {
      */
     private void updateWeight(double dt) {
         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
-        double exTot = (Double) fcnExCost.calculate(size);
         double exPerDay = exTot/D;
         double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
         if(growthRate>0){
-            weight = weight*Math.exp(-Math.log(growthRate)*(dt/DAY_SECS));
+            weight = weight*Math.exp((Math.log(1.0+growthRate))*(dt/DAY_SECS));
         } else{
             double totRate = Math.max(-1.0,growthRate/weight);
             starvationMort = -Math.log(-totRate)*(dt/DAY_SECS);
-        } 
+        }
     }
 
     /**
@@ -725,7 +729,7 @@ public class MaleImmature extends AbstractBenthicStage {
     }
     
     private void interpolateEnvVars(double[] pos) {
-        temperature = i3d.interpolateTemperature(pos);
+        temperature = 5.0;
         salinity    = i3d.interpolateSalinity(pos);
     }
 

@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.logging.Logger;
 import org.openide.util.lookup.ServiceProvider;
 import disMELS.IBMs.SnowCrab.AbstractBenthicStage;
+import disMELS.IBMs.SnowCrab.MaleAdolescent.MaleAdolescentAttributes;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.models.utilities.CalendarIF;
@@ -227,7 +228,15 @@ public class MaleAdult extends AbstractBenthicStage {
         if (newAtts instanceof MaleAdultAttributes) {
             MaleAdultAttributes spAtts = (MaleAdultAttributes) newAtts;
             for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
-        } else {
+        } else if(newAtts instanceof MaleAdolescentAttributes){
+            MaleAdolescentAttributes spAtts = (MaleAdolescentAttributes) newAtts;
+            String key = MaleAdolescentAttributes.PROP_size; atts.setValue(key, spAtts.getValue(key));
+            key = MaleAdolescentAttributes.PROP_weight; atts.setValue(key, spAtts.getValue(key));
+            key = MaleAdolescentAttributes.PROP_instar; atts.setValue(key, spAtts.getValue(key));
+            key = MaleAdolescentAttributes.PROP_age; atts.setValue(key, spAtts.getValue(key));
+            key = MaleAdolescentAttributes.PROP_shellcond; atts.setValue(key, spAtts.getValue(key));
+            key = MaleAdolescentAttributes.PROP_shellthick; atts.setValue(key, spAtts.getValue(key));
+        }{
             //TODO: should throw an error here
             logger.info("AdultStage.setAttributes(): no match for attributes type");
         }

@@ -12,6 +12,7 @@ import org.openide.util.lookup.ServiceProvider;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
 import disMELS.IBMs.SnowCrab.AbstractBenthicStage;
+import disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes;
 import disMELS.IBMs.SnowCrab.FemaleMultiparous.FemaleMultiparous;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
@@ -237,7 +238,15 @@ public class FemalePrimiparous extends AbstractBenthicStage {
         if (newAtts instanceof FemalePrimiparousAttributes) {
             FemalePrimiparousAttributes spAtts = (FemalePrimiparousAttributes) newAtts;
             for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
-        } else {
+        } else if(newAtts instanceof FemaleImmatureAttributes){
+        FemaleImmatureAttributes spAtts = (FemaleImmatureAttributes) newAtts;
+            String key = FemaleImmatureAttributes.PROP_size; atts.setValue(key, spAtts.getValue(key));
+            key = FemaleImmatureAttributes.PROP_weight; atts.setValue(key, spAtts.getValue(key));
+            key = FemaleImmatureAttributes.PROP_instar; atts.setValue(key, spAtts.getValue(key));
+            key = FemaleImmatureAttributes.PROP_age; atts.setValue(key, spAtts.getValue(key));
+            key = FemaleImmatureAttributes.PROP_shellcond; atts.setValue(key, spAtts.getValue(key));
+            key = FemaleImmatureAttributes.PROP_shellthick; atts.setValue(key, spAtts.getValue(key));
+        }{
             //TODO: should throw an error here
             logger.info("FemalePrimiparousAttributes.setAttributes(): no match for attributes type");
         }

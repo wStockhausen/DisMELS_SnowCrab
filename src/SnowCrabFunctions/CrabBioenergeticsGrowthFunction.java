@@ -129,7 +129,7 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
     public static final String PARAM_wRat = "wRat";
     
     /** value of pVal parameter */
-    private static final double[] pVal = new double[]{
+    private double[] pVal = new double[]{
     1.5, 1.1, 1.02, 1.02, 0.97, 0.95, 0.94, 0.94, 0.96, 1.00, 1.05, 1.11, 1.19};
     
     /** value of aC parameter */

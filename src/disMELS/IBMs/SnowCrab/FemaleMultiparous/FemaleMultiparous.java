@@ -14,6 +14,7 @@ import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRa
 import disMELS.IBMs.SnowCrab.AbstractBenthicStage;
 import disMELS.IBMs.SnowCrab.EggMassExtruded.ExtrudedEggMass;
 import disMELS.IBMs.SnowCrab.EggMassExtruded.ExtrudedEggMassAttributes;
+import disMELS.IBMs.SnowCrab.FemalePrimiparous.FemalePrimiparousAttributes;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.models.utilities.CalendarIF;
@@ -246,6 +247,14 @@ public class FemaleMultiparous extends AbstractBenthicStage {
         if (newAtts instanceof FemaleMultiparousAttributes) {
             FemaleMultiparousAttributes spAtts = (FemaleMultiparousAttributes) newAtts;
             for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
+        } else if(newAtts instanceof FemalePrimiparousAttributes){
+            FemalePrimiparousAttributes spAtts = (FemalePrimiparousAttributes) newAtts;
+            String key = FemalePrimiparousAttributes.PROP_size; atts.setValue(key, spAtts.getValue(key));
+            key = FemalePrimiparousAttributes.PROP_weight; atts.setValue(key, spAtts.getValue(key));
+            key = FemalePrimiparousAttributes.PROP_instar; atts.setValue(key, spAtts.getValue(key));
+            key = FemalePrimiparousAttributes.PROP_age; atts.setValue(key, spAtts.getValue(key));
+            key = FemalePrimiparousAttributes.PROP_shellcond; atts.setValue(key, spAtts.getValue(key));
+            key = FemalePrimiparousAttributes.PROP_shellthick; atts.setValue(key, spAtts.getValue(key));   
         } else {
             //TODO: should throw an error here
             logger.info("AdultStage.setAttributes(): no match for attributes type");
@@ -277,8 +286,12 @@ public class FemaleMultiparous extends AbstractBenthicStage {
         atts.setValue(LifeStageAttributesInterface.PROP_ageInStage, 0.0);//reset age in stage
         atts.setValue(LifeStageAttributesInterface.PROP_active,true);    //set active to true
         atts.setValue(LifeStageAttributesInterface.PROP_alive,true);     //set alive to true
+        atts.setValue(FemaleMultiparousAttributes.PROP_size, size);
+        atts.setValue(FemaleMultiparousAttributes.PROP_weight, weight);
+        atts.setValue(FemaleMultiparousAttributes.PROP_instar, instar);
         id = atts.getID(); //reset id for current LHS to one from old LHS
 
+        
         //copy LagrangianParticle information
         this.setLagrangianParticle(oldLHS.getLagrangianParticle());
         //start track at last position of oldLHS track
