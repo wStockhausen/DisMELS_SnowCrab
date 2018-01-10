@@ -247,16 +247,7 @@ public class FemaleAdolescent extends AbstractBenthicStage {
             for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
         }  else if(newAtts instanceof FemaleImmatureAttributes) {
             FemaleImmatureAttributes spAtts = (FemaleImmatureAttributes) newAtts;
-            String key = FemaleImmatureAttributes.PROP_size; atts.setValue(key, spAtts.getValue(key));
-            key = FemaleImmatureAttributes.PROP_weight; atts.setValue(key, spAtts.getValue(key));
-            key = FemaleImmatureAttributes.PROP_instar; atts.setValue(key, spAtts.getValue(key));
-            key = FemaleImmatureAttributes.PROP_age; atts.setValue(key, spAtts.getValue(key));
-            key = FemaleImmatureAttributes.PROP_shellcond; atts.setValue(key, spAtts.getValue(key));
-            key = FemaleImmatureAttributes.PROP_shellthick; atts.setValue(key, spAtts.getValue(key));
-            atts.setValue(FemaleAdolescentAttributes.PROP_size, size);//reset age in stage
-            atts.setValue(FemaleAdolescentAttributes.PROP_weight,weight);    //set active to true
-            atts.setValue(FemaleAdolescentAttributes.PROP_instar,instar);
-        
+            for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
         }else {
             //TODO: should throw an error here
             logger.info("FemaleAdolescentAttributes.setAttributes(): no match for attributes type");
@@ -663,16 +654,23 @@ public class FemaleAdolescent extends AbstractBenthicStage {
             mortalityRate = (Double)fcnMort.calculate(temperature);//using temperature as covariate for mortality
         }
         double totRate = mortalityRate + starvationMort;
-        if ((ageInStage>=minStageDuration)&&(size>=minSizeAtTrans)) {
+        if ((ageInStage>=minStageDuration)&&numTrans>0) {
+            if(number!=numTrans){
             double matRate = numTrans/number;
             double instMatRate = -Math.log(1-matRate);
             totRate += instMatRate;
             //apply mortality rate to previous number transitioning and
             //add in new transitioners
+            
                     numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
                     (instMatRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
+            } else{
+                number = number-numTrans;
+        }
         }
         number = number*Math.exp(-dt*totRate/DAY_SECS);
+        this.setActive(number!=0);
+        this.setAlive(number!=0);
     }
 
     private void updatePosition(double[] pos) {

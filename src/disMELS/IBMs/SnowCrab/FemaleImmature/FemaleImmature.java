@@ -677,7 +677,7 @@ public class FemaleImmature extends AbstractBenthicStage {
      * @param dt - time step in seconds
      */
     private void updateSize(double dt) {
-         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+        double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
         if((ageInInstar+dt/DAY_SECS)>D){
             size = (Double) fcnMolt.calculate(size);
             instar += 1;
@@ -728,7 +728,7 @@ public class FemaleImmature extends AbstractBenthicStage {
             mortalityRate = (Double)fcnMort.calculate(temperature);//using temperature as covariate for mortality
         }
         double totRate = mortalityRate + starvationMort;
-        if ((ageInStage>=minStageDuration)) {
+        if ((ageInStage>=minStageDuration)&&numTrans>0) {
             if(number!=numTrans){
             double matRate = numTrans/number;
             double instMatRate = -Math.log(1-matRate);
@@ -743,6 +743,9 @@ public class FemaleImmature extends AbstractBenthicStage {
         }
         }
         number = number*Math.exp(-dt*totRate/DAY_SECS);
+        this.setActive(number!=0);
+        this.setAlive(number!=0);
+
     }
     
     private void updatePosition(double[] pos) {
@@ -852,6 +855,7 @@ public class FemaleImmature extends AbstractBenthicStage {
         atts.setValue(FemaleImmatureAttributes.PROP_size,size);
         atts.setValue(FemaleImmatureAttributes.PROP_weight,weight);
         atts.setValue(FemaleImmatureAttributes.PROP_ageInInstar,ageInInstar);
+        atts.setValue(FemaleImmatureAttributes.PROP_number, number);
         atts.setValue(FemaleImmatureAttributes.PROP_instar,instar);
         atts.setValue(FemaleImmatureAttributes.PROP_salinity,salinity);
         atts.setValue(FemaleImmatureAttributes.PROP_temperature,temperature);
@@ -869,6 +873,7 @@ public class FemaleImmature extends AbstractBenthicStage {
        size        = atts.getValue(FemaleImmatureAttributes.PROP_size,size);
        weight      = atts.getValue(FemaleImmatureAttributes.PROP_weight, weight);
        ageInInstar = atts.getValue(FemaleImmatureAttributes.PROP_ageInInstar, ageInInstar);
+       number      = atts.getValue(FemaleImmatureAttributes.PROP_number, number);
        instar      = atts.getValue(FemaleImmatureAttributes.PROP_instar, instar);
        salinity    = atts.getValue(FemaleImmatureAttributes.PROP_salinity,salinity);
        temperature = atts.getValue(FemaleImmatureAttributes.PROP_temperature,temperature);

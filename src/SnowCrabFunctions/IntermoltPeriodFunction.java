@@ -119,7 +119,7 @@ public class IntermoltPeriodFunction extends AbstractIBMFunction implements IBMF
         double T   = 5.0;
         double K = aK*(1-Math.exp(bK*cW));
         double alpha = aAlpha*(1-Math.exp(bAlpha*cW));
-        Double D = new Double(K/T-alpha);
+        Double D = new Double(K/(T-alpha));
         return D;
     }
 }

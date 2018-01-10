@@ -732,8 +732,8 @@ public class MaleImmature extends AbstractBenthicStage {
              */
             mortalityRate = (Double)fcnMort.calculate(temperature);//using temperature as covariate for mortality
         }
-        double totRate = mortalityRate+starvationMort;
-        if ((ageInStage>=minStageDuration)) {
+        double totRate = mortalityRate + starvationMort;
+        if ((ageInStage>=minStageDuration)&&numTrans>0) {
             if(number!=numTrans){
             double matRate = numTrans/number;
             double instMatRate = -Math.log(1-matRate);
@@ -748,6 +748,8 @@ public class MaleImmature extends AbstractBenthicStage {
             }
         }
         number = number*Math.exp(-dt*totRate/DAY_SECS);
+        this.setActive(number!=0);
+        this.setAlive(number!=0);
     }
     
     private void updatePosition(double[] pos) {
@@ -856,6 +858,7 @@ public class MaleImmature extends AbstractBenthicStage {
         //update new attributes
         atts.setValue(MaleImmatureAttributes.PROP_size,size);
         atts.setValue(MaleImmatureAttributes.PROP_weight,weight);
+        atts.setValue(MaleImmatureAttributes.PROP_number,number);
         atts.setValue(MaleImmatureAttributes.PROP_ageInInstar,ageInInstar);
         atts.setValue(MaleImmatureAttributes.PROP_instar,instar);
         atts.setValue(MaleImmatureAttributes.PROP_salinity,salinity);
@@ -877,6 +880,7 @@ public class MaleImmature extends AbstractBenthicStage {
        instar      = atts.getValue(MaleImmatureAttributes.PROP_instar, instar);
        salinity    = atts.getValue(MaleImmatureAttributes.PROP_salinity,salinity);
        temperature = atts.getValue(MaleImmatureAttributes.PROP_temperature,temperature);
+       number      = atts.getValue(MaleImmatureAttributes.PROP_number, number);
        ph        = atts.getValue(MaleImmatureAttributes.PROP_ph,ph);
     }
 

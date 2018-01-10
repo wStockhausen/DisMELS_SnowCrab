@@ -661,7 +661,8 @@ public class MaleAdolescent extends AbstractBenthicStage {
             mortalityRate = (Double)fcnMort.calculate(temperature);//using temperature as covariate for mortality
         }
         double totRate = mortalityRate + starvationMort;
-        if ((ageInStage>=minStageDuration)&&(size>=minSizeAtTrans)) {
+        if ((ageInStage>=minStageDuration)&&numTrans>0) {
+            if(number!=numTrans){
             double matRate = numTrans/number;
             double instMatRate = -Math.log(1-matRate);
             totRate += instMatRate;
@@ -669,8 +670,13 @@ public class MaleAdolescent extends AbstractBenthicStage {
             //add in new transitioners
             numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
                     (instMatRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
+            } else{
+                number = number-numTrans;
+        }
         }
         number = number*Math.exp(-dt*totRate/DAY_SECS);
+        this.setActive(number!=0);
+        this.setAlive(number!=0);
     }
 
     private void updatePosition(double[] pos) {
@@ -773,6 +779,7 @@ public class MaleAdolescent extends AbstractBenthicStage {
         //update new attributes
         atts.setValue(MaleAdolescentAttributes.PROP_size,size);
         atts.setValue(MaleAdolescentAttributes.PROP_weight,weight);
+        atts.setValue(MaleAdolescentAttributes.PROP_number,number);
         atts.setValue(MaleAdolescentAttributes.PROP_ageInInstar,ageInInstar);
         atts.setValue(MaleAdolescentAttributes.PROP_instar,instar);
         atts.setValue(MaleAdolescentAttributes.PROP_salinity,salinity);
@@ -791,6 +798,7 @@ public class MaleAdolescent extends AbstractBenthicStage {
        size        = atts.getValue(MaleAdolescentAttributes.PROP_size,size);
        weight      = atts.getValue(MaleAdolescentAttributes.PROP_weight, weight);
        ageInInstar = atts.getValue(MaleAdolescentAttributes.PROP_ageInInstar, ageInInstar);
+       number      = atts.getValue(MaleAdolescentAttributes.PROP_number, number);
        instar      = atts.getValue(MaleAdolescentAttributes.PROP_instar, instar);
        salinity    = atts.getValue(MaleAdolescentAttributes.PROP_salinity,salinity);
        temperature = atts.getValue(MaleAdolescentAttributes.PROP_temperature,temperature);
