@@ -18,6 +18,8 @@ import disMELS.IBMs.SnowCrab.MaleAdolescent.MaleAdolescentAttributes;
 import disMELS.IBMs.SnowCrab.Megalopa.MegalopaAttributes;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
+import wts.models.utilities.CalendarIF;
+import wts.models.utilities.DateTimeFunctions;
 import wts.roms.model.LagrangianParticle;
 
 /**
@@ -268,10 +270,33 @@ public class MaleImmature extends AbstractBenthicStage {
             MegalopaAttributes spAtts = (MegalopaAttributes) newAtts;
             String key = MegalopaAttributes.PROP_weight; atts.setValue(key, spAtts.getValue(key));
             key = MegalopaAttributes.PROP_age; atts.setValue(key, spAtts.getValue(key));
-                    size = params.getValue(MaleImmatureParameters.PARAM_initialSize, size);
+            key = MegalopaAttributes.PROP_startTime; atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_time; atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_track; atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_id; atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_parentID; atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_origID; atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_horizType; atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_vertType;   atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_horizPos1;  atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_horizPos2;  atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_vertPos;   atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_gridCellID; atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_track;      atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_active;     atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_alive;      atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_number;     atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_shellthick; atts.setValue(key, spAtts.getValue(key));
+
+            size = params.getValue(MaleImmatureParameters.PARAM_initialSize, size);
             instar = 1;
+            ageInStage = 0.0;
+            ageInInstar = 0.0;
+            
             atts.setValue(MaleImmatureAttributes.PROP_size, size);
             atts.setValue(MaleImmatureAttributes.PROP_instar, instar);
+            atts.setValue(MaleImmatureAttributes.PROP_ageInInstar, ageInInstar);
+            atts.setValue(MaleImmatureAttributes.PROP_ageInStage, ageInStage);
         } else {
             //TODO: should throw an error here
             logger.info("AdultStage.setAttributes(): no match for attributes type");
@@ -451,7 +476,7 @@ public class MaleImmature extends AbstractBenthicStage {
         output.clear();
         List<LifeStageInterface> nLHSs=null;
         if (((ageInStage+dtp)>=minStageDuration)&&(size>=minSize)) {
-            if ((numTrans>0)||!isSuperIndividual){
+            if (numTrans>0){
                 nLHSs = createNextLHSs();
                 if (nLHSs!=null) output.addAll(nLHSs);
             }
@@ -583,6 +608,7 @@ public class MaleImmature extends AbstractBenthicStage {
         //determine daytime/nighttime
         dayOfYear = globalInfo.getCalendar().getYearDay();
         starvationMort = 0.0;
+        numTrans = 0.0;
         //movement here
         //TODO: revise so no advection by currents!
         double[] pos;
@@ -708,6 +734,7 @@ public class MaleImmature extends AbstractBenthicStage {
         }
         double totRate = mortalityRate+starvationMort;
         if ((ageInStage>=minStageDuration)) {
+            if(number!=numTrans){
             double matRate = numTrans/number;
             double instMatRate = -Math.log(1-matRate);
             totRate += instMatRate;
@@ -716,6 +743,9 @@ public class MaleImmature extends AbstractBenthicStage {
             
                     numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
                     (instMatRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
+            } else{
+                number = number-numTrans;
+            }
         }
         number = number*Math.exp(-dt*totRate/DAY_SECS);
     }
@@ -729,7 +759,7 @@ public class MaleImmature extends AbstractBenthicStage {
     }
     
     private void interpolateEnvVars(double[] pos) {
-        temperature = 5.0;
+        temperature = i3d.interpolateTemperature(pos);
         salinity    = i3d.interpolateSalinity(pos);
     }
 

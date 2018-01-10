@@ -12,6 +12,8 @@ import org.openide.util.lookup.ServiceProvider;
 import disMELS.IBMs.SnowCrab.AbstractBenthicStage;
 import disMELS.IBMs.SnowCrab.MaleAdult.MaleAdult;
 import disMELS.IBMs.SnowCrab.MaleImmature.MaleImmatureAttributes;
+import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
+import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.models.utilities.CalendarIF;
@@ -63,8 +65,6 @@ public class MaleAdolescent extends AbstractBenthicStage {
     protected double meanStageTransDelay;
     /** flag to use stochastic transitions */
     protected boolean randomizeTransitions;
-    /** stage transition rate */
-    protected double stageTransRate;
         
             //other fields
     /** number of individuals transitioning to next stage */
@@ -250,15 +250,15 @@ public class MaleAdolescent extends AbstractBenthicStage {
             key = MaleImmatureAttributes.PROP_age; atts.setValue(key, spAtts.getValue(key));
             key = MaleImmatureAttributes.PROP_shellcond; atts.setValue(key, spAtts.getValue(key));
             key = MaleImmatureAttributes.PROP_shellthick; atts.setValue(key, spAtts.getValue(key));
+            atts.setValue(MaleAdolescentAttributes.PROP_size, size);//reset age in stage
+            atts.setValue(MaleAdolescentAttributes.PROP_weight,weight);    //set active to true
+            atts.setValue(MaleAdolescentAttributes.PROP_instar,instar);     //set alive to true
         } else {
             //TODO: should throw an error here
             logger.info("AdultStage.setAttributes(): no match for attributes type");
         }
         id = atts.getValue(LifeStageAttributesInterface.PROP_id, id);
-        atts.setValue(MaleAdolescentAttributes.PROP_size, size);//reset age in stage
-        atts.setValue(MaleAdolescentAttributes.PROP_weight,weight);    //set active to true
-        atts.setValue(MaleAdolescentAttributes.PROP_instar,instar);     //set alive to true
-        atts.setValue(MaleAdolescentAttributes.PROP_ageInInstar,0.0);     //set alive to true
+       //set alive to true
         updateVariables();
     }
     
@@ -425,8 +425,10 @@ public class MaleAdolescent extends AbstractBenthicStage {
         output.clear();
         List<LifeStageInterface> nLHSs=null;
         if ((ageInStage+dtp>=minStageDuration)&&(size>=minSizeAtTrans)) {
+            if(numTrans>0){
             nLHSs = createNextLHSs();
             if (nLHSs!=null) output.addAll(nLHSs);
+        }
         }
         return output;
     }
@@ -547,6 +549,7 @@ public class MaleAdolescent extends AbstractBenthicStage {
     public void step(double dt) throws ArrayIndexOutOfBoundsException {
         //determine daytime/nighttime for vertical migration & calc indiv. W
         dayOfYear = globalInfo.getCalendar().getYearDay();
+        numTrans = 0.0;
 //        isDaytime = DateTimeFunctions.isDaylight(lon,lat,dayOfYear);
         //movement here
         double[] pos;
@@ -565,9 +568,8 @@ public class MaleAdolescent extends AbstractBenthicStage {
             lp.doCorrectorStep();
             pos = lp.getIJK();
         time = time+dt;
-        
-        updateWeight(dt);
         updateSize(dt);
+        updateWeight(dt);
         updateNum(dt);
         updateAge(dt);
         updatePosition(pos);
@@ -604,6 +606,7 @@ public class MaleAdolescent extends AbstractBenthicStage {
     private void updateAge(double dt) {
         age        = age+dt/DAY_SECS;
         ageInStage = ageInStage+dt/DAY_SECS;
+        ageInInstar = ageInInstar+dt/DAY_SECS;
         if (ageInStage>maxStageDuration) {
             alive = false;
             active = false;
@@ -642,17 +645,30 @@ public class MaleAdolescent extends AbstractBenthicStage {
      * @param dt - time step in seconds
      */
     private void updateNum(double dt) {
-        //The following works for
-        //  wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction
-        //  wts.models.DisMELS.IBMFunctions.Miscellaneous.PowerLawFunction
-        double mortalityRate = (Double)fcnMort.calculate(size);//in unis of [days]^-1
+        double mortalityRate=0.0D;
+         if (fcnMort instanceof ConstantMortalityRate){
+            /**
+             * @param vars - null
+             * @return     - Double - the corresponding mortality rate (per day) 
+             */
+            mortalityRate = (Double)fcnMort.calculate(null);
+        } else 
+        if (fcnMort instanceof TemperatureDependentMortalityRate_Houde1989){
+            /**
+             * @param vars - Double - temperature (deg C)
+             * @return     - Double - the corresponding mortality rate (per day) 
+             */
+            mortalityRate = (Double)fcnMort.calculate(temperature);//using temperature as covariate for mortality
+        }
         double totRate = mortalityRate + starvationMort;
         if ((ageInStage>=minStageDuration)&&(size>=minSizeAtTrans)) {
-            totRate += stageTransRate;
+            double matRate = numTrans/number;
+            double instMatRate = -Math.log(1-matRate);
+            totRate += instMatRate;
             //apply mortality rate to previous number transitioning and
             //add in new transitioners
             numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
-                    (stageTransRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
+                    (instMatRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
         }
         number = number*Math.exp(-dt*totRate/DAY_SECS);
     }

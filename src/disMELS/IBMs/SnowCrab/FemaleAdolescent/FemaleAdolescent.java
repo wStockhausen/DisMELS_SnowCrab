@@ -253,6 +253,10 @@ public class FemaleAdolescent extends AbstractBenthicStage {
             key = FemaleImmatureAttributes.PROP_age; atts.setValue(key, spAtts.getValue(key));
             key = FemaleImmatureAttributes.PROP_shellcond; atts.setValue(key, spAtts.getValue(key));
             key = FemaleImmatureAttributes.PROP_shellthick; atts.setValue(key, spAtts.getValue(key));
+            atts.setValue(FemaleAdolescentAttributes.PROP_size, size);//reset age in stage
+            atts.setValue(FemaleAdolescentAttributes.PROP_weight,weight);    //set active to true
+            atts.setValue(FemaleAdolescentAttributes.PROP_instar,instar);
+        
         }else {
             //TODO: should throw an error here
             logger.info("FemaleAdolescentAttributes.setAttributes(): no match for attributes type");
@@ -423,8 +427,10 @@ public class FemaleAdolescent extends AbstractBenthicStage {
         output.clear();
         List<LifeStageInterface> nLHSs=null;
         if ((ageInStage+dtp>=minStageDuration)&&(size>=minSizeAtTrans)) {
+            if(numTrans>0){
             nLHSs = createNextLHSs();
             if (nLHSs!=null) output.addAll(nLHSs);
+        }
         }
         return output;
     }
@@ -556,8 +562,8 @@ public class FemaleAdolescent extends AbstractBenthicStage {
             lp.doCorrectorStep();
             pos = lp.getIJK();
         time = time+dt;
-        updateWeight(dt);
         updateSize(dt);
+        updateWeight(dt);
         updateNum(dt);
         updateAge(dt);
         updatePosition(pos);
@@ -657,13 +663,12 @@ public class FemaleAdolescent extends AbstractBenthicStage {
             mortalityRate = (Double)fcnMort.calculate(temperature);//using temperature as covariate for mortality
         }
         double totRate = mortalityRate + starvationMort;
-        if ((ageInStage>=minStageDuration)) {
+        if ((ageInStage>=minStageDuration)&&(size>=minSizeAtTrans)) {
             double matRate = numTrans/number;
             double instMatRate = -Math.log(1-matRate);
             totRate += instMatRate;
             //apply mortality rate to previous number transitioning and
             //add in new transitioners
-            
                     numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
                     (instMatRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
         }

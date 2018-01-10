@@ -22,15 +22,15 @@ public class MaleAdolescentAttributes extends AbstractBenthicStageAttributes {
     /** set of keys identifying new attributes */
     protected static final Set<String> newKeys = new LinkedHashSet<>((int)(2*numNewAttributes));
     /** set of keys identifying all attributes */
-    protected static final Set<String> allKeys = new LinkedHashSet<>((int)(2*(numAttributes+numNewAttributes)));
+    protected static final Set<String> allKeys = new LinkedHashSet<>((int)(2*(AbstractBenthicStageAttributes.numAttributes+numNewAttributes)));
     /** map containing all attributes */
-    protected static final Map<String,IBMAttribute> mapAllAttributes = new HashMap<>((int)(2*(numAttributes+numNewAttributes)));
+    protected static final Map<String,IBMAttribute> mapAllAttributes = new HashMap<>((int)(2*(AbstractBenthicStageAttributes.numAttributes+numNewAttributes)));
     /** String[] containing all attribute keys EXCEPT typeName */
-    protected static final String[] aKeys      = new String[numAttributes+numNewAttributes-1];//does not include typeName
+    protected static final String[] aKeys      = new String[AbstractBenthicStageAttributes.numAttributes+numNewAttributes-1];//does not include typeName
     /** Class[] containing the class associated with each attribute */
-    protected static final Class[]  classes    = new Class[numAttributes+numNewAttributes];
+    protected static final Class[]  classes    = new Class[AbstractBenthicStageAttributes.numAttributes+numNewAttributes];
     /** String[] containing short names for all attributes (for writing results) */
-    protected static final String[] shortNames = new String[numAttributes+numNewAttributes];
+    protected static final String[] shortNames = new String[AbstractBenthicStageAttributes.numAttributes+numNewAttributes];
    
     /** class logger */
     private static final Logger logger = Logger.getLogger(MaleAdolescentAttributes.class.getName());
@@ -94,7 +94,7 @@ public class MaleAdolescentAttributes extends AbstractBenthicStageAttributes {
             while (it.hasNext()) aKeys[j++] = it.next();
         }
         //set instance information
-        Map<String,Object> tmpMapValues = new HashMap<>((int)(2*(numNewAttributes+numAttributes)));
+        Map<String,Object> tmpMapValues = new HashMap<>((int)(2*(super.numAttributes+numNewAttributes)));
         tmpMapValues.putAll(mapValues);//copy from super
         //add new attributes
 //        //no new attributes for this class, but would look like:
@@ -121,7 +121,7 @@ public class MaleAdolescentAttributes extends AbstractBenthicStageAttributes {
      */
     @Override
     public Object[] getAttributes() {
-        Object[] atts = new Object[numNewAttributes+AbstractBenthicStageAttributes.numAttributes-1];
+        Object[] atts = new Object[super.numAttributes+numNewAttributes-1];
         int j = 0;
         Iterator<String> it = allKeys.iterator();
         it.next();//skip PROP_typeName
@@ -151,8 +151,8 @@ public class MaleAdolescentAttributes extends AbstractBenthicStageAttributes {
      */
     @Override
     public String getCSVHeader() {
-        Iterator<String> it = allKeys.iterator();
-        String str = it.next();//typeName
+        String str = super.getCSVHeader();
+        Iterator<String> it = newKeys.iterator();
         while (it.hasNext()) str = str+cc+it.next();
         return str;
     }
@@ -165,8 +165,8 @@ public class MaleAdolescentAttributes extends AbstractBenthicStageAttributes {
      */
     @Override
     public String getCSVHeaderShortNames() {
-        Iterator<String> it = allKeys.iterator();
-        String str = mapAllAttributes.get(it.next()).shortName;//this is "typeName"
+        String str = super.getCSVHeaderShortNames();
+        Iterator<String> it = newKeys.iterator();
         while (it.hasNext()) str = str+cc+mapAllAttributes.get(it.next()).shortName;
         return str;
     }
@@ -224,7 +224,7 @@ public class MaleAdolescentAttributes extends AbstractBenthicStageAttributes {
     public void setValues(final String[] strv) {
         super.setValues(strv);//set the standard attribute values
         //set the values of the new attributes
-        int j = AbstractBenthicStageAttributes.numAttributes;
+        int j = super.numAttributes;
         try {
             for (String key: newKeys) setValueFromString(key,strv[j++]);
         } catch (java.lang.IndexOutOfBoundsException ex) {
