@@ -144,7 +144,7 @@ public class MaturityOgiveFunction extends AbstractIBMFunction implements IBMFun
         double[] lvars = (double[]) vars;//cast object to required double[]
         int i = 0;
         double size = lvars[i++];
-        double T = lvars[i++];
+        double T = 5.0;
         double q1 = Math.exp(aQ1*Math.log(T+2.0)+bQ1);
         double q99 = Math.exp(aQ99*Math.log(T+2.0)+bQ99);
         NormalDistribution stdNorm = new NormalDistribution();

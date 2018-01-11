@@ -66,16 +66,11 @@ public class Zooea2 extends AbstractPelagicStage {
     protected double minStageDuration;
     /** maximum stage duration (followed by death) */
     protected double maxStageDuration;
-    /** minimum size before metamorphosis to next stage */
-    protected double minSize;
-    /** initial size (mm) */
-    protected double initialSize;
-    /** initial weight (g) */
+    /** minimum weight before metamorphosis to next stage */
+    protected double minWeight;
     protected double initialWeight;
     /** flag to use stochastic transitions */
     protected boolean randomizeTransitions;
-    /** stage transition rate */
-    protected double stageTransRate;
     
         //fields that reflect (new) attribute values
     //none
@@ -90,6 +85,8 @@ public class Zooea2 extends AbstractPelagicStage {
     private IBMFunctionInterface fcnGrowth = null; 
     /** IBM function selected for mortality */
     private IBMFunctionInterface fcnMort = null; 
+    
+    private IBMFunctionInterface fcnMoltTime = null;
     /** IBM function selected for vertical movement */
     private IBMFunctionInterface fcnVM = null; 
     /** IBM function selected for vertical velocity */
@@ -262,8 +259,7 @@ public class Zooea2 extends AbstractPelagicStage {
         if (newAtts instanceof Zooea1Attributes) {
             //get initial values for size and weight
             String akey; String pkey;
-            akey = Zooea2Attributes.PROP_size;    atts.setValue(akey, initialSize);
-            akey = Zooea2Attributes.PROP_weight;  atts.setValue(akey, initialWeight);
+                      akey = Zooea2Attributes.PROP_weight;  atts.setValue(akey, initialWeight);
         }
         id = atts.getValue(LifeStageAttributesInterface.PROP_id, id);
         updateVariables();
@@ -380,8 +376,8 @@ public class Zooea2 extends AbstractPelagicStage {
         fcnMort    = params.getSelectedIBMFunctionForCategory(Zooea2Parameters.FCAT_Mortality);
         fcnVM      = params.getSelectedIBMFunctionForCategory(Zooea2Parameters.FCAT_VerticalMovement);
         fcnVV      = params.getSelectedIBMFunctionForCategory(Zooea2Parameters.FCAT_VerticalVelocity);
+        fcnMoltTime = params.getSelectedIBMFunctionForCategory(Zooea2Parameters.FCAT_MoltTime);
     }
-    
     /*
      * Copy the values from the params map to the param variables.
      */
@@ -390,18 +386,16 @@ public class Zooea2 extends AbstractPelagicStage {
                 params.getValue(Zooea2Parameters.PARAM_isSuperIndividual,isSuperIndividual);
         horizRWP = 
                 params.getValue(Zooea2Parameters.PARAM_horizRWP,horizRWP);
-        initialSize = 
-                params.getValue(Zooea2Parameters.PARAM_initialSize,initialSize);
         initialWeight = 
                 params.getValue(Zooea2Parameters.PARAM_initialWeight,initialWeight);
         minStageDuration = 
                 params.getValue(Zooea2Parameters.PARAM_minStageDuration,minStageDuration);
         maxStageDuration = 
                 params.getValue(Zooea2Parameters.PARAM_maxStageDuration,maxStageDuration);
-        minSize = 
-                params.getValue(Zooea2Parameters.PARAM_minSize,minSize);
         randomizeTransitions = 
                 params.getValue(Zooea2Parameters.PARAM_randomizeTransitions,true);
+                minWeight = 
+                params.getValue(Zooea2Parameters.PARAM_minWeight,minWeight);
     }
     
     /**
@@ -436,8 +430,8 @@ public class Zooea2 extends AbstractPelagicStage {
         double dtp = 0.25*(dt/DAY_SECS);//use 1/4 timestep (converted from sec to d)
         output.clear();
         List<LifeStageInterface> nLHSs=null;
-        if (((ageInStage+dtp)>=minStageDuration)&&(size>=minSize)) {
-            if ((numTrans>0)||!isSuperIndividual){
+        if (((ageInStage+dtp)>=minStageDuration)&&(weight>=minWeight)) {
+            if ((numTrans>0)){
                 nLHSs = createNextLHSs();
                 if (nLHSs!=null) output.addAll(nLHSs);
             }
@@ -585,10 +579,11 @@ public class Zooea2 extends AbstractPelagicStage {
         pos = lp.getIJK();
         if (debugOps) logger.info("Depth after corrector step = "+(-i3d.calcZfromK(pos[0],pos[1],pos[2])));
         time = time+dt;
+        updateWeight(dt);
         updateNum(dt);
         updateAge(dt);
         updatePosition(pos);
-        updateSize(dt);
+    
         interpolateEnvVars(pos);
         //check for exiting grid
         if (i3d.isAtGridEdge(pos,tolGridEdge)){
@@ -688,25 +683,31 @@ public class Zooea2 extends AbstractPelagicStage {
      *
      * @param dt - time step in seconds
      */
-    private void updateSize(double dt) {
+    private void updateWeight(double dt) {
         if (fcnGrowth instanceof ExponentialGrowthFunction){
             /**
              * @param vars - the inputs variables, dt (in days) and z0, as a double[].
              * @return     - the function value (z[dt]) as a Double 
              */
-            size = (Double)fcnGrowth.calculate(new double[]{dt/DAY_SECS,size});
+            weight = (Double)fcnGrowth.calculate(new double[]{dt/DAY_SECS,weight});
         } else
         if (fcnGrowth instanceof LinearGrowthFunction){
             /**
-             * @param vars - the inputs variables, dt (in days) and z0, as a double[].
+             * @param vars - the inputs variables, z0 and dt, as a double[].
              * @return     - the function value (z[dt]) as a Double 
              */
-            size = (Double)fcnGrowth.calculate(new double[]{dt/DAY_SECS,size});
+            Double D = (Double) fcnMoltTime.calculate(temperature); 
+            Double growthRate = (Double) (minWeight-initialWeight)/D;
+            fcnGrowth.setParameterValue("rate", growthRate);
+            weight = (Double)fcnGrowth.calculate(new double[]{dt/DAY_SECS,weight});
         } else
         if (fcnGrowth instanceof ConstantFunction){
             double rate = (Double)fcnGrowth.calculate(null);
-            size += rate*dt/DAY_SECS;
+            weight += rate*dt/DAY_SECS;
         }
+        if(weight>minWeight){
+            numTrans += 1;
+    }
     }
 
     /**
@@ -731,13 +732,22 @@ public class Zooea2 extends AbstractPelagicStage {
         }
         double totRate = mortalityRate;
         if ((ageInStage>=minStageDuration)) {
-            totRate += stageTransRate;
+                      if((numTrans<number)&&(numTrans>0.0)){
+            double transRate = numTrans/number;
+            double instTransRate = -Math.log(1-transRate);
+            totRate += instTransRate;
             //apply mortality rate to previous number transitioning and
             //add in new transitioners
             numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
-                    (stageTransRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
+                    (instTransRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
+            } else if(numTrans==number){
+                number = number - numTrans;
+            }
         }
         number = number*Math.exp(-dt*totRate/DAY_SECS);
+        if(number==0){
+            active=false;alive=false;
+        }
     }
     
     private void updatePosition(double[] pos) {
@@ -837,26 +847,33 @@ public class Zooea2 extends AbstractPelagicStage {
         return atts.getCSVHeaderShortNames();
     }
     
-//    /**
-//     * Updates attribute values defined for this class. 
-//     */
-//    @Override
-//    protected void updateAttributes() {
-//        //update superclass attributes
-//        super.updateAttributes();
-//        //update new attributes
-////        atts.setValue(Zooea2Attributes.PROP_size,size);
-//    }
-//
-//    /**
-//     * Updates local variables from the attributes.  
-//     */
-//    @Override
-//    protected void updateVariables() {
-//        //update superclass variables
-//        super.updateVariables();
-//        //update new variables like:
-////        size        = atts.getValue(Zooea2Attributes.PROP_size,size);
-//    }
+    /**
+     * Updates attribute values defined for this class. 
+     */
+    @Override
+    protected void updateAttributes() {
+        //update superclass attributes
+        super.updateAttributes();
+        //update new attributes
+        atts.setValue(Zooea1Attributes.PROP_weight,weight);
+        atts.setValue(Zooea1Attributes.PROP_number,number);
+        atts.setValue(Zooea1Attributes.PROP_salinity,salinity);
+        atts.setValue(Zooea1Attributes.PROP_temperature,temperature);
+        atts.setValue(Zooea1Attributes.PROP_ph,ph);
+    }
 
+    /**
+     * Updates local variables from the attributes.  
+     */
+    @Override
+    protected void updateVariables() {
+        //update superclass variables
+        super.updateVariables();
+        //update new variables
+       weight      = atts.getValue(Zooea1Attributes.PROP_weight, weight);
+       salinity    = atts.getValue(Zooea1Attributes.PROP_salinity,salinity);
+       temperature = atts.getValue(Zooea1Attributes.PROP_temperature,temperature);
+       number      = atts.getValue(Zooea1Attributes.PROP_number, number);
+       ph        = atts.getValue(Zooea1Attributes.PROP_ph,ph);
+}
 }

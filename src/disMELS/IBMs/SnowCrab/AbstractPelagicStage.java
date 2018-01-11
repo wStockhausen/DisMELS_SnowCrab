@@ -374,7 +374,6 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
         key = LifeStageAttributesInterface.PROP_number;     atts.setValue(key,newAtts.getValue(key));
         
         if (newAtts instanceof AbstractPelagicStageAttributes){
-            key = AbstractPelagicStageAttributes.PROP_size;       atts.setValue(key,newAtts.getValue(key));
             key = AbstractPelagicStageAttributes.PROP_weight;     atts.setValue(key,newAtts.getValue(key));
             key = AbstractPelagicStageAttributes.PROP_shellthick; atts.setValue(key,newAtts.getValue(key));
         }
@@ -400,7 +399,6 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
         atts.setValue(AbstractPelagicStageAttributes.PROP_age,age);
         atts.setValue(AbstractPelagicStageAttributes.PROP_ageInStage,ageInStage);
         atts.setValue(AbstractPelagicStageAttributes.PROP_number,number);
-        atts.setValue(AbstractPelagicStageAttributes.PROP_size,size);
         atts.setValue(AbstractPelagicStageAttributes.PROP_weight,weight);
         atts.setValue(AbstractPelagicStageAttributes.PROP_shellthick,shellthick);
         atts.setValue(AbstractPelagicStageAttributes.PROP_salinity,salinity);
@@ -425,7 +423,6 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
         age        = atts.getValue(AbstractPelagicStageAttributes.PROP_age,age);
         ageInStage = atts.getValue(AbstractPelagicStageAttributes.PROP_ageInStage,ageInStage);
         number     = atts.getValue(AbstractPelagicStageAttributes.PROP_number,number);
-        size        = atts.getValue(AbstractPelagicStageAttributes.PROP_size,size);
         weight      = atts.getValue(AbstractPelagicStageAttributes.PROP_weight,weight);
         salinity    = atts.getValue(AbstractPelagicStageAttributes.PROP_salinity,salinity);
         temperature = atts.getValue(AbstractPelagicStageAttributes.PROP_temperature,temperature);

@@ -74,13 +74,11 @@ public class Megalopa extends AbstractPelagicStage {
     /** maximum settlement depth */
     protected double maxSettlementDepth;
     /** initial size (mm) */
-    protected double initialSize;
+    protected double minWeight;
     /** initial weight (g) */
     protected double initialWeight;
     /** flag to use stochastic transitions */
     protected boolean randomizeTransitions;
-    /** stage transition rate */
-    protected double stageTransRate;
     
         //fields that reflect (new) attribute values
     //none
@@ -95,6 +93,8 @@ public class Megalopa extends AbstractPelagicStage {
     private IBMFunctionInterface fcnGrowth = null; 
     /** IBM function selected for mortality */
     private IBMFunctionInterface fcnMort = null; 
+    
+    private IBMFunctionInterface fcnMoltTime = null;
     /** IBM function selected for vertical movement */
     private IBMFunctionInterface fcnVM = null; 
     /** IBM function selected for vertical velocity */
@@ -375,6 +375,7 @@ public class Megalopa extends AbstractPelagicStage {
     private void setIBMFunctions(){
         fcnGrowth  = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_Growth);
         fcnMort    = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_Mortality);
+        fcnMoltTime = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_MoltTime);
         fcnVM      = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_VerticalMovement);
         fcnVV      = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_VerticalVelocity);
     }
@@ -387,8 +388,8 @@ public class Megalopa extends AbstractPelagicStage {
                 params.getValue(MegalopaParameters.PARAM_isSuperIndividual,isSuperIndividual);
         horizRWP = 
                 params.getValue(MegalopaParameters.PARAM_horizRWP,horizRWP);
-        initialSize = 
-                params.getValue(MegalopaParameters.PARAM_initialSize,initialSize);
+        minWeight = 
+                params.getValue(MegalopaParameters.PARAM_minWeight,minWeight);
         initialWeight = 
                 params.getValue(MegalopaParameters.PARAM_initialWeight,initialWeight);
         minStageDuration = 
@@ -432,15 +433,14 @@ public class Megalopa extends AbstractPelagicStage {
      */
     @Override
     public List<LifeStageInterface> getMetamorphosedIndividuals(double dt) {
+        double dtp = 0.25*(dt/DAY_SECS);//use 1/4 timestep (converted from sec to d)
         output.clear();
-        List<LifeStageInterface> nLHSs = null;
-        //if total depth is appropriate for settlement and 
-        //indiv is near the bottom, then settle and transform to next stage.
-        if (debugOps) logger.info("minDepth,totDepth,maxDepth,depth = "+minSettlementDepth+","+totalDepth+","+maxSettlementDepth+","+depth);
-        if ((minSettlementDepth<=totalDepth)&&(totalDepth<=maxSettlementDepth)&&
-                (depth>(totalDepth-5))) {
+        List<LifeStageInterface> nLHSs=null;
+        if (((ageInStage+dtp)>=minStageDuration)&&(weight>=minWeight)) {
+            if ((numTrans>0)){
             nLHSs = createNextLHSs();
             if (nLHSs!=null) output.addAll(nLHSs);
+        }
         }
         return output;
     }
@@ -585,10 +585,12 @@ public class Megalopa extends AbstractPelagicStage {
             pos = lp.getIJK();
             if (debugOps) logger.info("Depth after corrector step = "+(-i3d.calcZfromK(pos[0],pos[1],pos[2])));
         time = time+dt;
+        numTrans = 0.0;
+        updateWeight(dt);
         updateNum(dt);
         updateAge(dt);
         updatePosition(pos);
-        updateSize(dt);
+    
         interpolateEnvVars(pos);
         //check for exiting grid
         if (i3d.isAtGridEdge(pos,tolGridEdge)){
@@ -692,24 +694,30 @@ public class Megalopa extends AbstractPelagicStage {
      *
      * @param dt - time step in seconds
      */
-    private void updateSize(double dt) {
+    private void updateWeight(double dt) {
         if (fcnGrowth instanceof ExponentialGrowthFunction){
             /**
              * @param vars - the inputs variables, dt (in days) and z0, as a double[].
              * @return     - the function value (z[dt]) as a Double 
              */
-            size = (Double)fcnGrowth.calculate(new double[]{dt/DAY_SECS,size});
+            weight = (Double)fcnGrowth.calculate(new double[]{dt/DAY_SECS,weight});
         } else
         if (fcnGrowth instanceof LinearGrowthFunction){
             /**
              * @param vars - the inputs variables, z0 and dt, as a double[].
              * @return     - the function value (z[dt]) as a Double 
              */
-            size = (Double)fcnGrowth.calculate(new double[]{dt/DAY_SECS,size});
+            Double D = (Double) fcnMoltTime.calculate(temperature); 
+            Double growthRate = (Double) (minWeight-initialWeight)/D;
+            fcnGrowth.setParameterValue("rate", growthRate);
+            weight = (Double)fcnGrowth.calculate(new double[]{dt/DAY_SECS,weight});
         } else
         if (fcnGrowth instanceof ConstantFunction){
             double rate = (Double)fcnGrowth.calculate(null);
-            size += rate*dt/DAY_SECS;
+            weight += rate*dt/DAY_SECS;
+        }
+        if(weight>minWeight){
+            numTrans += 1;
         }
     }
 
@@ -735,13 +743,22 @@ public class Megalopa extends AbstractPelagicStage {
         }
         double totRate = mortalityRate;
         if ((ageInStage>=minStageDuration)) {
-            totRate += stageTransRate;
+              if((numTrans<number)&&(numTrans>0.0)){
+            double transRate = numTrans/number;
+            double instTransRate = -Math.log(1-transRate);
+            totRate += instTransRate;
             //apply mortality rate to previous number transitioning and
             //add in new transitioners
             numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
-                    (stageTransRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
+                    (instTransRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
+            } else if(numTrans==number){
+                number = number - numTrans;
+            }
         }
         number = number*Math.exp(-dt*totRate/DAY_SECS);
+        if(number==0){
+            active=false;alive=false;
+        }
     }
     
     private void updatePosition(double[] pos) {
@@ -841,26 +858,33 @@ public class Megalopa extends AbstractPelagicStage {
         return atts.getCSVHeaderShortNames();
     }
     
-//    /**
-//     * Updates attribute values defined for this class. 
-//     */
-//    @Override
-//    protected void updateAttributes() {
-//        //update superclass attributes
-//        super.updateAttributes();
-//        //update new attributes
-////        atts.setValue(Zooea2Attributes.PROP_size,size);
-//    }
-//
-//    /**
-//     * Updates local variables from the attributes.  
-//     */
-//    @Override
-//    protected void updateVariables() {
-//        //update superclass variables
-//        super.updateVariables();
-//        //update new variables like:
-////        size        = atts.getValue(Zooea2Attributes.PROP_size,size);
-//    }
+    /**
+     * Updates attribute values defined for this class. 
+     */
+    @Override
+    protected void updateAttributes() {
+        //update superclass attributes
+        super.updateAttributes();
+        //update new attributes
+        atts.setValue(MegalopaAttributes.PROP_weight,weight);
+        atts.setValue(MegalopaAttributes.PROP_number,number);
+        atts.setValue(MegalopaAttributes.PROP_salinity,salinity);
+        atts.setValue(MegalopaAttributes.PROP_temperature,temperature);
+        atts.setValue(MegalopaAttributes.PROP_ph,ph);
+    }
 
+    /**
+     * Updates local variables from the attributes.  
+     */
+    @Override
+    protected void updateVariables() {
+        //update superclass variables
+        super.updateVariables();
+        //update new variables
+       weight      = atts.getValue(MegalopaAttributes.PROP_weight, weight);
+       salinity    = atts.getValue(MegalopaAttributes.PROP_salinity,salinity);
+       temperature = atts.getValue(MegalopaAttributes.PROP_temperature,temperature);
+       number      = atts.getValue(MegalopaAttributes.PROP_number, number);
+       ph        = atts.getValue(MegalopaAttributes.PROP_ph,ph);
+    }
 }

@@ -7,6 +7,7 @@
 
 package disMELS.IBMs.SnowCrab.Zooea1;
 
+import SnowCrabFunctions.IntermoltLarvaFunction;
 import java.beans.PropertyChangeSupport;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -42,24 +43,23 @@ public class Zooea1Parameters extends AbstractLHSParameters {
     public static final long serialVersionUID = 1L;
     
     /** the number of IBMParameter objects defined in the class */
-    public static final int numParams = 9;
+    public static final int numParams = 7;
     public static final String PARAM_isSuperIndividual      = "is a super-individual?";
     public static final String PARAM_horizRWP               = "horizontal random walk parameter [m^2]/[s]";
     public static final String PARAM_minStageDuration       = "min stage duration [d]";
     public static final String PARAM_maxStageDuration       = "max stage duration [d]";
-    public static final String PARAM_minSize                = "min size before metamorphosis (mm)";
     public static final String PARAM_minWeight              = "min weight before metamorphosis (g)";
     public static final String PARAM_randomizeTransitions   = "randomize transitions?";
-    public static final String PARAM_initialSize            = "initial size in stage (mm CL)";
     public static final String PARAM_initialWeight          = "initial weight in stage (g)";
     
     
     /** the number of IBMFunction categories defined in the class */
-    public static final int numFunctionCats = 4;
+    public static final int numFunctionCats = 5;
     public static final String FCAT_Growth           = "growth";
     public static final String FCAT_Mortality        = "mortality";
     public static final String FCAT_VerticalMovement = "vertical movement";
     public static final String FCAT_VerticalVelocity = "vertical velocity";
+    public static final String FCAT_MoltTime        = "molt timing";
     
     /** The 'keys' used to store the ibm functions */
     protected static final Set<String> setOfFunctionCategories = new LinkedHashSet<>(2*numFunctionCats);
@@ -99,13 +99,11 @@ public class Zooea1Parameters extends AbstractLHSParameters {
         String key;
         key = PARAM_isSuperIndividual;    setOfParamKeys.add(key); mapParams.put(key,new IBMParameterBoolean(key,key,false));
         key = PARAM_horizRWP;             setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
-        key = PARAM_initialSize;          setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,4.4));
-        key = PARAM_initialWeight;        setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
         key = PARAM_minStageDuration;     setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
         key = PARAM_maxStageDuration;     setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,365.0));
-        key = PARAM_minSize;              setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
-        key = PARAM_minWeight;            setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
+        key = PARAM_minWeight;            setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0002));
         key = PARAM_randomizeTransitions; setOfParamKeys.add(key); mapParams.put(key,new IBMParameterBoolean(key,key,false));
+        key = PARAM_initialWeight;        setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.00008));
     }
 
     @Override
@@ -115,6 +113,7 @@ public class Zooea1Parameters extends AbstractLHSParameters {
         setOfFunctionCategories.add(FCAT_Mortality);
         setOfFunctionCategories.add(FCAT_VerticalMovement);
         setOfFunctionCategories.add(FCAT_VerticalVelocity);
+        setOfFunctionCategories.add(FCAT_MoltTime);
         
         //create the map from function categories to potential functions in each category
         String cat; Map<String,IBMFunctionInterface> mapOfPotentialFunctions; IBMFunctionInterface ifi;
@@ -148,6 +147,11 @@ public class Zooea1Parameters extends AbstractLHSParameters {
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new ConstantMovementRateFunction(); 
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+            
+        cat = FCAT_MoltTime;
+        mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        ifi = new IntermoltLarvaFunction();
+        mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
     }
     
     /**
