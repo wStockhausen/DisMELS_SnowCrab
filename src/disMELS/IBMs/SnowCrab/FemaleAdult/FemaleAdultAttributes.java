@@ -1,8 +1,8 @@
 /*
- * FemaleMultiparousAttributes.java
+ * FemaleAdultAttributes.java
  */
 
-package disMELS.IBMs.SnowCrab.FemaleMultiparous;
+package disMELS.IBMs.SnowCrab.FemaleAdult;
 
 import java.util.*;
 import java.util.logging.Logger;
@@ -11,18 +11,10 @@ import disMELS.IBMs.SnowCrab.AbstractBenthicStageAttributes;
 import wts.models.DisMELS.framework.IBMAttributes.IBMAttribute;
 
 /**
- * DisMELS class representing attributes for multiparous female snow crab.
- * 
- * Primiparous female snow crab (females with their first egg clutch) become
- * multiparous after their egg clutch is hatched. Multiparous females typically
- * have larger egg clutches with a higher fraction of viable eggs than similarly-sized
- * primiparous females.
- * 
- * For the IBM, instances of the FemalePrimiparous class metamorphose into
- * instances of the FemaleMultiparous class after their egg clutch hatches.
+ * DisMELS class representing attributes for primiparous female snow crab.
  */
 @ServiceProvider(service=wts.models.DisMELS.framework.LifeStageAttributesInterface.class)
-public class FemaleMultiparousAttributes extends AbstractBenthicStageAttributes {
+public class FemaleAdultAttributes extends AbstractBenthicStageAttributes {
     
     /** Number of new attributes defined by this class */
     public static final int numNewAttributes = 0;
@@ -43,13 +35,13 @@ public class FemaleMultiparousAttributes extends AbstractBenthicStageAttributes 
     protected static final String[] shortNames = new String[AbstractBenthicStageAttributes.numAttributes+numNewAttributes];
    
     /** class logger */
-    private static final Logger logger = Logger.getLogger(FemaleMultiparousAttributes.class.getName());
+    private static final Logger logger = Logger.getLogger(FemaleAdultAttributes.class.getName());
     
     /**
      * This constructor is provided only to facilitate the ServiceProvider functionality.
      * DO NOT USE IT!!
      */
-    public FemaleMultiparousAttributes(){
+    public FemaleAdultAttributes(){
         super("NULL");
         finishInstantiation();
     }
@@ -57,7 +49,7 @@ public class FemaleMultiparousAttributes extends AbstractBenthicStageAttributes 
     /**
      * Creates a new attributes instance with type name 'typeName'.
      */
-    public FemaleMultiparousAttributes(String typeName) {
+    public FemaleAdultAttributes(String typeName) {
         super(typeName);
         finishInstantiation();
     }
@@ -69,7 +61,7 @@ public class FemaleMultiparousAttributes extends AbstractBenthicStageAttributes 
      */
     @Override
     public Object clone() {
-        FemaleMultiparousAttributes clone = new FemaleMultiparousAttributes(typeName);
+        FemaleAdultAttributes clone = new FemaleAdultAttributes(typeName);
         for (String key: allKeys) clone.setValue(key,this.getValue(key));
         return clone;
     }
@@ -82,8 +74,8 @@ public class FemaleMultiparousAttributes extends AbstractBenthicStageAttributes 
      * @return - the new instance
      */
     @Override
-    public FemaleMultiparousAttributes createInstance(final String[] strv) {
-        FemaleMultiparousAttributes atts = new FemaleMultiparousAttributes(strv[0]);//this sets atts.typeName
+    public FemaleAdultAttributes createInstance(final String[] strv) {
+        FemaleAdultAttributes atts = new FemaleAdultAttributes(strv[0]);//this sets atts.typeName
         atts.setValues(strv);
         return atts;
     }
@@ -240,8 +232,8 @@ public class FemaleMultiparousAttributes extends AbstractBenthicStageAttributes 
             for (String key: newKeys) setValueFromString(key,strv[j++]);
         } catch (java.lang.IndexOutOfBoundsException ex) {
             //@TODO: should throw an exception here that identifies the problem
-            String[] aKeys = new String[FemaleMultiparousAttributes.allKeys.size()];
-            aKeys = FemaleMultiparousAttributes.allKeys.toArray(aKeys);
+            String[] aKeys = new String[FemaleAdultAttributes.allKeys.size()];
+            aKeys = FemaleAdultAttributes.allKeys.toArray(aKeys);
                 String str = "Missing attribute value for "+aKeys[j-1]+".\n"+
                              "Prior values are ";
                 for (int i=0;i<(j);i++) str = str+strv[i]+" ";
@@ -252,8 +244,8 @@ public class FemaleMultiparousAttributes extends AbstractBenthicStageAttributes 
                         javax.swing.JOptionPane.ERROR_MESSAGE);
                 throw ex;
         } catch (java.lang.NumberFormatException ex) {
-            String[] aKeys = new String[FemaleMultiparousAttributes.allKeys.size()];
-            aKeys = FemaleMultiparousAttributes.allKeys.toArray(aKeys);
+            String[] aKeys = new String[FemaleAdultAttributes.allKeys.size()];
+            aKeys = FemaleAdultAttributes.allKeys.toArray(aKeys);
             String str = "Bad attribute value for "+aKeys[j-2]+".\n"+
                          "Value was '"+strv[j-1]+"'.\n"+
                          "Entry was '";

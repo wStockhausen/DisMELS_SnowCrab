@@ -1,8 +1,8 @@
 /*
- * FemalePrimiparous.java
+ * FemaleAdult.java
  */
 
-package disMELS.IBMs.SnowCrab.FemalePrimiparous;
+package disMELS.IBMs.SnowCrab.FemaleAdult;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import java.util.ArrayList;
@@ -13,7 +13,6 @@ import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
 import disMELS.IBMs.SnowCrab.AbstractBenthicStage;
 import disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes;
-import disMELS.IBMs.SnowCrab.FemaleMultiparous.FemaleMultiparous;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import static wts.models.DisMELS.framework.LifeStageInterface.DAY_SECS;
@@ -25,30 +24,30 @@ import wts.roms.model.LagrangianParticle;
  * that have terminally molted, mated and extruded their first egg clutch.
  */
 @ServiceProvider(service=LifeStageInterface.class)
-public class FemalePrimiparous extends AbstractBenthicStage {
+public class FemaleAdult extends AbstractBenthicStage {
     
         //Static fields    
             //  Static fields new to this class
     /* flag to do debug operations */
     public static boolean debugOps = false;
     /* Class for attributes */
-    public static final String attributesClass = FemalePrimiparousAttributes.class.getName();
+    public static final String attributesClass = FemaleAdultAttributes.class.getName();
     /* Class for parameters */
-    public static final String parametersClass = FemalePrimiparousParameters.class.getName();
+    public static final String parametersClass = FemaleAdultParameters.class.getName();
     /* Class for feature type for point positions */
     public static final String pointFTClass = wts.models.DisMELS.framework.LHSPointFeatureType.class.getName();
 //            "wts.models.DisMELS.LHS.BenthicAdult.AdultStagePointFT";
     /* Classes for next LHS */
-    public static final String[] nextLHSClasses = new String[]{FemaleMultiparous.class.getName()};
+    public static final String[] nextLHSClasses = new String[]{FemaleAdult.class.getName()};
     /* Classes for spawned LHS */
     public static final String[] spawnedLHSClasses = new String[]{};
     
         //Instance fields
             //  Fields hiding ones from superclass
     /** life stage attributes object */
-    protected FemalePrimiparousAttributes atts = null;
+    protected FemaleAdultAttributes atts = null;
     /** life stage parameters object */
-    protected FemalePrimiparousParameters params = null;
+    protected FemaleAdultParameters params = null;
             //  Fields new to class
             //fields that reflect parameter values
     /** flag indicating instance is a super-individual */
@@ -83,13 +82,13 @@ public class FemalePrimiparous extends AbstractBenthicStage {
     /** flag to print debugging info */
     public static boolean debug = false;
     /** logger for class */
-    private static final Logger logger = Logger.getLogger(FemalePrimiparous.class.getName());
+    private static final Logger logger = Logger.getLogger(FemaleAdult.class.getName());
     
     /**
      * This constructor is provided only to facilitate the ServiceProvider functionality.
      * DO NOT USE IT!!
      */
-    public FemalePrimiparous() {
+    public FemaleAdult() {
         super("");
         super.atts = atts;
         super.params = params;
@@ -99,15 +98,15 @@ public class FemalePrimiparous extends AbstractBenthicStage {
      * Creates a new life stage instance with parameters based on the typeName and
      * "default" attributes.
      */
-    public FemalePrimiparous(String typeName) 
+    public FemaleAdult(String typeName) 
                 throws InstantiationException, IllegalAccessException {
         super(typeName);
-        atts   = new FemalePrimiparousAttributes(typeName);
+        atts   = new FemaleAdultAttributes(typeName);
         atts.setValue(LifeStageAttributesInterface.PROP_id,id);
         atts.setValue(LifeStageAttributesInterface.PROP_parentID,id);
         atts.setValue(LifeStageAttributesInterface.PROP_origID,id);
         setAttributesFromSubClass(atts);  //set object in the superclass
-        params = (FemalePrimiparousParameters) LHS_Factory.createParameters(typeName);
+        params = (FemaleAdultParameters) LHS_Factory.createParameters(typeName);
         setParametersFromSubClass(params);//set object in the superclass
         setParameters(params);
     }
@@ -126,10 +125,10 @@ public class FemalePrimiparous extends AbstractBenthicStage {
      * @throws java.lang.IllegalAccessException
      */
     @Override
-    public FemalePrimiparous createInstance(String[] strv) 
+    public FemaleAdult createInstance(String[] strv) 
                         throws InstantiationException, IllegalAccessException {
         LifeStageAttributesInterface theAtts = LHS_Factory.createAttributes(strv);
-        FemalePrimiparous lhs = createInstance(theAtts);
+        FemaleAdult lhs = createInstance(theAtts);
         return lhs;
     }
 
@@ -151,11 +150,11 @@ public class FemalePrimiparous extends AbstractBenthicStage {
      * @throws java.lang.IllegalAccessException
      */
     @Override
-    public FemalePrimiparous createInstance(LifeStageAttributesInterface theAtts)
+    public FemaleAdult createInstance(LifeStageAttributesInterface theAtts)
                         throws InstantiationException, IllegalAccessException {
-        FemalePrimiparous lhs = null;
-        if (theAtts instanceof FemalePrimiparousAttributes) {
-            lhs = new FemalePrimiparous(theAtts.getTypeName());
+        FemaleAdult lhs = null;
+        if (theAtts instanceof FemaleAdultAttributes) {
+            lhs = new FemaleAdult(theAtts.getTypeName());
             long newID = lhs.id;//save id of new instance
             lhs.setAttributes(theAtts);
             if (lhs.atts.getID()==-1) {
@@ -180,7 +179,7 @@ public class FemalePrimiparous extends AbstractBenthicStage {
      *  Returns the associated attributes.  
      */
     @Override
-    public FemalePrimiparousAttributes getAttributes() {
+    public FemaleAdultAttributes getAttributes() {
         return atts;
     }
 
@@ -235,8 +234,8 @@ public class FemalePrimiparous extends AbstractBenthicStage {
      */
     @Override
     public void setAttributes(LifeStageAttributesInterface newAtts) {
-        if (newAtts instanceof FemalePrimiparousAttributes) {
-            FemalePrimiparousAttributes spAtts = (FemalePrimiparousAttributes) newAtts;
+        if (newAtts instanceof FemaleAdultAttributes) {
+            FemaleAdultAttributes spAtts = (FemaleAdultAttributes) newAtts;
             for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
         } else if(newAtts instanceof FemaleImmatureAttributes){
         FemaleImmatureAttributes spAtts = (FemaleImmatureAttributes) newAtts;
@@ -338,18 +337,18 @@ public class FemalePrimiparous extends AbstractBenthicStage {
      *  Returns the associated parameters.  
      */
     @Override
-    public FemalePrimiparousParameters getParameters() {
+    public FemaleAdultParameters getParameters() {
         return params;
     }
 
     /**
      * Sets the parameters for the instance to a cloned version of the input.
-     * @param newParams - should be instance of FemalePrimiparousParameters
+     * @param newParams - should be instance of FemaleAdultParameters
      */
     @Override
     public void setParameters(LifeStageParametersInterface newParams) {
-        if (newParams instanceof FemalePrimiparousParameters) {
-            params = (FemalePrimiparousParameters) newParams;
+        if (newParams instanceof FemaleAdultParameters) {
+            params = (FemaleAdultParameters) newParams;
             setParametersFromSubClass(params);
             setParameterValues();
             setIBMFunctions();
@@ -362,7 +361,7 @@ public class FemalePrimiparous extends AbstractBenthicStage {
      * Sets the IBM functions from the parameters object
      */
     private void setIBMFunctions(){
-        fcnMort = params.getSelectedIBMFunctionForCategory(FemalePrimiparousParameters.FCAT_Mortality);
+        fcnMort = params.getSelectedIBMFunctionForCategory(FemaleAdultParameters.FCAT_Mortality);
     }
     
     /*
@@ -392,11 +391,11 @@ public class FemalePrimiparous extends AbstractBenthicStage {
      */
     @Override
     public Object clone() {
-        FemalePrimiparous clone = null;
+        FemaleAdult clone = null;
         try {
-            clone       = (FemalePrimiparous) super.clone();
-            clone.setAttributes((FemalePrimiparousAttributes) atts.clone());
-            clone.setParameters((FemalePrimiparousParameters) params.clone());
+            clone       = (FemaleAdult) super.clone();
+            clone.setAttributes((FemaleAdultAttributes) atts.clone());
+            clone.setParameters((FemaleAdultParameters) params.clone());
             clone.lp    = (LagrangianParticle) lp.clone();
             clone.track = (ArrayList<Coordinate>) track.clone();
         } catch (CloneNotSupportedException ex) {

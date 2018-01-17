@@ -74,6 +74,8 @@ public class FemaleImmature extends AbstractBenthicStage {
     protected double initialWeight;
     /** flag to use stochastic transitions */
     protected boolean randomizeTransitions;
+    /*** Ratio at which crabs become male or female*/
+    protected double sexRatio;
         /** IBM function selected for mortality */
     private IBMFunctionInterface fcnMort = null; 
      /** IBM function selected for growth (in weight)*/
@@ -281,7 +283,13 @@ public class FemaleImmature extends AbstractBenthicStage {
             key = MegalopaAttributes.PROP_track;      atts.setValue(key, spAtts.getValue(key));
             key = MegalopaAttributes.PROP_active;     atts.setValue(key, spAtts.getValue(key));
             key = MegalopaAttributes.PROP_alive;      atts.setValue(key, spAtts.getValue(key));
-            key = MegalopaAttributes.PROP_number;     atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_temperature;      atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_ph;     atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_salinity;      atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_number;     
+            //Need to cut numbers in half
+            Double value = (Double) spAtts.getValue(key)*sexRatio;
+            atts.setValue(key, value);
             key = MegalopaAttributes.PROP_shellthick; atts.setValue(key, spAtts.getValue(key));
 
             size = params.getValue(FemaleImmatureParameters.PARAM_initialSize, size);
@@ -437,6 +445,8 @@ public class FemaleImmature extends AbstractBenthicStage {
                 params.getValue(FemaleImmatureParameters.PARAM_randomizeTransitions,true);
         sCost =
                 params.getValue(FemaleImmatureParameters.PARAM_sCost,sCost);
+        sexRatio =
+                params.getValue(FemaleImmatureParameters.PARAM_sexRatio, sexRatio);
     }
     
     /**
@@ -743,8 +753,9 @@ public class FemaleImmature extends AbstractBenthicStage {
         }
         }
         number = number*Math.exp(-dt*totRate/DAY_SECS);
-        this.setActive(number!=0);
-        this.setAlive(number!=0);
+        if(number==0){
+            active=false;alive=false;number=number+numTrans;
+        }
 
     }
     

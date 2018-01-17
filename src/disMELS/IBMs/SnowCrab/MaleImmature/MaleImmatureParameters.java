@@ -46,7 +46,7 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
     public static final long serialVersionUID = 1L;
     
     /** the number of IBMParameter objects defined in the class */
-    public static final int numParams = 10;
+    public static final int numParams = 11;
     public static final String PARAM_isSuperIndividual      = "is a super-individual?";
     public static final String PARAM_horizRWP               = "horizontal random walk parameter [m^2]/[s]";
     public static final String PARAM_minStageDuration       = "min stage duration [d]";
@@ -57,6 +57,7 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
     public static final String PARAM_initialSize            = "initial size in stage (mm)";
     public static final String PARAM_initialWeight          = "initial weight in stage (g)";
     public static final String PARAM_sCost                  = "number of days of exuviae cost";
+    public static final String PARAM_sexRatio               = "ratio of males to females";
     
     
     /** the number of IBMFunction categories defined in the class */
@@ -114,6 +115,7 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
         key = PARAM_minWeight;            setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.001));
         key = PARAM_randomizeTransitions; setOfParamKeys.add(key); mapParams.put(key,new IBMParameterBoolean(key,key,false));
         key = PARAM_sCost; setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
+        key = PARAM_sexRatio; setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.5));
     }
 
     @Override

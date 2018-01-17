@@ -13,7 +13,7 @@ import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
 import disMELS.IBMs.SnowCrab.AbstractBenthicStage;
 import disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes;
-import disMELS.IBMs.SnowCrab.FemalePrimiparous.FemalePrimiparous;
+import disMELS.IBMs.SnowCrab.FemaleAdult.FemaleAdult;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import static wts.models.DisMELS.framework.LifeStageInterface.DAY_SECS;
@@ -42,7 +42,7 @@ public class FemaleAdolescent extends AbstractBenthicStage {
     public static final String pointFTClass = wts.models.DisMELS.framework.LHSPointFeatureType.class.getName();
 //            "wts.models.DisMELS.LHS.BenthicAdult.AdultStagePointFT";
     /* Classes for next LHS */
-    public static final String[] nextLHSClasses = new String[]{FemalePrimiparous.class.getName()};
+    public static final String[] nextLHSClasses = new String[]{FemaleAdult.class.getName()};
     /* Classes for spawned LHS */
     public static final String[] spawnedLHSClasses = new String[]{};
     

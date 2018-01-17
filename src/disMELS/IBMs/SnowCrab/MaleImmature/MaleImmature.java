@@ -76,6 +76,8 @@ public class MaleImmature extends AbstractBenthicStage {
     protected double initialWeight;
     /** flag to use stochastic transitions */
     protected boolean randomizeTransitions;
+    /** ratio of male to female */
+    protected double sexRatio;
 
     protected double sCost;
         //fields that reflect (new) attribute values
@@ -285,8 +287,13 @@ public class MaleImmature extends AbstractBenthicStage {
             key = MegalopaAttributes.PROP_track;      atts.setValue(key, spAtts.getValue(key));
             key = MegalopaAttributes.PROP_active;     atts.setValue(key, spAtts.getValue(key));
             key = MegalopaAttributes.PROP_alive;      atts.setValue(key, spAtts.getValue(key));
-            key = MegalopaAttributes.PROP_number;     atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_number;     
+            Double value = (Double) spAtts.getValue(key)*sexRatio;
+            atts.setValue(key, value);
             key = MegalopaAttributes.PROP_shellthick; atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_ph;      atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_temperature;      atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_salinity;      atts.setValue(key, spAtts.getValue(key));
 
             size = params.getValue(MaleImmatureParameters.PARAM_initialSize, size);
             instar = 1;
@@ -441,6 +448,7 @@ public class MaleImmature extends AbstractBenthicStage {
         randomizeTransitions = 
                 params.getValue(MaleImmatureParameters.PARAM_randomizeTransitions,true);
         sCost = params.getValue(MaleImmatureParameters.PARAM_sCost, sCost);
+        sexRatio = params.getValue(MaleImmatureParameters.PARAM_sexRatio, sexRatio);
     }
     
     /**
@@ -748,8 +756,9 @@ public class MaleImmature extends AbstractBenthicStage {
             }
         }
         number = number*Math.exp(-dt*totRate/DAY_SECS);
-        this.setActive(number!=0);
-        this.setAlive(number!=0);
+        if(number==0){
+            active=false;alive=false;number=number+numTrans;
+        }
     }
     
     private void updatePosition(double[] pos) {
