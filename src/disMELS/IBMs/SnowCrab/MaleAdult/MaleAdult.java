@@ -590,7 +590,7 @@ public class MaleAdult extends AbstractBenthicStage {
             weight = weight*Math.exp(Math.log(1.0+growthRate)*(dt/DAY_SECS));
         } else{
             double totRate = Math.max(-1.0,growthRate/weight);
-            starvationMort = -Math.log(-totRate)*(dt/DAY_SECS);
+            starvationMort = -Math.log(-(.0099+totRate));
         } 
     }
 
@@ -616,8 +616,9 @@ public class MaleAdult extends AbstractBenthicStage {
         }
         double totRate = mortalityRate + starvationMort;
         number = number*Math.exp(-dt*totRate/DAY_SECS);
-        this.setActive(number!=0);
-        this.setAlive(number!=0);
+        if(number==0){
+            active=false;alive=false;number=number+numTrans;
+        }
     }
 
     private void updatePosition(double[] pos) {
@@ -718,14 +719,14 @@ public class MaleAdult extends AbstractBenthicStage {
         //update superclass attributes
         super.updateAttributes();
         //update new attributes
-        atts.setValue(MaleAdolescentAttributes.PROP_size,size);
-        atts.setValue(MaleAdolescentAttributes.PROP_weight,weight);
-        atts.setValue(MaleAdolescentAttributes.PROP_number,number);
-        atts.setValue(MaleAdolescentAttributes.PROP_ageInInstar,ageInInstar);
-        atts.setValue(MaleAdolescentAttributes.PROP_instar,instar);
-        atts.setValue(MaleAdolescentAttributes.PROP_salinity,salinity);
-        atts.setValue(MaleAdolescentAttributes.PROP_temperature,temperature);
-        atts.setValue(MaleAdolescentAttributes.PROP_ph,ph);
+        atts.setValue(MaleAdultAttributes.PROP_size,size);
+        atts.setValue(MaleAdultAttributes.PROP_weight,weight);
+        atts.setValue(MaleAdultAttributes.PROP_number,number);
+        atts.setValue(MaleAdultAttributes.PROP_ageInInstar,ageInInstar);
+        atts.setValue(MaleAdultAttributes.PROP_instar,instar);
+        atts.setValue(MaleAdultAttributes.PROP_salinity,salinity);
+        atts.setValue(MaleAdultAttributes.PROP_temperature,temperature);
+        atts.setValue(MaleAdultAttributes.PROP_ph,ph);
 }
 
     /**
@@ -736,13 +737,13 @@ public class MaleAdult extends AbstractBenthicStage {
         //update superclass variables
         super.updateVariables();
         //update new variables
-       size        = atts.getValue(MaleAdolescentAttributes.PROP_size,size);
-       weight      = atts.getValue(MaleAdolescentAttributes.PROP_weight, weight);
-       ageInInstar = atts.getValue(MaleAdolescentAttributes.PROP_ageInInstar, ageInInstar);
-       number      = atts.getValue(MaleAdolescentAttributes.PROP_number, number);
-       instar      = atts.getValue(MaleAdolescentAttributes.PROP_instar, instar);
-       salinity    = atts.getValue(MaleAdolescentAttributes.PROP_salinity,salinity);
-       temperature = atts.getValue(MaleAdolescentAttributes.PROP_temperature,temperature);
-       ph        = atts.getValue(MaleAdolescentAttributes.PROP_ph,ph);
+       size        = atts.getValue(MaleAdultAttributes.PROP_size,size);
+       weight      = atts.getValue(MaleAdultAttributes.PROP_weight, weight);
+       ageInInstar = atts.getValue(MaleAdultAttributes.PROP_ageInInstar, ageInInstar);
+       number      = atts.getValue(MaleAdultAttributes.PROP_number, number);
+       instar      = atts.getValue(MaleAdultAttributes.PROP_instar, instar);
+       salinity    = atts.getValue(MaleAdultAttributes.PROP_salinity,salinity);
+       temperature = atts.getValue(MaleAdultAttributes.PROP_temperature,temperature);
+       ph        = atts.getValue(MaleAdultAttributes.PROP_ph,ph);
     }
 }

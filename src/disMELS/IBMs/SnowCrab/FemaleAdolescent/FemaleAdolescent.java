@@ -629,7 +629,7 @@ public class FemaleAdolescent extends AbstractBenthicStage {
             weight = weight*Math.exp(-Math.log(growthRate)*(dt/DAY_SECS));
         } else{
             double totRate = Math.max(-1.0,growthRate/weight);
-            starvationMort = -Math.log(-totRate)*(dt/DAY_SECS);
+            starvationMort = -Math.log(-(.0099+totRate));
         } 
     }
 
@@ -669,8 +669,9 @@ public class FemaleAdolescent extends AbstractBenthicStage {
         }
         }
         number = number*Math.exp(-dt*totRate/DAY_SECS);
-        this.setActive(number!=0);
-        this.setAlive(number!=0);
+        if(number==0){
+            active=false;alive=false;number=number+numTrans;
+        }
     }
 
     private void updatePosition(double[] pos) {
@@ -788,12 +789,12 @@ public class FemaleAdolescent extends AbstractBenthicStage {
         //update superclass variables
         super.updateVariables();
         //update new variables
-       size        = atts.getValue(FemaleImmatureAttributes.PROP_size,size);
-       weight      = atts.getValue(FemaleImmatureAttributes.PROP_weight, weight);
-       ageInInstar = atts.getValue(FemaleImmatureAttributes.PROP_ageInInstar, ageInInstar);
-       instar      = atts.getValue(FemaleImmatureAttributes.PROP_instar, instar);
-       salinity    = atts.getValue(FemaleImmatureAttributes.PROP_salinity,salinity);
-       temperature = atts.getValue(FemaleImmatureAttributes.PROP_temperature,temperature);
-       ph        = atts.getValue(FemaleImmatureAttributes.PROP_ph,ph);
+       size        = atts.getValue(FemaleAdolescentAttributes.PROP_size,size);
+       weight      = atts.getValue(FemaleAdolescentAttributes.PROP_weight, weight);
+       ageInInstar = atts.getValue(FemaleAdolescentAttributes.PROP_ageInInstar, ageInInstar);
+       instar      = atts.getValue(FemaleAdolescentAttributes.PROP_instar, instar);
+       salinity    = atts.getValue(FemaleAdolescentAttributes.PROP_salinity,salinity);
+       temperature = atts.getValue(FemaleAdolescentAttributes.PROP_temperature,temperature);
+       ph        = atts.getValue(FemaleAdolescentAttributes.PROP_ph,ph);
     }
 }

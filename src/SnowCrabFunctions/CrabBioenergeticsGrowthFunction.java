@@ -305,7 +305,8 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
         double maxR = aR*Math.pow(w0,bR-1.0)*.00463*24.0;       //reference-level respiration
         double r = maxR*ACT*calcF(T,rmT,roT,c1r);
         double f = FA*c;     //weight-specific egestion
-        double s = (aSDA*Math.exp(bSDA*T)*(c-f)*24.0)/(w0*1000.0);//temperature-specific loss due to specific dynamic action
+        double SDA = (24.0*aSDA*Math.exp(bSDA*T))/(1000.0);
+        double s = (SDA*f);//temperature-specific loss due to specific dynamic action
         double m = r+s;       //weight-specific metabolic loss rate
         double e = UA; //weight-specific excretion
         double w = f+e;       //weight-specific waste rate

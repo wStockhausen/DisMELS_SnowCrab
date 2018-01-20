@@ -12,6 +12,7 @@ import org.openide.util.lookup.ServiceProvider;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
 import disMELS.IBMs.SnowCrab.AbstractBenthicStage;
+import disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes;
 import disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
@@ -75,9 +76,12 @@ public class FemaleAdult extends AbstractBenthicStage {
     private double numTrans;  
      /** day of year */
     private double dayOfYear;
+    private double starvationMort;
    
     /** IBM function selected for mortality */
     private IBMFunctionInterface fcnMort = null; 
+    private IBMFunctionInterface fcnGrowth = null;
+ 
     
     /** flag to print debugging info */
     public static boolean debug = false;
@@ -234,20 +238,15 @@ public class FemaleAdult extends AbstractBenthicStage {
      */
     @Override
     public void setAttributes(LifeStageAttributesInterface newAtts) {
-        if (newAtts instanceof FemaleAdultAttributes) {
+        if (newAtts instanceof FemaleAdolescentAttributes) {
             FemaleAdultAttributes spAtts = (FemaleAdultAttributes) newAtts;
             for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
         } else if(newAtts instanceof FemaleImmatureAttributes){
         FemaleImmatureAttributes spAtts = (FemaleImmatureAttributes) newAtts;
-            String key = FemaleImmatureAttributes.PROP_size; atts.setValue(key, spAtts.getValue(key));
-            key = FemaleImmatureAttributes.PROP_weight; atts.setValue(key, spAtts.getValue(key));
-            key = FemaleImmatureAttributes.PROP_instar; atts.setValue(key, spAtts.getValue(key));
-            key = FemaleImmatureAttributes.PROP_age; atts.setValue(key, spAtts.getValue(key));
-            key = FemaleImmatureAttributes.PROP_shellcond; atts.setValue(key, spAtts.getValue(key));
-            key = FemaleImmatureAttributes.PROP_shellthick; atts.setValue(key, spAtts.getValue(key));
-        }{
+            for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
+        }else {
             //TODO: should throw an error here
-            logger.info("FemalePrimiparousAttributes.setAttributes(): no match for attributes type");
+            logger.info("FemaleAdultAttributes.setAttributes(): no match for attributes type");
         }
         id = atts.getValue(LifeStageAttributesInterface.PROP_id, id);
         updateVariables();
@@ -362,7 +361,8 @@ public class FemaleAdult extends AbstractBenthicStage {
      */
     private void setIBMFunctions(){
         fcnMort = params.getSelectedIBMFunctionForCategory(FemaleAdultParameters.FCAT_Mortality);
-    }
+        fcnGrowth = params.getSelectedIBMFunctionForCategory(FemaleAdultParameters.FCAT_Growth);
+  }
     
     /*
      * Copy the values from the params map to the param variables.
@@ -409,7 +409,7 @@ public class FemaleAdult extends AbstractBenthicStage {
         double dtp = 0.25*(dt/DAY_SECS);//use 1/4 timestep (converted from sec to d)
         output.clear();
         List<LifeStageInterface> nLHSs=null;
-        if ((ageInStage+dtp>=minStageDuration)&&(size>=minSizeAtTrans)) {
+        if (false) {
             nLHSs = createNextLHSs();
             if (nLHSs!=null) output.addAll(nLHSs);
         }
@@ -482,6 +482,7 @@ public class FemaleAdult extends AbstractBenthicStage {
         zPos       = atts.getValue(LifeStageAttributesInterface.PROP_vertPos,zPos);
         time       = startTime;
         numTrans   = 0.0; //set numTrans to zero
+        starvationMort = 0.0;
         if (debug) {
             logger.info("\n---------------Setting initial position------------");
             logger.info(hType+cc+vType+cc+startTime+cc+xPos+cc+yPos+cc+zPos);
@@ -523,6 +524,7 @@ public class FemaleAdult extends AbstractBenthicStage {
     public void step(double dt) throws ArrayIndexOutOfBoundsException {
         //determine daytime/nighttime
         dayOfYear = globalInfo.getCalendar().getYearDay();
+        starvationMort = 0.0;
         //movement here
         //TODO: revise so no advection by currents!
         double[] pos;
@@ -541,7 +543,7 @@ public class FemaleAdult extends AbstractBenthicStage {
             lp.doCorrectorStep();
             pos = lp.getIJK();
         time = time+dt;
-        updateSize(dt);
+        updateWeight(dt);
         updateNum(dt);
         updateAge(dt);
         updatePosition(pos);
@@ -578,15 +580,13 @@ public class FemaleAdult extends AbstractBenthicStage {
     private void updateAge(double dt) {
         age        = age+dt/DAY_SECS;
         ageInStage = ageInStage+dt/DAY_SECS;
+        ageInInstar = ageInInstar+dt/DAY_SECS;
         if (ageInStage>maxStageDuration) {
             alive = false;
             active = false;
         }
     }
 
-    private void updateSize(double dt) {
-        //TODO: implement!
-    }
 
     /**
      * Updates weight.
@@ -594,7 +594,14 @@ public class FemaleAdult extends AbstractBenthicStage {
      * @param dt - time step in seconds
      */
     private void updateWeight(double dt) {
-        //TODO: implement!
+        //todo - Add in cost of reproduction!
+        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, 0});
+        if(growthRate>0){
+            weight = weight*Math.exp(-Math.log(growthRate)*(dt/DAY_SECS));
+        } else{
+            double totRate = Math.max(-1.0,growthRate/weight);
+            starvationMort = -Math.log(-(.0099+totRate));
+        }
     }
 
     /**
@@ -617,15 +624,12 @@ public class FemaleAdult extends AbstractBenthicStage {
              */
             mortalityRate = (Double)fcnMort.calculate(temperature);//using temperature as covariate for mortality
         }
-        double totRate = mortalityRate;
-        if ((ageInStage>=minStageDuration)) {
-            totRate += stageTransRate;
-            //apply mortality rate to previous number transitioning and
-            //add in new transitioners
-            numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
-                    (stageTransRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
-        }
+        double totRate = mortalityRate + starvationMort;
+       
         number = number*Math.exp(-dt*totRate/DAY_SECS);
+        if(number==0){
+            active=false;alive=false;number=number+numTrans;
+        }
     }
 
     private void updatePosition(double[] pos) {
@@ -726,8 +730,13 @@ public class FemaleAdult extends AbstractBenthicStage {
         //update superclass attributes
         super.updateAttributes();
         //update new attributes
-//        //no new attributes, but would look like:
-//        atts.setValue(MaleImmatureAttributes.PROP_size,size);
+        atts.setValue(FemaleAdultAttributes.PROP_size,size);
+        atts.setValue(FemaleAdultAttributes.PROP_weight,weight);
+        atts.setValue(FemaleAdultAttributes.PROP_ageInInstar,ageInInstar);
+        atts.setValue(FemaleAdultAttributes.PROP_instar,instar);
+        atts.setValue(FemaleAdultAttributes.PROP_salinity,salinity);
+        atts.setValue(FemaleAdultAttributes.PROP_temperature,temperature);
+        atts.setValue(FemaleAdultAttributes.PROP_ph,ph);
     }
 
     /**
@@ -738,7 +747,12 @@ public class FemaleAdult extends AbstractBenthicStage {
         //update superclass variables
         super.updateVariables();
         //update new variables
-//        //no new variables, but would look like:
-//        size        = atts.getValue(FemaleImmatureAttributes.PROP_size,size);
+       size        = atts.getValue(FemaleAdultAttributes.PROP_size,size);
+       weight      = atts.getValue(FemaleAdultAttributes.PROP_weight, weight);
+       ageInInstar = atts.getValue(FemaleAdultAttributes.PROP_ageInInstar, ageInInstar);
+       instar      = atts.getValue(FemaleAdultAttributes.PROP_instar, instar);
+       salinity    = atts.getValue(FemaleAdultAttributes.PROP_salinity,salinity);
+       temperature = atts.getValue(FemaleAdultAttributes.PROP_temperature,temperature);
+       ph        = atts.getValue(FemaleAdultAttributes.PROP_ph,ph);
     }
 }

@@ -636,7 +636,7 @@ public class MaleAdolescent extends AbstractBenthicStage {
             weight = weight*Math.exp(Math.log(1.0+growthRate)*(dt/DAY_SECS));
         } else{
             double totRate = Math.max(-1.0,growthRate/weight);
-            starvationMort = -Math.log(-totRate)*(dt/DAY_SECS);
+            starvationMort = -Math.log(-(.0099+totRate));
         } 
     }
 
@@ -675,8 +675,9 @@ public class MaleAdolescent extends AbstractBenthicStage {
         }
         }
         number = number*Math.exp(-dt*totRate/DAY_SECS);
-        this.setActive(number!=0);
-        this.setAlive(number!=0);
+        if(number==0){
+            active=false;alive=false;number=number+numTrans;
+        }
     }
 
     private void updatePosition(double[] pos) {
