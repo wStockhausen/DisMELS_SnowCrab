@@ -714,7 +714,7 @@ public class MaleImmature extends AbstractBenthicStage {
         double exPerDay = exTot/D;
         double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, exPerDay});
         if(growthRate>0){
-            weight = weight*Math.exp((Math.log(1.0+growthRate))*(dt/DAY_SECS));
+            weight = weight*Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
         } else{
             double totRate = Math.max(-1.0,growthRate/weight);
             starvationMort = -Math.log(-(.0099+totRate))*(dt/DAY_SECS);
