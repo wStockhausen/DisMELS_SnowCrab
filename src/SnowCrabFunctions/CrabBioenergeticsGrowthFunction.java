@@ -308,9 +308,9 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
         double SDA = (24.0*aSDA*Math.exp(bSDA*T))/(1000.0);
         double s = (SDA*f);//temperature-specific loss due to specific dynamic action
         double m = r+s;       //weight-specific metabolic loss rate
-        double e = UA; //weight-specific excretion
+        double e = UA*w0; //weight-specific excretion
         double w = f+e;       //weight-specific waste rate
-        double g = ((c-(m+w+(ex/w0)))/calPerGram)/wRat;   //weight-specific total daily growth rate / weight 
+        double g = (c-(m+w+ex))/(calPerGram*wRat*w0);   //weight-specific total daily growth rate / weight 
         if (sigRt>0) g += rng.computeNormalVariate()*sigRt; 
         return g;
     }
