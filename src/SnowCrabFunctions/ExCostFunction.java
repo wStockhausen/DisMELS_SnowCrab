@@ -47,30 +47,35 @@ public class ExCostFunction extends AbstractIBMFunction implements IBMFunctionIn
             "\n\t* author: Christine Stawitz"+
             "\n\t**************************************************************************";
     /** number of settable parameters */
-    public static final int numParams = 3;
+    public static final int numParams = 5;
     /** number of sub-functions */
     public static final int numSubFuncs = 0;
         
     public static final String PARAM_a = "a";
 
     public static final String PARAM_b = "b";
+    public static final String PARAM_aBig = "aBig";
+    public static final String PARAM_bBig = "bBig";
+    public static final String PARAM_minSize = "minSize";
 
-    public static final String PARAM_mat = "mat";
 
 
     private double a = 0;
 
     private double b = 0;
-
-    private boolean mat = false;
+    private double aBig = 0;
+    private double bBig = 0;
+    private double minSize = 0;
 
 
     public ExCostFunction(){
         super(numParams,numSubFuncs,DEFAULT_type,DEFAULT_name,DEFAULT_descr,DEFAULT_fullDescr);
         String key; 
-        key = PARAM_a;addParameter(key,Double.class,"intercept of exuviae cost");
+        key = PARAM_a;addParameter(key,Double.class,"coefficient of exuviae cost");
         key = PARAM_b;addParameter(key,Double.class,"exponent of exuviae cost");
-        key = PARAM_mat;addParameter(key,Boolean.class,"if crab is mature");
+        key = PARAM_aBig;addParameter(key,Double.class,"intercept of exuviae for crabs over min size");
+        key = PARAM_bBig; addParameter(key,Double.class, "slope of exuviae for crabs over min size");
+        key = PARAM_minSize; addParameter(key, Double.class,"minimum size before switching functions");
     }
     
      @Override
@@ -95,8 +100,14 @@ public class ExCostFunction extends AbstractIBMFunction implements IBMFunctionIn
                 case PARAM_b:
                     b = ((Double) value).doubleValue();
                     break;
-                case PARAM_mat:
-                    mat = ((Boolean) value).booleanValue();
+                case PARAM_aBig:
+                    aBig = ((Double) value).doubleValue();
+                    break;
+                case PARAM_bBig:
+                    bBig =((Double) value).doubleValue();
+                    break;
+                case PARAM_minSize:
+                    minSize = ((Double) value).doubleValue();
                     break;
             }
         }
@@ -108,10 +119,10 @@ public class ExCostFunction extends AbstractIBMFunction implements IBMFunctionIn
         double lvars = (Double) vars;//cast object to required double[]
         double size = lvars;
         Double exuviae;
-        if(!mat){
+        if(size<minSize){
             exuviae = new Double(a*Math.pow(size,b));
         } else{
-            exuviae = new Double(a+b*size);
+            exuviae = new Double(aBig+bBig*size);
         }  
         return exuviae;
     }

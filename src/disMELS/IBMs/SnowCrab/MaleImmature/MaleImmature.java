@@ -712,12 +712,17 @@ public class MaleImmature extends AbstractBenthicStage {
     private void updateWeight(double dt) {
         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
         double exPerDay = exTot/D;
+        fcnGrowth.setParameterValue("sex", 0.0);
         double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, exPerDay});
         if(growthRate>0){
             weight = weight*Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
         } else{
             double totRate = Math.max(-1.0,growthRate/weight);
             starvationMort = -Math.log(-(.0099+totRate))*(dt/DAY_SECS);
+        }
+        if(molted){
+            weight = weight - exTot;
+            molted = false;
         }
     }
 

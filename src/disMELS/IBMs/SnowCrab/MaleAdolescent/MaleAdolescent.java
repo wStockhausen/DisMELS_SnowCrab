@@ -72,6 +72,8 @@ public class MaleAdolescent extends AbstractBenthicStage {
      /** day of year */
     private double dayOfYear;
     private double starvationMort;
+    private double exTot;
+    private boolean molted;
    
     /** IBM function selected for growth */
     private IBMFunctionInterface fcnGrowth = null; 
@@ -499,6 +501,8 @@ public class MaleAdolescent extends AbstractBenthicStage {
         time       = startTime;
         numTrans   = 0.0; //set numTrans to zero
         starvationMort = 0.0;
+        molted = false;
+        exTot = 0.0;
         if (debug) {
             logger.info("\n---------------Setting initial position------------");
             logger.info(hType+cc+vType+cc+startTime+cc+xPos+cc+yPos+cc+zPos);
@@ -563,6 +567,8 @@ public class MaleAdolescent extends AbstractBenthicStage {
         dayOfYear = globalInfo.getCalendar().getYearDay();
         starvationMort = 0.0;
         numTrans = 0.0;
+        molted = false;
+        exTot = 0.0;
 //        isDaytime = DateTimeFunctions.isDaylight(lon,lat,dayOfYear);
         //movement here
         double[] pos;
@@ -628,11 +634,14 @@ public class MaleAdolescent extends AbstractBenthicStage {
 
     private void updateSize(double dt) {
         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+        exTot = (Double) fcnExCost.calculate(size);
         if((ageInInstar+dt/DAY_SECS)>D){
             boolean mat = (Boolean) fcnMaturity.calculate(new double[]{size,temperature});
+            
             size = (Double) fcnMolt.calculate(size);
             instar += 1;
             ageInInstar = 0.0;
+            molted = true;
             if(mat){
                 numTrans +=1;
             }
@@ -641,15 +650,18 @@ public class MaleAdolescent extends AbstractBenthicStage {
     
     private void updateWeight(double dt){
         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
-        double exTot = (Double) fcnExCost.calculate(size);
         double exPerDay = exTot/D;
-        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
+        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, exPerDay});
         if(growthRate>0){
             weight = weight*Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
         } else{
             double totRate = Math.max(-1.0,growthRate/weight);
             starvationMort = -Math.log(-(.0099+totRate))*(dt/DAY_SECS);
         } 
+        if(molted){
+            weight = weight - exTot;
+            molted=false;
+        }
     }
 
     /**

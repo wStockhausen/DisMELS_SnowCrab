@@ -98,6 +98,7 @@ public class FemaleImmature extends AbstractBenthicStage {
     private double dayOfYear;
     private double starvationMort;
     private boolean molted;
+    private double exTot;
     
     private double sCost;
     
@@ -552,6 +553,7 @@ public class FemaleImmature extends AbstractBenthicStage {
         time       = startTime;
         numTrans   = 0.0; //set numTrans to zero
         starvationMort = 0.0;
+        molted = false;
         if (debug) {
             logger.info("\n---------------Setting initial position------------");
             logger.info(hType+cc+vType+cc+startTime+cc+xPos+cc+yPos+cc+zPos);
@@ -613,8 +615,8 @@ public class FemaleImmature extends AbstractBenthicStage {
         //determine daytime/nighttime for vertical migration & calc indiv. W
         dayOfYear = globalInfo.getCalendar().getYearDay();
         starvationMort = 0.0;
+        numTrans = 0.0;
         molted = false;
-//        isDaytime = DateTimeFunctions.isDaylight(lon,lat,dayOfYear);
         //movement here
         //TODO: revise so no advection by currents!
         double[] pos;
@@ -688,6 +690,7 @@ public class FemaleImmature extends AbstractBenthicStage {
      */
     private void updateSize(double dt) {
         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+        exTot = (Double) fcnExCost.calculate(size);
         if((ageInInstar+dt/DAY_SECS)>D){
             size = (Double) fcnMolt.calculate(size);
             instar += 1;
@@ -706,8 +709,8 @@ public class FemaleImmature extends AbstractBenthicStage {
      */
     private void updateWeight(double dt) {
         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
-        double exTot = (Double) fcnExCost.calculate(size);
         double exPerDay = exTot/D;
+        fcnGrowth.setParameterValue("sex", 1.0);
         double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, exPerDay});
         if(growthRate>0){
             weight = weight*Math.exp(Math.log(1.0+growthRate)*(dt/DAY_SECS));
@@ -715,6 +718,10 @@ public class FemaleImmature extends AbstractBenthicStage {
             double totRate = Math.max(-1.0,growthRate/weight);
             starvationMort = -Math.log(-(.0099+totRate));
         } 
+        if(molted){
+            weight = weight - exTot;
+            molted = false;
+        }
     }
 
     /**

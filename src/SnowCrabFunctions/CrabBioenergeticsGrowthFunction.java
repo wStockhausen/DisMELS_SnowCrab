@@ -82,7 +82,7 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
     /** random number generator */
     protected static final RandomNumberGenerator rng = GlobalInfo.getInstance().getRandomNumberGenerator();
     /** number of settable parameters */
-    public static final int numParams = 16;
+    public static final int numParams = 21;
     /** number of sub-functions */
     public static final int numSubFuncs = 1;
 
@@ -128,9 +128,13 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
     
     public static final String PARAM_wRat = "wRat";
     
+    public static final String PARAM_sex = "sex";
+    
     /** value of pVal parameter */
-    private double[] pVal = new double[]{
-    0.83, 0.76, 0.74, .79, 0.75, 0.75, 0.75, 0.75, 0.75, 0.91, 1, 1.05, 0.9};
+    private static final double[][] pVal = new double[][]{
+        {0.91, 0.85, 0.82, 0.86, 0.87, 0.89, 0.89, 0.92, 0.96, 0.99, 1.1, 1.18, 1.1},
+        {0.89, 0.8, 0.77, 0.71, 0.73, 0.8, 0.8, 0.75, 0.8, 0.8, 0.9, 1.18, 1.1}
+    };
     
     /** value of aC parameter */
     private double aC = 18.08;
@@ -172,11 +176,13 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
     private double wRat = .136;
     private double calPerGram = 3900;
     
+    private double sex = 0;
+    
     /** constructor for class */
     public CrabBioenergeticsGrowthFunction(){
         super(numParams,numSubFuncs,DEFAULT_type,DEFAULT_name,DEFAULT_descr,DEFAULT_fullDescr);
         String key; 
-        key = PARAM_pVal;addParameter(key,double[][].class,"realized fraction of max consumption");
+        key = PARAM_pVal;addParameter(key,double[].class,"realized fraction of max consumption");
         
         key = PARAM_aC; addParameter(key,Double.class,"linear coefficient of weight-dependent max consumption");
         key = PARAM_bC; addParameter(key,Double.class,"exponent coefficient of weight-dependent max consumption");
@@ -199,6 +205,7 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
         key = PARAM_sigRt;addParameter(key,Double.class,"std. dev. in linear growth rate");
         key = PARAM_wRat; addParameter(key, Double.class, "dry to wet weight ratio of crab");
         key = PARAM_calPerGram; addParameter(key, Double.class, "calories per gram of crab tissue");
+        key = PARAM_sex; addParameter(key, Double.class, "sex of the crab");
     }
     
     @Override
@@ -279,6 +286,9 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
                 case PARAM_wRat:
                     wRat = ((Double) value).doubleValue();
                     break;
+                case PARAM_sex:
+                    sex = ((Double) value).doubleValue();
+                    break;
             }
         }
         return false;
@@ -300,7 +310,7 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
         double T   = 5.0;
         double ex = lvars[i++];
         double maxC = aC*Math.pow(w0,bC-1.0);//max consumption
-        double p = pVal[instar-1];
+        double p = pVal[(int) sex][instar-1];
         double c = maxC*p*calcF(T,cmT,coT,c1c);//realized weight-specific consumption
         double maxR = aR*Math.pow(w0,bR-1.0)*.00463*24.0;       //reference-level respiration
         double r = maxR*ACT*calcF(T,rmT,roT,c1r);
