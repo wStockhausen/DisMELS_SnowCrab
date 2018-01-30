@@ -699,7 +699,7 @@ public class MaleImmature extends AbstractBenthicStage {
             molted = true;
 
             if(size>35){
-                numTrans +=1;
+                numTrans += number;
             }
         }
     }
@@ -713,7 +713,7 @@ public class MaleImmature extends AbstractBenthicStage {
         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
         double exPerDay = exTot/D;
         fcnGrowth.setParameterValue("sex", 0.0);
-        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, exPerDay});
+        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
         if(growthRate>0){
             weight = weight*Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
         } else{

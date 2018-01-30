@@ -635,12 +635,13 @@ public class FemaleAdolescent extends AbstractBenthicStage {
          double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
         exTot = (Double) fcnExCost.calculate(size);
         if((ageInInstar+dt/DAY_SECS)>D){
+            boolean mat = (Boolean) fcnMaturity.calculate(new double[]{size,temperature});
             size = (Double) fcnMolt.calculate(size);
             instar += 1;
             ageInInstar = 0.0;
-            boolean mat = (Boolean) fcnMaturity.calculate(new double[]{size,temperature});
-            if(mat){
-                numTrans +=1;
+            molted = true;
+          if(mat){
+                numTrans += number;
             }
         }
     }
@@ -653,6 +654,7 @@ public class FemaleAdolescent extends AbstractBenthicStage {
     private void updateWeight(double dt) {
         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
         double exPerDay = exTot/D;
+        fcnGrowth.setParameterValue("sex", 1.0);
         double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
         if(growthRate>0){
             weight = weight*Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));

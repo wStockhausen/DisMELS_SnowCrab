@@ -14,9 +14,12 @@ import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRa
 import disMELS.IBMs.SnowCrab.AbstractBenthicStage;
 import disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes;
 import disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes;
+import disMELS.IBMs.SnowCrab.Zooea1.Zooea1Attributes;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import static wts.models.DisMELS.framework.LifeStageInterface.DAY_SECS;
+import wts.models.utilities.CalendarIF;
+import wts.models.utilities.DateTimeFunctions;
 import wts.roms.model.LagrangianParticle;
 
 
@@ -67,7 +70,10 @@ public class FemaleAdult extends AbstractBenthicStage {
     protected boolean randomizeTransitions;
     /** stage transition rate */
     protected double stageTransRate;    
-    
+        /** elapsed time to spawn (days) */
+    protected double timeToSpawn = 366;
+     protected double firstDayOfSpawning;
+     protected double lengthOfSpawningSeason;
         //fields that reflect (new) attribute values
     //none
     
@@ -77,11 +83,15 @@ public class FemaleAdult extends AbstractBenthicStage {
      /** day of year */
     private double dayOfYear;
     private double starvationMort;
+        private boolean isSpawningSeason;
+    /** spawning season flag */
+    /** flag to clean up after spawning */
+    private boolean doOnceAfterSpawningSeason = true;
    
     /** IBM function selected for mortality */
     private IBMFunctionInterface fcnMort = null; 
     private IBMFunctionInterface fcnGrowth = null;
-    private IBMFunctionInterface fcnRepro = null;
+    private IBMFunctionInterface fcnFecundity = null;
  
     
     /** flag to print debugging info */
@@ -363,7 +373,7 @@ public class FemaleAdult extends AbstractBenthicStage {
     private void setIBMFunctions(){
         fcnMort = params.getSelectedIBMFunctionForCategory(FemaleAdultParameters.FCAT_Mortality);
         fcnGrowth = params.getSelectedIBMFunctionForCategory(FemaleAdultParameters.FCAT_Growth);
-        fcnRepro = params.getSelectedIBMFunctionForCategory(FemaleAdultParameters.FCAT_Fecundity);
+        fcnFecundity = params.getSelectedIBMFunctionForCategory(FemaleAdultParameters.FCAT_Fecundity);
   }
     
     /*
@@ -384,6 +394,10 @@ public class FemaleAdult extends AbstractBenthicStage {
                 params.getValue(params.PARAM_meanStageTransDelay,meanStageTransDelay);
         randomizeTransitions = 
                 params.getValue(params.PARAM_randomizeTransitions,randomizeTransitions);
+        firstDayOfSpawning =
+                params.getValue(params.PARAM_firstDaySpawning, firstDayOfSpawning);
+        lengthOfSpawningSeason =
+                params.getValue(params.PARAM_lengthSpawningSeason, lengthOfSpawningSeason);
     }
     
     /**
@@ -435,6 +449,7 @@ public class FemaleAdult extends AbstractBenthicStage {
                  */
                 nLHSs = LHS_Factory.createNextLHSsFromSuperIndividual(typeName,this,numTrans);
                 numTrans = 0.0;//reset numTrans to zero
+                starvationMort = 0.0;
             } else {
                 /** 
                  * Since this is a single individual making a transition, we should
@@ -461,6 +476,108 @@ public class FemaleAdult extends AbstractBenthicStage {
     public List<LifeStageInterface> getSpawnedIndividuals() {
         output.clear();
         return output;
+    }
+    
+    private void doSpawning() {
+        try {
+            //create number of new individuals = fecundity
+            //logger.info("Adult"+id+" spawning: fecundity = "+fecundity);
+            LifeStageInterface nLHS = null;
+            LifeStageAttributesInterface newAttsI = null;
+            Double fecundity = (Double) fcnFecundity.calculate(size);
+            for (int i=0;i<fecundity;i++) {
+                /** 
+                 * For each individual, we need to:
+                 *          1) create new LHS instance.
+                 *          2. assign new id to new instance (gets done automatically).
+                 *          3) assign current LHS id to new LHS as parentID
+                 *          4) assign current LHS id to new LHS origID
+                 *          5) set number in new LHS to 1.TODO: change this to a variable.
+                 *          6) set age and ageInStage to 0 in new instance.
+                 *          7) copy other attributes.
+                 */
+                nLHS = LHS_Factory.createSpawnedLHS(typeName);
+                newAttsI = nLHS.getAttributes();
+                if (newAttsI instanceof Zooea1Attributes) {
+                    Zooea1Attributes newAtts = (Zooea1Attributes) newAttsI;
+                    //newAtts.setValue(LifeStageAttributesInterface.PROP_id,         -1);<-don't need to update this
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_parentID,   atts.getValue(LifeStageAttributesInterface.PROP_id));
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_origID,     atts.getValue(LifeStageAttributesInterface.PROP_id));
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_startTime,  time);
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_time,       atts.getValue(LifeStageAttributesInterface.PROP_time));
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_horizType,  atts.getValue(LifeStageAttributesInterface.PROP_horizType));
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_vertType,   atts.getValue(LifeStageAttributesInterface.PROP_vertType));
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_horizPos1,  atts.getValue(LifeStageAttributesInterface.PROP_horizPos1));
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_horizPos2,  atts.getValue(LifeStageAttributesInterface.PROP_horizPos2));
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_vertPos,    atts.getValue(LifeStageAttributesInterface.PROP_vertPos));
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_gridCellID, atts.getValue(LifeStageAttributesInterface.PROP_gridCellID));
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_track,      atts.getValue(LifeStageAttributesInterface.PROP_track));
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_active,     true);
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_alive,      true);
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_age,        0.0);
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_ageInStage, 0.0);
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_number,     1.0);//TODO:change this to fecundity/numSpawnPerIndiv
+//                    newAtts.setValue(EggStageAttributes.PROP_salinity,   atts.getValue(atts.PROP_salinity));
+//                    newAtts.setValue(EggStageAttributes.PROP_temperature,atts.getValue(atts.PROP_temperature));
+                    //copy LagrangianParticle information
+                    nLHS.setLagrangianParticle(lp);
+                    //start track at last position of oldLHS track
+                    nLHS.startTrack(track.get(track.size()-1),COORDINATE_TYPE_PROJECTED);
+                    nLHS.startTrack(trackLL.get(trackLL.size()-1),COORDINATE_TYPE_GEOGRAPHIC);
+                    //update local variables to capture changes made here
+                    nLHS.setAttributes(newAtts);
+                } else {
+                    //should throw error
+                    logger.info("AdultStage.doSpawning(): no match for attributes type:"+newAttsI.toString());
+                }
+                output.add(nLHS);
+                nLHS = null;
+            }
+
+                //spawning only occurs once per season, so set to infinity
+                timeToSpawn = Double.POSITIVE_INFINITY;
+
+        } catch (IllegalAccessException | InstantiationException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    /**
+     * Initializes time-dependent and time-independent variables
+     * @param time
+     */
+    private void initializeTimedependentVariables() {
+        //temporarily set calendar time to variable time
+        CalendarIF cal = globalInfo.getCalendar();
+        long modTime = cal.getTimeOffset();
+        cal.setTimeOffset((long) time);
+        dayOfYear = cal.getYearDay();
+        
+        //set up spawning
+        isSpawningSeason = DateTimeFunctions.isBetweenDOY(dayOfYear,
+                                                          firstDayOfSpawning,
+                                                          firstDayOfSpawning+lengthOfSpawningSeason);        
+        if (!isSpawningSeason) {
+            //we're starting outside the spawning season, set up for next one
+            setupSpawningSeason();
+        } else {
+            //we're starting in the middle of a spawning season
+
+                    timeToSpawn = (lengthOfSpawningSeason-(dayOfYear-firstDayOfSpawning))/2.0;
+                
+            
+        }
+        
+        //reset calendar time to model time
+        cal.setTimeOffset(modTime);
+    }
+    
+     private void setupSpawningSeason() {
+        doOnceAfterSpawningSeason = false;
+        //Set up time of first spawning
+
+        timeToSpawn = (lengthOfSpawningSeason/2.0)*DAY_SECS;
+ 
     }
     
     /**
@@ -502,9 +619,29 @@ public class FemaleAdult extends AbstractBenthicStage {
             double K = 0;  //benthic adult starts out on bottom
             double z = i3d.interpolateBathymetricDepth(IJ);
             if (debug) logger.info("Bathymetric depth = "+z);
+            double ssh = i3d.interpolateSSH(IJ);
+
+            if (vType==Types.VERT_K) {
+                if (zPos<0) {K = 0;} else
+                if (zPos>i3d.getGrid().getN()) {K = i3d.getGrid().getN();} else
+                K = zPos;
+            } else if (vType==Types.VERT_Z) {//depths negative
+                if (zPos<-z) {K = 0;} else                     //at bottom
+                if (zPos>ssh) {K = i3d.getGrid().getN();} else //at surface
+                K = i3d.calcKfromZ(IJ[0],IJ[1],zPos);          //at requested depth
+            } else if (vType==Types.VERT_H) {//depths positive
+                if (zPos>z) {K = 0;} else                       //at bottom
+                if (zPos<-ssh) {K = i3d.getGrid().getN();} else //at surface
+                K = i3d.calcKfromZ(IJ[0],IJ[1],-zPos);          //at requested depth
+            } else if (vType==Types.VERT_DH) {//distance off bottom
+                if (zPos<0) {K = 0;} else                        //at bottom
+                if (zPos>z+ssh) {K = i3d.getGrid().getN();} else //at surface
+                K = i3d.calcKfromZ(IJ[0],IJ[1],-(z-zPos));       //at requested distance off bottom
+            }
             lp.setIJK(IJ[0],IJ[1],K);
             //reset track array
             track.clear();
+            trackLL.clear();
             //set horizType to lat/lon and vertType to depth
             atts.setValue(LifeStageAttributesInterface.PROP_horizType,Types.HORIZ_LL);
             atts.setValue(LifeStageAttributesInterface.PROP_vertType,Types.VERT_H);
@@ -526,6 +663,18 @@ public class FemaleAdult extends AbstractBenthicStage {
     public void step(double dt) throws ArrayIndexOutOfBoundsException {
         //determine daytime/nighttime
         dayOfYear = globalInfo.getCalendar().getYearDay();
+        starvationMort = 0.0;
+        numTrans = 0.0;
+//        isDaytime = DateTimeFunctions.isDaylight(lon,lat,dayOfYear);
+        isSpawningSeason = DateTimeFunctions.isBetweenDOY(dayOfYear,firstDayOfSpawning,firstDayOfSpawning+lengthOfSpawningSeason);
+        if (isSpawningSeason) {
+            timeToSpawn = timeToSpawn-dt;
+            doOnceAfterSpawningSeason = true;
+        } else {
+            if (doOnceAfterSpawningSeason) {
+                setupSpawningSeason();
+            }
+        }
         starvationMort = 0.0;
         //movement here
         //TODO: revise so no advection by currents!
@@ -597,12 +746,13 @@ public class FemaleAdult extends AbstractBenthicStage {
      */
     private void updateWeight(double dt) {
         //todo - Add in cost of reproduction!
+        fcnGrowth.setParameterValue("sex", 1.0);
         double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, 0});
         if(growthRate>0){
-            weight = weight*Math.exp(-Math.log(growthRate)*(dt/DAY_SECS));
+            weight = weight*Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
         } else{
             double totRate = Math.max(-1.0,growthRate/weight);
-            starvationMort = -Math.log(-(.0099+totRate));
+            starvationMort = -Math.log(-(.0099+totRate))*(dt/DAY_SECS);
         }
     }
 

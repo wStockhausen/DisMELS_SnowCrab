@@ -90,9 +90,9 @@ public class IntermoltLarvaFunction  extends AbstractIBMFunction implements IBMF
     
     @Override
     public Double calculate(Object vars) {
-        double lvars = (double) vars;//cast object to required double[]
-        double T   = lvars;
-        T = 5.0;
+        Double lvars = (Double) vars;//cast object to required double[]
+        int i = 0;
+        Double T   = lvars;
         Double D = new Double(a/(T-b));
         return D;
     }
