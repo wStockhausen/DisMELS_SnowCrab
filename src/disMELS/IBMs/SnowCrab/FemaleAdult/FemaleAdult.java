@@ -81,6 +81,7 @@ public class FemaleAdult extends AbstractBenthicStage {
     /** IBM function selected for mortality */
     private IBMFunctionInterface fcnMort = null; 
     private IBMFunctionInterface fcnGrowth = null;
+    private IBMFunctionInterface fcnRepro = null;
  
     
     /** flag to print debugging info */
@@ -239,7 +240,7 @@ public class FemaleAdult extends AbstractBenthicStage {
     @Override
     public void setAttributes(LifeStageAttributesInterface newAtts) {
         if (newAtts instanceof FemaleAdolescentAttributes) {
-            FemaleAdultAttributes spAtts = (FemaleAdultAttributes) newAtts;
+            FemaleAdolescentAttributes spAtts = (FemaleAdolescentAttributes) newAtts;
             for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
         } else if(newAtts instanceof FemaleImmatureAttributes){
         FemaleImmatureAttributes spAtts = (FemaleImmatureAttributes) newAtts;
@@ -362,6 +363,7 @@ public class FemaleAdult extends AbstractBenthicStage {
     private void setIBMFunctions(){
         fcnMort = params.getSelectedIBMFunctionForCategory(FemaleAdultParameters.FCAT_Mortality);
         fcnGrowth = params.getSelectedIBMFunctionForCategory(FemaleAdultParameters.FCAT_Growth);
+        fcnRepro = params.getSelectedIBMFunctionForCategory(FemaleAdultParameters.FCAT_Fecundity);
   }
     
     /*
@@ -546,6 +548,7 @@ public class FemaleAdult extends AbstractBenthicStage {
         updateWeight(dt);
         updateNum(dt);
         updateAge(dt);
+        makeEggs(dt);
         updatePosition(pos);
         interpolateEnvVars(pos);
         //check for exiting grid
@@ -602,6 +605,10 @@ public class FemaleAdult extends AbstractBenthicStage {
             double totRate = Math.max(-1.0,growthRate/weight);
             starvationMort = -Math.log(-(.0099+totRate));
         }
+    }
+    
+    private void makeEggs(double dt){
+        double eggs = (Double) fcnRepro.calculate(new double[]{weight, dt});
     }
 
     /**
