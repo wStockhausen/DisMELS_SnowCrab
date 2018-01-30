@@ -548,7 +548,6 @@ public class FemaleAdult extends AbstractBenthicStage {
         updateWeight(dt);
         updateNum(dt);
         updateAge(dt);
-        makeEggs(dt);
         updatePosition(pos);
         interpolateEnvVars(pos);
         //check for exiting grid
@@ -606,10 +605,7 @@ public class FemaleAdult extends AbstractBenthicStage {
             starvationMort = -Math.log(-(.0099+totRate));
         }
     }
-    
-    private void makeEggs(double dt){
-        double eggs = (Double) fcnRepro.calculate(new double[]{weight, dt});
-    }
+
 
     /**
      *

@@ -42,7 +42,8 @@ public class FemaleAdolescent extends AbstractBenthicStage {
     public static final String pointFTClass = wts.models.DisMELS.framework.LHSPointFeatureType.class.getName();
 //            "wts.models.DisMELS.LHS.BenthicAdult.AdultStagePointFT";
     /* Classes for next LHS */
-    public static final String[] nextLHSClasses = new String[]{FemaleAdult.class.getName()};
+    public static final String[] nextLHSClasses = new String[]{FemaleAdolescent.class.getName(),
+        FemaleAdult.class.getName()};
     /* Classes for spawned LHS */
     public static final String[] spawnedLHSClasses = new String[]{};
     
@@ -78,6 +79,8 @@ public class FemaleAdolescent extends AbstractBenthicStage {
      /** day of year */
     private double dayOfYear;
     private double starvationMort;
+    private double exTot;
+    private boolean molted;
    
     /** IBM function selected for mortality */
     private IBMFunctionInterface fcnMort = null; 
@@ -115,7 +118,6 @@ public class FemaleAdolescent extends AbstractBenthicStage {
         atts.setValue(LifeStageAttributesInterface.PROP_origID,id);
         setAttributesFromSubClass(atts);  //set object in the superclass
         params = (FemaleAdolescentParameters) LHS_Factory.createParameters(typeName);
-        setParametersFromSubClass(params);//set object in the superclass
         setParameters(params);
     }
 
@@ -443,6 +445,7 @@ public class FemaleAdolescent extends AbstractBenthicStage {
                  */
                 nLHSs = LHS_Factory.createNextLHSsFromSuperIndividual(typeName,this,numTrans);
                 numTrans = 0.0;//reset numTrans to zero
+                starvationMort = 0.0;
             } else {
                 /** 
                  * Since this is a single individual making a transition, we should
@@ -493,6 +496,8 @@ public class FemaleAdolescent extends AbstractBenthicStage {
         time       = startTime;
         numTrans   = 0.0; //set numTrans to zero
         starvationMort = 0.0;
+        molted = false;
+        exTot = 0.0;
         if (debug) {
             logger.info("\n---------------Setting initial position------------");
             logger.info(hType+cc+vType+cc+startTime+cc+xPos+cc+yPos+cc+zPos);
@@ -510,9 +515,29 @@ public class FemaleAdolescent extends AbstractBenthicStage {
             double K = 0;  //benthic adult starts out on bottom
             double z = i3d.interpolateBathymetricDepth(IJ);
             if (debug) logger.info("Bathymetric depth = "+z);
+            double ssh = i3d.interpolateSSH(IJ);
+
+            if (vType==Types.VERT_K) {
+                if (zPos<0) {K = 0;} else
+                if (zPos>i3d.getGrid().getN()) {K = i3d.getGrid().getN();} else
+                K = zPos;
+            } else if (vType==Types.VERT_Z) {//depths negative
+                if (zPos<-z) {K = 0;} else                     //at bottom
+                if (zPos>ssh) {K = i3d.getGrid().getN();} else //at surface
+                K = i3d.calcKfromZ(IJ[0],IJ[1],zPos);          //at requested depth
+            } else if (vType==Types.VERT_H) {//depths positive
+                if (zPos>z) {K = 0;} else                       //at bottom
+                if (zPos<-ssh) {K = i3d.getGrid().getN();} else //at surface
+                K = i3d.calcKfromZ(IJ[0],IJ[1],-zPos);          //at requested depth
+            } else if (vType==Types.VERT_DH) {//distance off bottom
+                if (zPos<0) {K = 0;} else                        //at bottom
+                if (zPos>z+ssh) {K = i3d.getGrid().getN();} else //at surface
+                K = i3d.calcKfromZ(IJ[0],IJ[1],-(z-zPos));       //at requested distance off bottom
+            }
             lp.setIJK(IJ[0],IJ[1],K);
             //reset track array
             track.clear();
+            trackLL.clear();
             //set horizType to lat/lon and vertType to depth
             atts.setValue(LifeStageAttributesInterface.PROP_horizType,Types.HORIZ_LL);
             atts.setValue(LifeStageAttributesInterface.PROP_vertType,Types.VERT_H);
@@ -535,6 +560,10 @@ public class FemaleAdolescent extends AbstractBenthicStage {
         //determine daytime/nighttime
         dayOfYear = globalInfo.getCalendar().getYearDay();
         starvationMort = 0.0;
+        numTrans = 0.0;
+        molted = false;
+        exTot = 0.0;
+//        isDaytime = DateTimeFunctions.isDaylight(lon,lat,dayOfYear);
         //movement here
         //TODO: revise so no advection by currents!
         double[] pos;
@@ -604,6 +633,7 @@ public class FemaleAdolescent extends AbstractBenthicStage {
      */
     private void updateSize(double dt) {
          double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+        exTot = (Double) fcnExCost.calculate(size);
         if((ageInInstar+dt/DAY_SECS)>D){
             size = (Double) fcnMolt.calculate(size);
             instar += 1;
@@ -622,15 +652,18 @@ public class FemaleAdolescent extends AbstractBenthicStage {
      */
     private void updateWeight(double dt) {
         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
-        double exTot = (Double) fcnExCost.calculate(size);
         double exPerDay = exTot/D;
         double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
         if(growthRate>0){
-            weight = weight*Math.exp(-Math.log(growthRate)*(dt/DAY_SECS));
+            weight = weight*Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
         } else{
             double totRate = Math.max(-1.0,growthRate/weight);
-            starvationMort = -Math.log(-(.0099+totRate));
+            starvationMort = -Math.log(-(.0099+totRate))*(dt/DAY_SECS);
         } 
+        if(molted){
+            weight = weight - exTot;
+            molted=false;
+        }
     }
 
     /**
