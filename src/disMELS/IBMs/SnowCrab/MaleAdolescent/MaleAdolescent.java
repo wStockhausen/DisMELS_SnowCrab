@@ -558,7 +558,6 @@ public class MaleAdolescent extends AbstractBenthicStage {
             updateAttributes(); 
             initializeTimedependentVariables();
         }
-        updateVariables();//set instance variables to attribute values
     }
     
     @Override
@@ -567,9 +566,6 @@ public class MaleAdolescent extends AbstractBenthicStage {
         dayOfYear = globalInfo.getCalendar().getYearDay();
         starvationMort = 0.0;
         numTrans = 0.0;
-        molted = false;
-        exTot = 0.0;
-//        isDaytime = DateTimeFunctions.isDaylight(lon,lat,dayOfYear);
         //movement here
         double[] pos;
             double[] uv = calcUV(dt);

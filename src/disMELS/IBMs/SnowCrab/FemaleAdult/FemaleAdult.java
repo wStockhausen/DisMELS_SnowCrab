@@ -14,6 +14,7 @@ import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRa
 import disMELS.IBMs.SnowCrab.AbstractBenthicStage;
 import disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes;
 import disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes;
+import disMELS.IBMs.SnowCrab.Zooea1.Zooea1;
 import disMELS.IBMs.SnowCrab.Zooea1.Zooea1Attributes;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
@@ -44,7 +45,7 @@ public class FemaleAdult extends AbstractBenthicStage {
     /* Classes for next LHS */
     public static final String[] nextLHSClasses = new String[]{FemaleAdult.class.getName()};
     /* Classes for spawned LHS */
-    public static final String[] spawnedLHSClasses = new String[]{};
+    public static final String[] spawnedLHSClasses = new String[]{Zooea1.class.getName()};
     
         //Instance fields
             //  Fields hiding ones from superclass
@@ -424,10 +425,10 @@ public class FemaleAdult extends AbstractBenthicStage {
     public List<LifeStageInterface> getMetamorphosedIndividuals(double dt) {
         double dtp = 0.25*(dt/DAY_SECS);//use 1/4 timestep (converted from sec to d)
         output.clear();
-        List<LifeStageInterface> nLHSs=null;
-        if (false) {
-            nLHSs = createNextLHSs();
-            if (nLHSs!=null) output.addAll(nLHSs);
+        List<LifeStageInterface> nLHS;
+        if ((ageInStage+dtp>=minStageDuration)&&(size>=minSizeAtTrans)) {
+            nLHS = createNextLHSs();
+            if (nLHS!=null) output.addAll(nLHS);
         }
         return output;
     }
@@ -475,6 +476,8 @@ public class FemaleAdult extends AbstractBenthicStage {
     @Override
     public List<LifeStageInterface> getSpawnedIndividuals() {
         output.clear();
+        //logger.info("Adult "+id+": "+isSpawningSeason+", "+elapsedTimeToSpawn);
+        if (isSpawningSeason && (timeToSpawn<0)) doSpawning();
         return output;
     }
     
@@ -562,7 +565,7 @@ public class FemaleAdult extends AbstractBenthicStage {
             setupSpawningSeason();
         } else {
             //we're starting in the middle of a spawning season
-
+     doOnceAfterSpawningSeason = true;
                     timeToSpawn = (lengthOfSpawningSeason-(dayOfYear-firstDayOfSpawning))/2.0;
                 
             
@@ -657,6 +660,7 @@ public class FemaleAdult extends AbstractBenthicStage {
             updateAttributes(); 
         }
         updateVariables();//set instance variables to attribute values
+        initializeTimedependentVariables();
     }
     
     @Override
