@@ -438,8 +438,13 @@ public class Megalopa extends AbstractPelagicStage {
         List<LifeStageInterface> nLHSs=null;
         if (((ageInStage+dtp)>=minStageDuration)&&(weight>=minWeight)) {
             if ((numTrans>0)){
+                if(depth<=minSettlementDepth){
+                    active = false;
+                    alive = false;
+                } else{
             nLHSs = createNextLHSs();
             if (nLHSs!=null) output.addAll(nLHSs);
+                }
         }
         }
         return output;
