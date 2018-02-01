@@ -42,8 +42,7 @@ public class FemaleAdolescent extends AbstractBenthicStage {
     public static final String pointFTClass = wts.models.DisMELS.framework.LHSPointFeatureType.class.getName();
 //            "wts.models.DisMELS.LHS.BenthicAdult.AdultStagePointFT";
     /* Classes for next LHS */
-    public static final String[] nextLHSClasses = new String[]{FemaleAdolescent.class.getName(),
-        FemaleAdult.class.getName()};
+    public static final String[] nextLHSClasses = new String[]{FemaleAdult.class.getName()};
     /* Classes for spawned LHS */
     public static final String[] spawnedLHSClasses = new String[]{};
     
@@ -419,7 +418,7 @@ public class FemaleAdolescent extends AbstractBenthicStage {
         double dtp = 0.25*(dt/DAY_SECS);//use 1/4 timestep (converted from sec to d)
         output.clear();
         List<LifeStageInterface> nLHSs=null;
-        if ((ageInStage+dtp>=minStageDuration)&&(size>=minSizeAtTrans)) {
+        if ((ageInStage+dtp>=minStageDuration)) {
             if(numTrans>0){
             nLHSs = createNextLHSs();
             if (nLHSs!=null) output.addAll(nLHSs);
@@ -552,7 +551,6 @@ public class FemaleAdolescent extends AbstractBenthicStage {
             interpolateEnvVars(pos);
             updateAttributes(); 
         }
-        updateVariables();//set instance variables to attribute values
     }
     
     @Override
@@ -582,10 +580,10 @@ public class FemaleAdolescent extends AbstractBenthicStage {
             lp.doCorrectorStep();
             pos = lp.getIJK();
         time = time+dt;
+        updateAge(dt);
         updateSize(dt);
         updateWeight(dt);
         updateNum(dt);
-        updateAge(dt);
         updatePosition(pos);
         interpolateEnvVars(pos);
         //check for exiting grid
@@ -632,7 +630,7 @@ public class FemaleAdolescent extends AbstractBenthicStage {
      * @param dt - time step in seconds
      */
     private void updateSize(double dt) {
-         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+        double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
         exTot = (Double) fcnExCost.calculate(size);
         if((ageInInstar+dt/DAY_SECS)>D){
             boolean mat = (Boolean) fcnMaturity.calculate(new double[]{size,temperature});
@@ -814,6 +812,7 @@ public class FemaleAdolescent extends AbstractBenthicStage {
         atts.setValue(FemaleAdolescentAttributes.PROP_salinity,salinity);
         atts.setValue(FemaleAdolescentAttributes.PROP_temperature,temperature);
         atts.setValue(FemaleAdolescentAttributes.PROP_ph,ph);
+        atts.setValue(FemaleAdolescentAttributes.PROP_number, number);
     }
 
     /**
@@ -831,5 +830,6 @@ public class FemaleAdolescent extends AbstractBenthicStage {
        salinity    = atts.getValue(FemaleAdolescentAttributes.PROP_salinity,salinity);
        temperature = atts.getValue(FemaleAdolescentAttributes.PROP_temperature,temperature);
        ph        = atts.getValue(FemaleAdolescentAttributes.PROP_ph,ph);
+       number    = atts.getValue(FemaleAdolescentAttributes.PROP_number, number);
     }
 }

@@ -579,9 +579,10 @@ public class Zooea2 extends AbstractPelagicStage {
         pos = lp.getIJK();
         if (debugOps) logger.info("Depth after corrector step = "+(-i3d.calcZfromK(pos[0],pos[1],pos[2])));
         time = time+dt;
+        updateAge(dt);
         updateWeight(dt);
         updateNum(dt);
-        updateAge(dt);
+
         updatePosition(pos);
     
         interpolateEnvVars(pos);

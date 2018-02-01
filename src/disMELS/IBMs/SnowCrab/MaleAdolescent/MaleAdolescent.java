@@ -583,10 +583,10 @@ public class MaleAdolescent extends AbstractBenthicStage {
             lp.doCorrectorStep();
             pos = lp.getIJK();
         time = time+dt;
+        updateAge(dt);
         updateSize(dt);
         updateWeight(dt);
         updateNum(dt);
-        updateAge(dt);
         updatePosition(pos);
         interpolateEnvVars(pos);
         //check for exiting grid

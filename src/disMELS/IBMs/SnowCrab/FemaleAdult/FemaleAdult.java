@@ -253,8 +253,8 @@ public class FemaleAdult extends AbstractBenthicStage {
         if (newAtts instanceof FemaleAdolescentAttributes) {
             FemaleAdolescentAttributes spAtts = (FemaleAdolescentAttributes) newAtts;
             for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
-        } else if(newAtts instanceof FemaleImmatureAttributes){
-        FemaleImmatureAttributes spAtts = (FemaleImmatureAttributes) newAtts;
+        } else if(newAtts instanceof FemaleAdultAttributes){
+        FemaleAdultAttributes spAtts = (FemaleAdultAttributes) newAtts;
             for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
         }else {
             //TODO: should throw an error here
@@ -520,8 +520,9 @@ public class FemaleAdult extends AbstractBenthicStage {
                     newAtts.setValue(LifeStageAttributesInterface.PROP_age,        0.0);
                     newAtts.setValue(LifeStageAttributesInterface.PROP_ageInStage, 0.0);
                     newAtts.setValue(LifeStageAttributesInterface.PROP_number,     1.0);//TODO:change this to fecundity/numSpawnPerIndiv
-//                    newAtts.setValue(EggStageAttributes.PROP_salinity,   atts.getValue(atts.PROP_salinity));
-//                    newAtts.setValue(EggStageAttributes.PROP_temperature,atts.getValue(atts.PROP_temperature));
+                    newAtts.setValue(Zooea1Attributes.PROP_salinity,   atts.getValue(atts.PROP_salinity));
+                    newAtts.setValue(Zooea1Attributes.PROP_temperature,atts.getValue(atts.PROP_temperature));
+                    newAtts.setValue(Zooea1Attributes.PROP_ph,atts.getValue(atts.PROP_ph));
                     //copy LagrangianParticle information
                     nLHS.setLagrangianParticle(lp);
                     //start track at last position of oldLHS track
@@ -658,8 +659,7 @@ public class FemaleAdult extends AbstractBenthicStage {
             }
             interpolateEnvVars(pos);
             updateAttributes(); 
-        }
-        updateVariables();//set instance variables to attribute values
+        };//set instance variables to attribute values
         initializeTimedependentVariables();
     }
     
@@ -698,9 +698,9 @@ public class FemaleAdult extends AbstractBenthicStage {
             lp.doCorrectorStep();
             pos = lp.getIJK();
         time = time+dt;
+        updateAge(dt);
         updateWeight(dt);
         updateNum(dt);
-        updateAge(dt);
         updatePosition(pos);
         interpolateEnvVars(pos);
         //check for exiting grid

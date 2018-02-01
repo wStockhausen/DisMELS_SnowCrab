@@ -623,7 +623,7 @@ public class MaleImmature extends AbstractBenthicStage {
             double[] uv = calcUV(dt);
             lp.setU(uv[0],lp.getN());
             lp.setV(uv[1],lp.getN());
-            lp.doPredictorStep();
+                lp.doPredictorStep();
             //assume same daytime status, but recalc depth and revise W 
 //            pos = lp.getPredictedIJK();
 //            depth = -i3d.calcZfromK(pos[0],pos[1],pos[2]);
@@ -635,10 +635,10 @@ public class MaleImmature extends AbstractBenthicStage {
             lp.doCorrectorStep();
             pos = lp.getIJK();
         time = time+dt;
+        updateAge(dt);
         updateSize(dt);
         updateWeight(dt);
         updateNum(dt);
-        updateAge(dt);
         updatePosition(pos);
         interpolateEnvVars(pos);
         //check for exiting grid

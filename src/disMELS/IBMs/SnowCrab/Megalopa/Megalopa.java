@@ -591,9 +591,9 @@ public class Megalopa extends AbstractPelagicStage {
             if (debugOps) logger.info("Depth after corrector step = "+(-i3d.calcZfromK(pos[0],pos[1],pos[2])));
         time = time+dt;
         numTrans = 0.0;
+        updateAge(dt);
         updateWeight(dt);
         updateNum(dt);
-        updateAge(dt);
         updatePosition(pos);
     
         interpolateEnvVars(pos);
