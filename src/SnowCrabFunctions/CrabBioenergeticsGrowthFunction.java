@@ -308,7 +308,6 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
         int instar = Math.max((int) lvars[i++],1);
         double w0 = lvars[i++];
         double T   = lvars[i++];
-        T = 5.0;
         double ex = lvars[i++];
         double maxC = aC*Math.pow(w0,bC-1.0);//max consumption
         double p = pVal[(int) sex][instar-1];
