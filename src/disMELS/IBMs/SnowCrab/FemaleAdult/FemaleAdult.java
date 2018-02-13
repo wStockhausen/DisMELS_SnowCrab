@@ -520,6 +520,7 @@ public class FemaleAdult extends AbstractBenthicStage {
                     newAtts.setValue(LifeStageAttributesInterface.PROP_age,        0.0);
                     newAtts.setValue(LifeStageAttributesInterface.PROP_ageInStage, 0.0);
                     newAtts.setValue(LifeStageAttributesInterface.PROP_number,     1.0);//TODO:change this to fecundity/numSpawnPerIndiv
+                    newAtts.setValue(Zooea1Attributes.PROP_weight,     0.00008);
                     newAtts.setValue(Zooea1Attributes.PROP_salinity,   atts.getValue(atts.PROP_salinity));
                     newAtts.setValue(Zooea1Attributes.PROP_temperature,atts.getValue(atts.PROP_temperature));
                     newAtts.setValue(Zooea1Attributes.PROP_ph,atts.getValue(atts.PROP_ph));
