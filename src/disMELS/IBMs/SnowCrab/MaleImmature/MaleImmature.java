@@ -762,7 +762,7 @@ public class MaleImmature extends AbstractBenthicStage {
             }
         }
         number = number*Math.exp(-dt*totRate/DAY_SECS);
-        if(number==0){
+        if(number<0.01){
             active=false;alive=false;number=number+numTrans;
         }
     }
