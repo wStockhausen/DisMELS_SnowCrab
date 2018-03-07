@@ -629,8 +629,13 @@ public class FemaleAdolescent extends AbstractBenthicStage {
      *
      * @param dt - time step in seconds
      */
-    private void updateSize(double dt) {
-        double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+    private void updateSize(double dt) {        
+        double D;
+        if(instar<8){
+            D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+        } else{
+            D = 365.0;
+        }
         exTot = (Double) fcnExCost.calculate(size);
         if((ageInInstar+dt/DAY_SECS)>D){
             boolean mat = (Boolean) fcnMaturity.calculate(new double[]{size,temperature});

@@ -689,7 +689,12 @@ public class FemaleImmature extends AbstractBenthicStage {
      * @param dt - time step in seconds
      */
     private void updateSize(double dt) {
-        double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+        double D;
+        if(instar<8){
+            D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+        } else{
+            D = 365.0;
+        }
         exTot = (Double) fcnExCost.calculate(size);
         if((ageInInstar+dt/DAY_SECS)>D){
             size = (Double) fcnMolt.calculate(size);
