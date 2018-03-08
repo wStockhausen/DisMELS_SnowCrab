@@ -794,7 +794,7 @@ public class FemaleAdult extends AbstractBenthicStage {
         depth = -i3d.calcZfromK(pos[0],pos[1],pos[2]);
         lat   = i3d.interpolateLat(pos);
         lon   = i3d.interpolateLon(pos);
-        double[] horizGradient = i3d.calcHorizGradient(pos, "temperature", 0);
+        double[] horizGradient = i3d.calcHorizGradient(pos, "temp", 0);
         gridCellID = ""+Math.round(pos[0])+"_"+Math.round(pos[1]);
         updateTrack();
     }
