@@ -93,6 +93,7 @@ public class FemaleAdult extends AbstractBenthicStage {
     private IBMFunctionInterface fcnMort = null; 
     private IBMFunctionInterface fcnGrowth = null;
     private IBMFunctionInterface fcnFecundity = null;
+    private IBMFunctionInterface fcnMovement = null;
  
     
     /** flag to print debugging info */
@@ -375,6 +376,7 @@ public class FemaleAdult extends AbstractBenthicStage {
         fcnMort = params.getSelectedIBMFunctionForCategory(FemaleAdultParameters.FCAT_Mortality);
         fcnGrowth = params.getSelectedIBMFunctionForCategory(FemaleAdultParameters.FCAT_Growth);
         fcnFecundity = params.getSelectedIBMFunctionForCategory(FemaleAdultParameters.FCAT_Fecundity);
+        fcnMovement = params.getSelectedIBMFunctionForCategory(FemaleAdultParameters.FCAT_Movement);
   }
     
     /*
@@ -723,9 +725,10 @@ public class FemaleAdult extends AbstractBenthicStage {
     public double[] calcUV(double dt) {
         double[] uv = {0.0,0.0};
         if (horizRWP>0) {
+            double[] horizGradient = i3d.calcHorizGradient(uv, "temp", 0);
             double r = Math.sqrt(horizRWP/Math.abs(dt));
-            uv[0] += r*rng.computeNormalVariate(); //stochastic swimming rate
-            uv[1] += r*rng.computeNormalVariate(); //stochastic swimming rate
+            uv[0] += r*horizGradient[0]; //stochastic swimming rate
+            uv[1] += r*horizGradient[1]; //stochastic swimming rate
             if (debugOps) logger.info("uv: "+r+"; "+uv[0]+", "+uv[1]+"\n");
         }
         uv[0] = Math.signum(dt)*uv[0];
@@ -794,7 +797,7 @@ public class FemaleAdult extends AbstractBenthicStage {
         depth = -i3d.calcZfromK(pos[0],pos[1],pos[2]);
         lat   = i3d.interpolateLat(pos);
         lon   = i3d.interpolateLon(pos);
-        double[] horizGradient = i3d.calcHorizGradient(pos, "temp", 0);
+        
         gridCellID = ""+Math.round(pos[0])+"_"+Math.round(pos[1]);
         updateTrack();
     }

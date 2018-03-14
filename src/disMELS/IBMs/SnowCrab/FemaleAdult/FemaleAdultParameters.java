@@ -55,10 +55,11 @@ public class FemaleAdultParameters extends AbstractLHSParameters {
     public static final String PARAM_randomizeSpawning     = "randomize spawning?";
     
     /** the number of IBMFunction categories defined in the class */
-    public static final int numFunctionCats = 3;
+    public static final int numFunctionCats = 4;
     public static final String FCAT_Growth         = "growth";
     public static final String FCAT_Mortality      = "mortality";
     public static final String FCAT_Fecundity      = "fecundity";
+    public static final String FCAT_Movement       = "movement";
     
     /** The 'keys' used to store the ibm functions */
     protected static final Set<String> setOfFunctionCategories = new LinkedHashSet<>(2*numFunctionCats);
@@ -117,6 +118,7 @@ public class FemaleAdultParameters extends AbstractLHSParameters {
         setOfFunctionCategories.add(FCAT_Growth);
         setOfFunctionCategories.add(FCAT_Mortality);
         setOfFunctionCategories.add(FCAT_Fecundity);
+        setOfFunctionCategories.add(FCAT_Movement);
         
         //create the map from function categories to potential functions in each category
         String cat; Map<String,IBMFunctionInterface> mapOfPotentialFunctions; IBMFunctionInterface ifi;
@@ -154,6 +156,14 @@ public class FemaleAdultParameters extends AbstractLHSParameters {
             ifi.setParameterDescription(PowerLawFunction.PARAM_stdX,"standard size z0 [cm]");
             ifi.setParameterDescription(PowerLawFunction.PARAM_exponent,"exponent (>0 for increasing function of size)");
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);        
+            
+             cat = FCAT_Movement;  
+        mapOfPotentialFunctions = new LinkedHashMap<>(4); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        ifi = new ConstantFunction(); 
+            ifi.setFunctionName("Constant movement speed");
+            ifi.setDescription("constant movement speed");
+            ifi.setParameterDescription(ConstantFunction.PARAM_constant,"constant movement speed");
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
     }
     
     /**
