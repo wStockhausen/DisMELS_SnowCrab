@@ -60,6 +60,7 @@ public class FemaleAdult extends AbstractBenthicStage {
     /** horizontal random walk parameter */
     protected double horizRWP;
     /** minimum stage duration before metamorphosis to next stage */
+    protected double percLostWeight;
     protected double minStageDuration;
     /** maximum stage duration (followed by death) */
     protected double maxStageDuration;
@@ -75,6 +76,7 @@ public class FemaleAdult extends AbstractBenthicStage {
     protected double timeToSpawn = 366;
      protected double firstDayOfSpawning;
      protected double lengthOfSpawningSeason;
+     protected double maxStarvTime;
         //fields that reflect (new) attribute values
     //none
     
@@ -84,7 +86,8 @@ public class FemaleAdult extends AbstractBenthicStage {
      /** day of year */
     private double dayOfYear;
     private double starvationMort;
-        private boolean isSpawningSeason;
+    private boolean isSpawningSeason;
+    private double starvCounter;
     /** spawning season flag */
     /** flag to clean up after spawning */
     private boolean doOnceAfterSpawningSeason = true;
@@ -93,7 +96,6 @@ public class FemaleAdult extends AbstractBenthicStage {
     private IBMFunctionInterface fcnMort = null; 
     private IBMFunctionInterface fcnGrowth = null;
     private IBMFunctionInterface fcnFecundity = null;
-    private IBMFunctionInterface fcnMovement = null;
  
     
     /** flag to print debugging info */
@@ -376,7 +378,6 @@ public class FemaleAdult extends AbstractBenthicStage {
         fcnMort = params.getSelectedIBMFunctionForCategory(FemaleAdultParameters.FCAT_Mortality);
         fcnGrowth = params.getSelectedIBMFunctionForCategory(FemaleAdultParameters.FCAT_Growth);
         fcnFecundity = params.getSelectedIBMFunctionForCategory(FemaleAdultParameters.FCAT_Fecundity);
-        fcnMovement = params.getSelectedIBMFunctionForCategory(FemaleAdultParameters.FCAT_Movement);
   }
     
     /*
@@ -756,12 +757,13 @@ public class FemaleAdult extends AbstractBenthicStage {
         //todo - Add in cost of reproduction!
         fcnGrowth.setParameterValue("sex", 1.0);
         double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, 0});
-        if(growthRate>0){
-            weight = weight*Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
+        double weightInc = Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
+        if(weightInc >= percLostWeight){
+            weight = weight*weightInc;
         } else{
-            double totRate = Math.max(-1.0,growthRate/weight);
-            starvationMort = -Math.log(-(.0099+totRate))*(dt/DAY_SECS);
+            starvCounter = starvCounter + dt;
         }
+
     }
 
 
@@ -789,7 +791,15 @@ public class FemaleAdult extends AbstractBenthicStage {
        
         number = number*Math.exp(-dt*totRate/DAY_SECS);
         if(number<0.01){
-            active=false;alive=false;number=number+numTrans;
+            active=false;alive=false;
+            if(numTrans>0){
+                number=number+numTrans;
+            } else{
+                number = 0;
+            }
+        }
+        if(starvCounter>maxStarvTime){
+            active=false;alive=false;number=0;
         }
     }
 

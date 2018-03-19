@@ -634,7 +634,12 @@ public class FemaleAdolescent extends AbstractBenthicStage {
         if(instar<8){
             D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
         } else{
-            D = 365.0;
+            //Set percentage of skip molters at 5%
+            if(rng.computeUniformVariate(0, 1)<=0.95){
+               D = 365.0;
+            } else{
+               D = 730.0; 
+            }
         }
         exTot = (Double) fcnExCost.calculate(size);
         if((ageInInstar+dt/DAY_SECS)>D){
@@ -667,7 +672,7 @@ public class FemaleAdolescent extends AbstractBenthicStage {
         } 
         if(molted){
             weight = weight - exTot;
-            molted=false;
+            molted = false;
         }
     }
 

@@ -50,6 +50,7 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
     public static final String PARAM_minSizeAtTrans        = "min size at transition (cm)";
     public static final String PARAM_meanStageTransDelay   = "mean stage transition delay (d)";
     public static final String PARAM_randomizeTransitions  = "randomize stage transitions?";
+
     
     /** the number of IBMFunction categories defined in the class */
     public static final int numFunctionCats = 7;
