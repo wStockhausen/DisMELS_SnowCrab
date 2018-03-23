@@ -59,6 +59,7 @@ public class FemaleAdolescent extends AbstractBenthicStage {
     /** horizontal random walk parameter */
     protected double horizRWP;
     /** minimum stage duration before metamorphosis to next stage */
+    protected double percLostWeight;
     protected double minStageDuration;
     /** maximum stage duration (followed by death) */
     protected double maxStageDuration;
@@ -68,6 +69,9 @@ public class FemaleAdolescent extends AbstractBenthicStage {
     protected double meanStageTransDelay;
     /** flag to use stochastic transitions */
     protected boolean randomizeTransitions;
+    protected double maxStarvTime;
+    protected boolean molted;
+    protected double exTot;
 
         //fields that reflect (new) attribute values
     //none
@@ -78,8 +82,7 @@ public class FemaleAdolescent extends AbstractBenthicStage {
      /** day of year */
     private double dayOfYear;
     private double starvationMort;
-    private double exTot;
-    private boolean molted;
+    private double starvCounter;
    
     /** IBM function selected for mortality */
     private IBMFunctionInterface fcnMort = null; 
@@ -391,6 +394,10 @@ public class FemaleAdolescent extends AbstractBenthicStage {
                 params.getValue(params.PARAM_meanStageTransDelay,meanStageTransDelay);
         randomizeTransitions = 
                 params.getValue(params.PARAM_randomizeTransitions,randomizeTransitions);
+        maxStarvTime = 
+                params.getValue(params.PARAM_maxStarvTime, maxStarvTime);
+        percLostWeight = 
+                params.getValue(params.PARAM_percLostWeight, percLostWeight);
     }
     
     /**
@@ -605,9 +612,10 @@ public class FemaleAdolescent extends AbstractBenthicStage {
     public double[] calcUV(double dt) {
         double[] uv = {0.0,0.0};
         if (horizRWP>0) {
+            double[] horizGradient = i3d.calcHorizGradient(uv, "temp", 0);
             double r = Math.sqrt(horizRWP/Math.abs(dt));
-            uv[0] += r*rng.computeNormalVariate(); //stochastic swimming rate
-            uv[1] += r*rng.computeNormalVariate(); //stochastic swimming rate
+            uv[0] += r*horizGradient[0]; //stochastic swimming rate
+            uv[1] += r*horizGradient[1]; //stochastic swimming rate
             if (debugOps) logger.info("uv: "+r+"; "+uv[0]+", "+uv[1]+"\n");
         }
         uv[0] = Math.signum(dt)*uv[0];
@@ -664,12 +672,12 @@ public class FemaleAdolescent extends AbstractBenthicStage {
         double exPerDay = exTot/D;
         fcnGrowth.setParameterValue("sex", 1.0);
         double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
-        if(growthRate>0){
-            weight = weight*Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
+        double weightInc = Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
+        if(weightInc >= percLostWeight){
+            weight = weight*weightInc;
         } else{
-            double totRate = Math.max(-1.0,growthRate/weight);
-            starvationMort = -Math.log(-(.0099+totRate))*(dt/DAY_SECS);
-        } 
+            starvCounter = starvCounter + dt;
+        }
         if(molted){
             weight = weight - exTot;
             molted = false;
@@ -714,6 +722,9 @@ public class FemaleAdolescent extends AbstractBenthicStage {
         number = number*Math.exp(-dt*totRate/DAY_SECS);
         if(number<0.01){
             active=false;alive=false;number=number+numTrans;
+        }
+        if(starvCounter>maxStarvTime){
+            active=false; alive=false; number = 0;
         }
     }
 

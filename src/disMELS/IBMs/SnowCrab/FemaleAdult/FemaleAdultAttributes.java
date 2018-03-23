@@ -90,7 +90,7 @@ public class FemaleAdultAttributes extends AbstractBenthicStageAttributes {
 //            String key;
 //            key = PROP_size;       newKeys.add(key); mapAllAttributes.put(key,new IBMAttributeDouble(key,"size"));
             //create allKeys by combining keys from superclass and new keys from this class
-            allKeys.addAll(super.keys);//add from superclass
+            allKeys.addAll(AbstractBenthicStageAttributes.keys);//add from superclass
             allKeys.addAll(newKeys);//add from this class
             Iterator<String> it = allKeys.iterator();
             int j = 0; it.next();//skip typeName

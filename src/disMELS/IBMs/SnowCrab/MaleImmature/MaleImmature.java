@@ -78,7 +78,8 @@ public class MaleImmature extends AbstractBenthicStage {
     protected boolean randomizeTransitions;
     /** ratio of male to female */
     protected double sexRatio;
-
+    protected double maxStarvTime;
+    protected double percLostWeight;
     protected double sCost;
         //fields that reflect (new) attribute values
     //none
@@ -91,6 +92,7 @@ public class MaleImmature extends AbstractBenthicStage {
     private double starvationMort;
     private boolean molted;
     private double exTot;
+    private double starvCounter;
     
     /** IBM function selected for mortality */
     private IBMFunctionInterface fcnMort = null; 
@@ -446,9 +448,11 @@ public class MaleImmature extends AbstractBenthicStage {
         minSize = 
                 params.getValue(MaleImmatureParameters.PARAM_minSize,minSize);
         randomizeTransitions = 
-                params.getValue(MaleImmatureParameters.PARAM_randomizeTransitions,true);
+                params.getValue(MaleImmatureParameters.PARAM_randomizeTransitions,randomizeTransitions);
         sCost = params.getValue(MaleImmatureParameters.PARAM_sCost, sCost);
         sexRatio = params.getValue(MaleImmatureParameters.PARAM_sexRatio, sexRatio);
+        maxStarvTime = params.getValue(MaleImmatureParameters.PARAM_maxStarvTime, maxStarvTime);
+        percLostWeight = params.getValue(MaleImmatureParameters.PARAM_percLostWeight, percLostWeight);
     }
     
     /**
@@ -718,12 +722,12 @@ public class MaleImmature extends AbstractBenthicStage {
         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
         double exPerDay = exTot/D;
         fcnGrowth.setParameterValue("sex", 0.0);
-        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
-        if(growthRate>0){
-            weight = weight*Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
+               double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, 0});
+        double weightInc = Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
+        if(weightInc >= percLostWeight){
+            weight = weight*weightInc;
         } else{
-            double totRate = Math.max(-1.0,growthRate/weight);
-            starvationMort = -Math.log(-(.0099+totRate))*(dt/DAY_SECS);
+            starvCounter = starvCounter + dt;
         }
         if(molted){
             weight = weight - exTot;
@@ -769,6 +773,9 @@ public class MaleImmature extends AbstractBenthicStage {
         number = number*Math.exp(-dt*totRate/DAY_SECS);
         if(number<0.01){
             active=false;alive=false;number=number+numTrans;
+        }
+        if((starvCounter)>maxStarvTime){
+            active=false;alive=false;number=0;
         }
     }
     

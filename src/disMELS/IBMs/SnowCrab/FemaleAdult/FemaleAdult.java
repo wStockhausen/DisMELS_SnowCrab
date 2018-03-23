@@ -126,8 +126,7 @@ public class FemaleAdult extends AbstractBenthicStage {
         atts.setValue(LifeStageAttributesInterface.PROP_origID,id);
         setAttributesFromSubClass(atts);  //set object in the superclass
         params = (FemaleAdultParameters) LHS_Factory.createParameters(typeName);
-        setParametersFromSubClass(params);//set object in the superclass
-        setParameters(params);
+      setParameters(params);
     }
 
     /**
@@ -256,10 +255,10 @@ public class FemaleAdult extends AbstractBenthicStage {
         if (newAtts instanceof FemaleAdolescentAttributes) {
             FemaleAdolescentAttributes spAtts = (FemaleAdolescentAttributes) newAtts;
             for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
-        } else if(newAtts instanceof FemaleAdultAttributes){
-        FemaleAdultAttributes spAtts = (FemaleAdultAttributes) newAtts;
+        } else if (newAtts instanceof FemaleAdultAttributes){
+            FemaleAdultAttributes spAtts = (FemaleAdultAttributes) newAtts;
             for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
-        }else {
+        }{
             //TODO: should throw an error here
             logger.info("FemaleAdultAttributes.setAttributes(): no match for attributes type");
         }
@@ -402,6 +401,10 @@ public class FemaleAdult extends AbstractBenthicStage {
                 params.getValue(params.PARAM_firstDaySpawning, firstDayOfSpawning);
         lengthOfSpawningSeason =
                 params.getValue(params.PARAM_lengthSpawningSeason, lengthOfSpawningSeason);
+        maxStarvTime = 
+                params.getValue(params.PARAM_maxStarvTime, maxStarvTime);
+        percLostWeight = 
+                params.getValue(params.PARAM_percLostWeight, percLostWeight);
     }
     
     /**
@@ -798,7 +801,7 @@ public class FemaleAdult extends AbstractBenthicStage {
                 number = 0;
             }
         }
-        if(starvCounter>maxStarvTime){
+        if((starvCounter)>maxStarvTime){
             active=false;alive=false;number=0;
         }
     }
@@ -904,7 +907,9 @@ public class FemaleAdult extends AbstractBenthicStage {
         //update new attributes
         atts.setValue(FemaleAdultAttributes.PROP_size,size);
         atts.setValue(FemaleAdultAttributes.PROP_weight,weight);
+        atts.setValue(FemaleAdultAttributes.PROP_age,age);
         atts.setValue(FemaleAdultAttributes.PROP_ageInInstar,ageInInstar);
+        atts.setValue(FemaleAdultAttributes.PROP_ageInStage,ageInStage);
         atts.setValue(FemaleAdultAttributes.PROP_instar,instar);
         atts.setValue(FemaleAdultAttributes.PROP_salinity,salinity);
         atts.setValue(FemaleAdultAttributes.PROP_temperature,temperature);
@@ -922,6 +927,8 @@ public class FemaleAdult extends AbstractBenthicStage {
        size        = atts.getValue(FemaleAdultAttributes.PROP_size,size);
        weight      = atts.getValue(FemaleAdultAttributes.PROP_weight, weight);
        ageInInstar = atts.getValue(FemaleAdultAttributes.PROP_ageInInstar, ageInInstar);
+       ageInStage  = atts.getValue(FemaleAdultAttributes.PROP_ageInStage, ageInStage);
+       age         = atts.getValue(FemaleAdultAttributes.PROP_age, age);
        instar      = atts.getValue(FemaleAdultAttributes.PROP_instar, instar);
        salinity    = atts.getValue(FemaleAdultAttributes.PROP_salinity,salinity);
        temperature = atts.getValue(FemaleAdultAttributes.PROP_temperature,temperature);

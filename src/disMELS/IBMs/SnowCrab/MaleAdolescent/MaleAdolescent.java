@@ -65,6 +65,9 @@ public class MaleAdolescent extends AbstractBenthicStage {
     protected double meanStageTransDelay;
     /** flag to use stochastic transitions */
     protected boolean randomizeTransitions;
+    protected double maxStarvTime;
+    protected double percLostWeight;
+    private double starvCounter;
         
             //other fields
     /** number of individuals transitioning to next stage */
@@ -389,6 +392,10 @@ public class MaleAdolescent extends AbstractBenthicStage {
                 params.getValue(params.PARAM_meanStageTransDelay,meanStageTransDelay);
         randomizeTransitions = 
                 params.getValue(params.PARAM_randomizeTransitions,randomizeTransitions);
+        percLostWeight =
+                params.getValue(params.PARAM_percLostWeight, percLostWeight);
+        maxStarvTime = 
+                params.getValue(params.PARAM_maxStarvTime, maxStarvTime);
     }
     
     /**
@@ -654,11 +661,11 @@ public class MaleAdolescent extends AbstractBenthicStage {
         double exPerDay = exTot/D;
         fcnGrowth.setParameterValue("sex", 0.0);
         double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
-        if(growthRate>0){
-            weight = weight*Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
+        double growthMult =Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
+        if(growthMult>percLostWeight){
+            weight = weight*growthMult;
         } else{
-            double totRate = Math.max(-1.0,growthRate/weight);
-            starvationMort = -Math.log(-(.0099+totRate))*(dt/DAY_SECS);
+            starvCounter=starvCounter+dt;
         } 
         if(molted){
             weight = weight - exTot;
@@ -703,6 +710,9 @@ public class MaleAdolescent extends AbstractBenthicStage {
         number = number*Math.exp(-dt*totRate/DAY_SECS);
         if(number<0.01){
             active=false;alive=false;number=number+numTrans;
+        }
+        if((starvCounter)>maxStarvTime){
+            active=false;alive=false;number=0;
         }
     }
 

@@ -56,11 +56,13 @@ public class MaleAdult extends AbstractBenthicStage {
     /** horizontal random walk parameter */
     protected double horizRWP;
     /** maximum stage duration (followed by death) */
+    protected double percLostWeight;
     protected double maxStageDuration;    
-    
+         protected double maxStarvTime;
         //fields that reflect (new) attribute values
     //none
     
+    private double starvCounter;
             //other fields
     /** number of individuals transitioning to next stage */
     private double numTrans;  
@@ -366,6 +368,10 @@ public class MaleAdult extends AbstractBenthicStage {
                 params.getValue(params.PARAM_horizRWP,horizRWP);
         maxStageDuration = 
                 params.getValue(params.PARAM_maxStageDuration,maxStageDuration);
+   maxStarvTime = 
+                params.getValue(params.PARAM_maxStarvTime, maxStarvTime);
+        percLostWeight = 
+                params.getValue(params.PARAM_percLostWeight, percLostWeight);
     }
     
     /**
@@ -582,9 +588,10 @@ public class MaleAdult extends AbstractBenthicStage {
     public double[] calcUV(double dt) {
         double[] uv = {0.0,0.0};
         if (horizRWP>0) {
+            double[] horizGradient = i3d.calcHorizGradient(uv, "temp", 0);
             double r = Math.sqrt(horizRWP/Math.abs(dt));
-            uv[0] += r*rng.computeNormalVariate(); //stochastic swimming rate
-            uv[1] += r*rng.computeNormalVariate(); //stochastic swimming rate
+            uv[0] += r*horizGradient[0]; //stochastic swimming rate
+            uv[1] += r*horizGradient[1]; //stochastic swimming rate
             if (debugOps) logger.info("uv: "+r+"; "+uv[0]+", "+uv[1]+"\n");
         }
         uv[0] = Math.signum(dt)*uv[0];
@@ -607,13 +614,15 @@ public class MaleAdult extends AbstractBenthicStage {
      * 
      * @param dt - time step in seconds
      */
-    private void updateWeight(double dt){
-        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, 0.0});
-        if(growthRate>0){
-            weight = weight*Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
+    private void updateWeight(double dt) {
+        //todo - Add in cost of reproduction!
+        fcnGrowth.setParameterValue("sex", 1.0);
+        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, 0});
+        double weightInc = Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
+        if(weightInc >= percLostWeight){
+            weight = weight*weightInc;
         } else{
-            double totRate = Math.max(-1.0,growthRate/weight);
-            starvationMort = -Math.log(-(.0099+totRate))*(dt/DAY_SECS);
+            starvCounter = starvCounter + dt;
         } 
     }
 
@@ -640,7 +649,15 @@ public class MaleAdult extends AbstractBenthicStage {
         double totRate = mortalityRate + starvationMort;
         number = number*Math.exp(-dt*totRate/DAY_SECS);
         if(number<0.01){
-            active=false;alive=false;number=number+numTrans;
+            active=false;alive=false;
+            if(numTrans>0){
+                number=number+numTrans;
+            } else{
+                number = 0;
+        }
+    }
+        if((starvCounter)>maxStarvTime){
+            active=false;alive=false;number=0;
         }
     }
 

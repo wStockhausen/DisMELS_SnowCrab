@@ -46,7 +46,7 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
     public static final long serialVersionUID = 1L;
     
     /** the number of IBMParameter objects defined in the class */
-    public static final int numParams = 11;
+    public static final int numParams = 13;
     public static final String PARAM_isSuperIndividual      = "is a super-individual?";
     public static final String PARAM_horizRWP               = "horizontal random walk parameter [m^2]/[s]";
     public static final String PARAM_minStageDuration       = "min stage duration [d]";
@@ -58,6 +58,8 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
     public static final String PARAM_initialWeight          = "initial weight in stage (g)";
     public static final String PARAM_sCost                  = "number of days of exuviae cost";
     public static final String PARAM_sexRatio               = "ratio of males to females";
+    public static final String PARAM_maxStarvTime           = "maximum time a crab can starve [s]";
+    public static final String PARAM_percLostWeight         = "maximum percentage of weight that can be lost";
     
     
     /** the number of IBMFunction categories defined in the class */
@@ -116,6 +118,8 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
         key = PARAM_randomizeTransitions; setOfParamKeys.add(key); mapParams.put(key,new IBMParameterBoolean(key,key,false));
         key = PARAM_sCost; setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
         key = PARAM_sexRatio; setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.5));
+        key = PARAM_maxStarvTime; setOfParamKeys.add(key); mapParams.put(key, new IBMParameterDouble(key, key, 514800));
+        key = PARAM_percLostWeight; setOfParamKeys.add(key); mapParams.put(key, new IBMParameterDouble(key, key, 0.9385));
     }
 
     @Override
