@@ -93,6 +93,7 @@ public class MaleImmature extends AbstractBenthicStage {
     private boolean molted;
     private double exTot;
     private double starvCounter;
+    private double weightCounter;
     
     /** IBM function selected for mortality */
     private IBMFunctionInterface fcnMort = null; 
@@ -722,10 +723,11 @@ public class MaleImmature extends AbstractBenthicStage {
         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
         double exPerDay = exTot/D;
         fcnGrowth.setParameterValue("sex", 0.0);
-               double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, 0});
+        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
         double weightInc = Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
         if(weightInc >= percLostWeight){
             weight = weight*weightInc;
+            weightCounter = weightCounter + weight*weightInc;
         } else{
             starvCounter = starvCounter + dt;
         }
