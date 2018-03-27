@@ -37,12 +37,14 @@ public class MaleAdultParameters extends AbstractLHSParameters {
     public static final long serialVersionUID = 1L;
     
     /** the number of IBMParameter objects defined in the class */
-    public static final int numParams = 5;
+    public static final int numParams = 7;
     public static final String PARAM_isSuperIndividual     = "is a super-individual?";
     public static final String PARAM_horizRWP              = "horizontal random walk parameter [m^2]/[s]";
     public static final String PARAM_maxStageDuration      = "max stage duration [d]";
     public static final String PARAM_percLostWeight        = "percentage weight that can be lost";
     public static final String PARAM_maxStarvTime          = "the maximum time for negative growth before a crab starves [s]";
+    public static final String PARAM_aLengthWeight          = "intercept of length-weight relationship";
+    public static final String PARAM_bLengthWeight          = "slope of length-weight relationship";
     
     /** the number of IBMFunction categories defined in the class */
     public static final int numFunctionCats   = 2;

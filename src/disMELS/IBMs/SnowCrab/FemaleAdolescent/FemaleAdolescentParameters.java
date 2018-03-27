@@ -42,7 +42,7 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
     public static final long serialVersionUID = 1L;
     
     /** the number of IBMParameter objects defined in the class */
-    public static final int numParams = 9;
+    public static final int numParams = 12;
     public static final String PARAM_isSuperIndividual     = "is a super-individual?";
     public static final String PARAM_horizRWP              = "horizontal random walk parameter [m^2]/[s]";
     public static final String PARAM_minStageDuration      = "min stage duration [d]";
@@ -52,6 +52,9 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
     public static final String PARAM_randomizeTransitions  = "randomize stage transitions?";
     public static final String PARAM_percLostWeight        = "maximum percentage of weight lost [0-1]";
     public static final String PARAM_maxStarvTime          = "maximum amount of time crab can starve before dying (s)";
+    public static final String PARAM_aLengthWeight          = "intercept of length-weight relationship";
+    public static final String PARAM_bLengthWeight          = "slope of length-weight relationship";
+    public static final String PARAM_confInt                = "mean width of length-weight confidence interval";
 
     
     /** the number of IBMFunction categories defined in the class */
@@ -109,6 +112,9 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
         key = PARAM_randomizeTransitions; setOfParamKeys.add(key); mapParams.put(key,new IBMParameterBoolean(key,key,false));
         key = PARAM_maxStarvTime;         setOfParamKeys.add(key); mapParams.put(key, new IBMParameterDouble(key, key, 518400.0));
         key = PARAM_percLostWeight;       setOfParamKeys.add(key); mapParams.put(key, new IBMParameterDouble(key, key, 0.9385));
+        key = PARAM_aLengthWeight;        setOfParamKeys.add(key); mapParams.put(key, new IBMParameterDouble(key, key, .000065));
+        key = PARAM_bLengthWeight;        setOfParamKeys.add(key); mapParams.put(key, new IBMParameterDouble(key, key, 2.869));
+        key = PARAM_confInt;              setOfParamKeys.add(key); mapParams.put(key, new IBMParameterDouble(key, key, 0.226));
     }
 
     @Override

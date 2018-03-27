@@ -72,6 +72,9 @@ public class FemaleAdolescent extends AbstractBenthicStage {
     protected double maxStarvTime;
     protected boolean molted;
     protected double exTot;
+    protected double aLW;
+    protected double bLW;
+    private double weightCounter;
 
         //fields that reflect (new) attribute values
     //none
@@ -504,6 +507,7 @@ public class FemaleAdolescent extends AbstractBenthicStage {
         starvationMort = 0.0;
         molted = false;
         exTot = 0.0;
+        weightCounter = 0.0;
         if (debug) {
             logger.info("\n---------------Setting initial position------------");
             logger.info(hType+cc+vType+cc+startTime+cc+xPos+cc+yPos+cc+zPos);
@@ -652,7 +656,12 @@ public class FemaleAdolescent extends AbstractBenthicStage {
         exTot = (Double) fcnExCost.calculate(size);
         if((ageInInstar+dt/DAY_SECS)>D){
             boolean mat = (Boolean) fcnMaturity.calculate(new double[]{size,temperature});
-            size = (Double) fcnMolt.calculate(size);
+            Double newSize = (Double) fcnMolt.calculate(size);
+            Double minWeightGain = (aLW*Math.pow(newSize,bLW) - (aLW*Math.pow(size,bLW)));
+            if(weightCounter<minWeightGain){
+                active=false;alive=false;number=0;
+            }
+            size = newSize;
             instar += 1;
             ageInInstar = 0.0;
             molted = true;
@@ -671,9 +680,10 @@ public class FemaleAdolescent extends AbstractBenthicStage {
         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
         double exPerDay = exTot/D;
         fcnGrowth.setParameterValue("sex", 1.0);
-        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
+        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay*(dt/DAY_SECS)});
         double weightInc = Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
         if(weightInc >= percLostWeight){
+            weightCounter += weight*weightInc;
             weight = weight*weightInc;
         } else{
             starvCounter = starvCounter + dt;
@@ -681,6 +691,7 @@ public class FemaleAdolescent extends AbstractBenthicStage {
         if(molted){
             weight = weight - exTot;
             molted = false;
+            weightCounter = 0.0;
         }
     }
 

@@ -39,7 +39,7 @@ public class FemaleAdultParameters extends AbstractLHSParameters {
     public static final long serialVersionUID = 1L;
     
     /** the number of IBMParameter objects defined in the class */
-    public static final int numParams = 15;
+    public static final int numParams = 17;
     public static final String PARAM_isSuperIndividual     = "is a super-individual?";
     public static final String PARAM_horizRWP              = "horizontal random walk parameter [m^2]/[s]";
     public static final String PARAM_minStageDuration      = "min stage duration [d]";
@@ -55,6 +55,8 @@ public class FemaleAdultParameters extends AbstractLHSParameters {
     public static final String PARAM_randomizeSpawning     = "randomize spawning?";
     public static final String PARAM_percLostWeight        = "maximum percentage of weight lost [0-1]";
     public static final String PARAM_maxStarvTime          = "maximum amount of time crab can starve before dying (s)";
+    public static final String PARAM_aLengthWeight          = "intercept of length-weight relationship";
+    public static final String PARAM_bLengthWeight          = "slope of length-weight relationship";
     
     /** the number of IBMFunction categories defined in the class */
     public static final int numFunctionCats = 3;
