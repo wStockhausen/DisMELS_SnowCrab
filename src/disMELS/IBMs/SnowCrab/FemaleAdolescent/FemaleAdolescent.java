@@ -74,6 +74,7 @@ public class FemaleAdolescent extends AbstractBenthicStage {
     protected double exTot;
     protected double aLW;
     protected double bLW;
+    protected double confInt;
     private double weightCounter;
 
         //fields that reflect (new) attribute values
@@ -401,6 +402,9 @@ public class FemaleAdolescent extends AbstractBenthicStage {
                 params.getValue(params.PARAM_maxStarvTime, maxStarvTime);
         percLostWeight = 
                 params.getValue(params.PARAM_percLostWeight, percLostWeight);
+        aLW = params.getValue(params.PARAM_aLengthWeight, aLW);
+        bLW = params.getValue(params.PARAM_bLengthWeight, bLW);
+        confInt = params.getValue(params.PARAM_confInt, confInt);
     }
     
     /**
@@ -657,9 +661,13 @@ public class FemaleAdolescent extends AbstractBenthicStage {
         if((ageInInstar+dt/DAY_SECS)>D){
             boolean mat = (Boolean) fcnMaturity.calculate(new double[]{size,temperature});
             Double newSize = (Double) fcnMolt.calculate(size);
-            Double minWeightGain = (aLW*Math.pow(newSize,bLW) - (aLW*Math.pow(size,bLW)));
+                 Double minWeightGain = aLW*((1-confInt)*Math.pow(newSize,bLW) - ((1+confInt)*Math.pow(size,bLW)));
+            Double maxWeightGain = aLW*((1+confInt)*Math.pow(newSize,bLW) - ((1-confInt)*Math.pow(size,bLW)));
             if(weightCounter<minWeightGain){
                 active=false;alive=false;number=0;
+            }
+            if(weightCounter>maxWeightGain){
+                weight = aLW*Math.pow(newSize,bLW);
             }
             size = newSize;
             instar += 1;

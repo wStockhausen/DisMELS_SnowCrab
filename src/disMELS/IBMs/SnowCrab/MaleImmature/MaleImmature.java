@@ -567,6 +567,7 @@ public class MaleImmature extends AbstractBenthicStage {
         starvationMort = 0.0;
         weightCounter = 0.0;
         molted = false;
+        exTot = 0.0;
         if (debug) {
             logger.info("\n---------------Setting initial position------------");
             logger.info(hType+cc+vType+cc+startTime+cc+xPos+cc+yPos+cc+zPos);
@@ -711,9 +712,13 @@ public class MaleImmature extends AbstractBenthicStage {
         exTot = (Double) fcnExCost.calculate(size);
         if((ageInInstar+dt/DAY_SECS)>D){
             Double newsize = (Double) fcnMolt.calculate(size);
-            Double minWeightGain = confInt*(aLW*Math.pow(newsize,bLW) - (aLW*Math.pow(size,bLW)));
+            Double minWeightGain = aLW*((1-confInt)*Math.pow(newsize,bLW) - ((1+confInt)*Math.pow(size,bLW)));
+            Double maxWeightGain = aLW*((1+confInt)*Math.pow(newsize,bLW) - ((1-confInt)*Math.pow(size,bLW)));
             if(weightCounter<minWeightGain){
                 active=false;alive=false;number=0;
+            }
+            if(weightCounter>maxWeightGain){
+                weight = aLW*Math.pow(newsize,bLW);
             }
             size=newsize;
             instar += 1;
@@ -737,8 +742,8 @@ public class MaleImmature extends AbstractBenthicStage {
         fcnGrowth.setParameterValue("sex", 0.0);
         double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, (exPerDay*dt)/DAY_SECS});
         double weightInc = Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
-        if(weightInc >= percLostWeight){
-            weightCounter = weightCounter + weight*weightInc;
+        if(weightInc > percLostWeight){
+            weightCounter += weight*weightInc;
             weight = weight*weightInc;
         } else{
             starvCounter = starvCounter + dt;

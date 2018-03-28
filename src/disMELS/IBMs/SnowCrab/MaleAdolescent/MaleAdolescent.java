@@ -70,6 +70,7 @@ public class MaleAdolescent extends AbstractBenthicStage {
     private double starvCounter;
     protected double aLW;
     protected double bLW;
+    protected double confInt;
         
             //other fields
     /** number of individuals transitioning to next stage */
@@ -402,6 +403,7 @@ public class MaleAdolescent extends AbstractBenthicStage {
         aLW =
                 params.getValue(params.PARAM_aLengthWeight, aLW);
         bLW =   params.getValue(params.PARAM_bLengthWeight, bLW);
+        confInt = params.getValue(params.PARAM_confInt, confInt);
     }
     
     /**
@@ -654,10 +656,14 @@ public class MaleAdolescent extends AbstractBenthicStage {
             boolean mat = (Boolean) fcnMaturity.calculate(new double[]{size,temperature});
             
             Double newSize = (Double) fcnMolt.calculate(size);
-            Double minWeightGain = (aLW*Math.pow(newSize,bLW) - (aLW*Math.pow(size,bLW)));
+            Double minWeightGain = aLW*((1-confInt)*Math.pow(newSize,bLW) - ((1+confInt)*Math.pow(size,bLW)));
+            Double maxWeightGain = aLW*((1+confInt)*Math.pow(newSize,bLW) - ((1-confInt)*Math.pow(size,bLW)));
             if(weightCounter<minWeightGain){
                 active=false;alive=false;number=0;
-            }   
+            }
+            if(weightCounter>maxWeightGain){
+                weight = aLW*Math.pow(newSize,bLW);
+            }
             size = newSize;
             instar += 1;
             ageInInstar = 0.0;

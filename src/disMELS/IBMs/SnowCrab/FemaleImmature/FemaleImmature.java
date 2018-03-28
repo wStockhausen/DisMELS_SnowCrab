@@ -710,9 +710,13 @@ public class FemaleImmature extends AbstractBenthicStage {
         exTot = (Double) fcnExCost.calculate(size);
         if((ageInInstar+dt/DAY_SECS)>D){
             Double newSize = (Double) fcnMolt.calculate(size);
-            Double minWeightGain = confInt*(aLW*Math.pow(newSize,bLW) - (aLW*Math.pow(size,bLW)));
+            Double minWeightGain = aLW*((1-confInt)*Math.pow(newSize,bLW) - ((1+confInt)*Math.pow(size,bLW)));
+            Double maxWeightGain = aLW*((1+confInt)*Math.pow(newSize,bLW) - ((1-confInt)*Math.pow(size,bLW)));
             if(weightCounter<minWeightGain){
                 active=false;alive=false;number=0;
+            }
+            if(weightCounter>maxWeightGain){
+                weight = aLW*Math.pow(newSize,bLW);
             }
             size = newSize;
             instar += 1;
