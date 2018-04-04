@@ -689,7 +689,7 @@ public class FemaleAdult extends AbstractBenthicStage {
         starvationMort = 0.0;
         //movement here
         //TODO: revise so no advection by currents!
-        double[] pos;
+        double[] pos = lp.getIJK();
             double[] uv = calcUV(dt);
             lp.setU(uv[0],lp.getN());
             lp.setV(uv[1],lp.getN());
