@@ -77,6 +77,7 @@ public class FemaleAdult extends AbstractBenthicStage {
      protected double firstDayOfSpawning;
      protected double lengthOfSpawningSeason;
      protected double maxStarvTime;
+     protected double walkSpeed;
         //fields that reflect (new) attribute values
     //none
     
@@ -405,6 +406,8 @@ public class FemaleAdult extends AbstractBenthicStage {
                 params.getValue(params.PARAM_maxStarvTime, maxStarvTime);
         percLostWeight = 
                 params.getValue(params.PARAM_percLostWeight, percLostWeight);
+        walkSpeed =
+                params.getValue(params.PARAM_walkSpeed, walkSpeed);
     }
     
     /**
@@ -432,9 +435,11 @@ public class FemaleAdult extends AbstractBenthicStage {
         double dtp = 0.25*(dt/DAY_SECS);//use 1/4 timestep (converted from sec to d)
         output.clear();
         List<LifeStageInterface> nLHS;
-        if ((ageInStage+dtp>=minStageDuration)&&(size>=minSizeAtTrans)) {
+        if ((ageInStage+dtp>=minStageDuration)) {
+            if(numTrans>0){
             nLHS = createNextLHSs();
             if (nLHS!=null) output.addAll(nLHS);
+            }
         }
         return output;
     }
@@ -695,7 +700,7 @@ public class FemaleAdult extends AbstractBenthicStage {
             lp.setV(uv[1],lp.getN());
             lp.doPredictorStep();
             //assume same daytime status, but recalc depth and revise W 
-//            pos = lp.getPredictedIJK();
+           pos = lp.getPredictedIJK();
 //            depth = -i3d.calcZfromK(pos[0],pos[1],pos[2]);
 //            if (debug) logger.info("Depth after predictor step = "+depth);
             //w = calcW(dt,lp.getNP1())+r; //set swimming rate for predicted position
@@ -705,9 +710,9 @@ public class FemaleAdult extends AbstractBenthicStage {
             lp.doCorrectorStep();
             pos = lp.getIJK();
         time = time+dt;
-        updateAge(dt);
         updateWeight(dt);
         updateNum(dt);
+        updateAge(dt);
         updatePosition(pos);
         interpolateEnvVars(pos);
         //check for exiting grid
@@ -731,8 +736,9 @@ public class FemaleAdult extends AbstractBenthicStage {
         if (horizRWP>0) {
             double[] horizGradient = i3d.calcHorizGradient(uv, "temp", 0);
             double r = Math.sqrt(horizRWP/Math.abs(dt));
-            uv[0] += r*horizGradient[0]; //stochastic swimming rate
-            uv[1] += r*horizGradient[1]; //stochastic swimming rate
+            double s = Math.sqrt(walkSpeed/Math.abs(dt));
+            uv[0] += s*(horizGradient[0]/Math.sqrt(Math.pow(horizGradient[0],2)+Math.pow(horizGradient[1],2))) + r*rng.computeNormalVariate(); //stochastic swimming rate
+            uv[1] += s*(horizGradient[1]/Math.sqrt(Math.pow(horizGradient[0],2)+Math.pow(horizGradient[1],2))) + r*rng.computeNormalVariate(); //stochastic swimming rate
             if (debugOps) logger.info("uv: "+r+"; "+uv[0]+", "+uv[1]+"\n");
         }
         uv[0] = Math.signum(dt)*uv[0];

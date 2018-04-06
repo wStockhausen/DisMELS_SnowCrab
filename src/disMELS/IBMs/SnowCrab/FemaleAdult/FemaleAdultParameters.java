@@ -39,7 +39,7 @@ public class FemaleAdultParameters extends AbstractLHSParameters {
     public static final long serialVersionUID = 1L;
     
     /** the number of IBMParameter objects defined in the class */
-    public static final int numParams = 17;
+    public static final int numParams = 18;
     public static final String PARAM_isSuperIndividual     = "is a super-individual?";
     public static final String PARAM_horizRWP              = "horizontal random walk parameter [m^2]/[s]";
     public static final String PARAM_minStageDuration      = "min stage duration [d]";
@@ -55,8 +55,9 @@ public class FemaleAdultParameters extends AbstractLHSParameters {
     public static final String PARAM_randomizeSpawning     = "randomize spawning?";
     public static final String PARAM_percLostWeight        = "maximum percentage of weight lost [0-1]";
     public static final String PARAM_maxStarvTime          = "maximum amount of time crab can starve before dying (s)";
-    public static final String PARAM_aLengthWeight          = "intercept of length-weight relationship";
-    public static final String PARAM_bLengthWeight          = "slope of length-weight relationship";
+    public static final String PARAM_aLengthWeight         = "intercept of length-weight relationship";
+    public static final String PARAM_bLengthWeight         = "slope of length-weight relationship";
+    public static final String PARAM_walkSpeed             = "speed of crab walking along bottom [m^2]/[s]";
     
     /** the number of IBMFunction categories defined in the class */
     public static final int numFunctionCats = 3;
@@ -115,6 +116,7 @@ public class FemaleAdultParameters extends AbstractLHSParameters {
         key = PARAM_randomizeSpawning;    setOfParamKeys.add(key); mapParams.put(key,new IBMParameterBoolean(key,key,false));
         key = PARAM_percLostWeight;       setOfParamKeys.add(key); mapParams.put(key, new IBMParameterDouble(key, key, 0.9385));
         key = PARAM_maxStarvTime;         setOfParamKeys.add(key); mapParams.put(key, new IBMParameterDouble(key, key, 518400.0));
+        key = PARAM_walkSpeed;            setOfParamKeys.add(key); mapParams.put(key, new IBMParameterDouble(key, key, 0.1));
     }
 
     @Override
