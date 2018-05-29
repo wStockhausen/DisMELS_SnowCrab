@@ -725,7 +725,7 @@ public class MaleImmature extends AbstractBenthicStage {
             ageInInstar = 0.0;
             molted = true;
             
-            if(size>35){
+            if(size>30){
                 numTrans += number;
             }
         }
