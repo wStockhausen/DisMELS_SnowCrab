@@ -84,6 +84,8 @@ public class MaleImmature extends AbstractBenthicStage {
     protected double aLW;
     protected double bLW;
     protected double confInt;
+    
+    
         //fields that reflect (new) attribute values
     //none
     
@@ -94,6 +96,7 @@ public class MaleImmature extends AbstractBenthicStage {
     private double dayOfYear;
     private double starvationMort;
     private boolean molted;
+    private double exEnergy;
     private double exTot;
     private double starvCounter;
     private double weightCounter;
@@ -566,6 +569,7 @@ public class MaleImmature extends AbstractBenthicStage {
         numTrans   = 0.0; //set numTrans to zero
         starvationMort = 0.0;
         weightCounter = 0.0;
+        exEnergy = 0.0;
         molted = false;
         exTot = 0.0;
         if (debug) {
@@ -710,7 +714,7 @@ public class MaleImmature extends AbstractBenthicStage {
             D = 365.0;
         }
         exTot = (Double) fcnExCost.calculate(size);
-        if((ageInInstar+dt/DAY_SECS)>D){
+        if(exEnergy>exTot){
             Double newsize = (Double) fcnMolt.calculate(size);
             Double minWeightGain = aLW*((1-confInt)*Math.pow(newsize,bLW) - ((1+confInt)*Math.pow(size,bLW)));
             Double maxWeightGain = aLW*((1+confInt)*Math.pow(newsize,bLW) - ((1-confInt)*Math.pow(size,bLW)));
@@ -738,9 +742,11 @@ public class MaleImmature extends AbstractBenthicStage {
      */
     private void updateWeight(double dt) {
         double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
-        double exPerDay = exTot/D;
+        double exPerDay = Math.exp(0.9786-0.9281*Math.log(size));
         fcnGrowth.setParameterValue("sex", 0.0);
-        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, (exPerDay*dt)/DAY_SECS});
+        double[] growthFun= (double[]) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
+        double growthRate = growthFun[0];
+        exEnergy += growthFun[1];
         double weightInc = Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
         if(weightInc > percLostWeight){
             weightCounter += weight*weightInc;
@@ -752,6 +758,7 @@ public class MaleImmature extends AbstractBenthicStage {
             weight = weight - exTot;
             molted = false;
             weightCounter = 0.0;
+            exEnergy = 0.0;
         }
     }
 

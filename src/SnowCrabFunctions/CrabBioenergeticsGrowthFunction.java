@@ -304,7 +304,7 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
      * @return     - the function value (w[dt]) as a Double 
      */
     @Override
-    public Double calculate(Object vars) {
+    public double[] calculate(Object vars) {
         double[] lvars = (double[]) vars;//cast object to required double[]
         int i = 0;
         int instar = Math.max((int) lvars[i++],1);
@@ -319,12 +319,14 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
         double f = FA*c;     //weight-specific egestion
         double SDA = (24.0*aSDA*Math.exp(bSDA*T))/(1000.0);
         double s = (SDA*f);//temperature-specific loss due to specific dynamic action
+        double eFrac = ex*f;
         double m = r+s;       //weight-specific metabolic loss rate
         double e = UA*w0; //weight-specific excretion
         double w = f+e;       //weight-specific waste rate
-        double g = (c-(m+w+ex))/(calPerGram*wRat*w0);   //weight-specific total daily growth rate / weight 
+        double g = (c-(m+w+eFrac))/(calPerGram*wRat*w0);   //weight-specific total daily growth rate / weight 
         if (sigRt>0) g += rng.computeNormalVariate()*sigRt; 
-        return g;
+        double[] returnVal = new double[]{g, eFrac/(calPerGram*wRat)};
+        return returnVal;
     }
 
     private double calcF(double T, double Tm, double T0, double a){
