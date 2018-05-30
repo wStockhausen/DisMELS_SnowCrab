@@ -81,7 +81,7 @@ public class FemaleImmature extends AbstractBenthicStage {
     protected double bLW;
     protected double confInt;
     private double weightCounter;
-    
+        private double exEnergy;
     /*** Ratio at which crabs become male or female*/
     protected double sexRatio;
         /** IBM function selected for mortality */
@@ -565,7 +565,9 @@ public class FemaleImmature extends AbstractBenthicStage {
         numTrans   = 0.0; //set numTrans to zero
         starvationMort = 0.0;
         weightCounter = 0.0;
+        exEnergy = 0.0;
         molted = false;
+        exTot = 0.0;
         if (debug) {
             logger.info("\n---------------Setting initial position------------");
             logger.info(hType+cc+vType+cc+startTime+cc+xPos+cc+yPos+cc+zPos);
@@ -647,10 +649,10 @@ public class FemaleImmature extends AbstractBenthicStage {
             lp.doCorrectorStep();
             pos = lp.getIJK();
         time = time+dt;
+        updateAge(dt);
         updateSize(dt);
         updateWeight(dt);
         updateNum(dt);
-        updateAge(dt);
         updatePosition(pos);
         interpolateEnvVars(pos);
         //check for exiting grid
@@ -722,7 +724,8 @@ public class FemaleImmature extends AbstractBenthicStage {
             instar += 1;
             ageInInstar = 0.0;
             molted = true;
-            if(size>60.0){
+            
+            if(size>30){
                 numTrans += number;
             }
         }
@@ -734,10 +737,12 @@ public class FemaleImmature extends AbstractBenthicStage {
      * @param dt - time step in seconds
      */
     private void updateWeight(double dt) {
-        double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
-        double exPerDay = exTot/D;
-        fcnGrowth.setParameterValue("sex", 1.0);
-        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay*(dt/DAY_SECS)});
+        //double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+        double exPerDay = Math.exp(0.9786-0.9281*Math.log(size));
+        fcnGrowth.setParameterValue("sex", 0.0);
+        double[] growthFun= (double[]) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
+        double growthRate = growthFun[0];
+        exEnergy += growthFun[1];
         double weightInc = Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
         if(weightInc >= percLostWeight){
             weightCounter += weight*weightInc;
@@ -749,6 +754,7 @@ public class FemaleImmature extends AbstractBenthicStage {
             weight = weight - exTot;
             molted = false;
             weightCounter = 0.0;
+            exEnergy = 0.0;
         }
     }
 

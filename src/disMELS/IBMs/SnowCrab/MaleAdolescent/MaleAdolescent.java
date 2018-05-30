@@ -78,8 +78,9 @@ public class MaleAdolescent extends AbstractBenthicStage {
      /** day of year */
     private double dayOfYear;
     private double starvationMort;
-    private double exTot;
     private boolean molted;
+    private double exEnergy;
+    private double exTot;
     private double weightCounter;
    
     /** IBM function selected for growth */
@@ -517,6 +518,7 @@ public class MaleAdolescent extends AbstractBenthicStage {
         numTrans   = 0.0; //set numTrans to zero
         starvationMort = 0.0;
         weightCounter = 0.0;
+        exEnergy = 0.0;
         molted = false;
         exTot = 0.0;
         if (debug) {
@@ -674,11 +676,18 @@ public class MaleAdolescent extends AbstractBenthicStage {
         }
     }
     
-    private void updateWeight(double dt){
-        double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
-        double exPerDay = exTot/D;
+    /**
+     * Updates weight.
+     * 
+     * @param dt - time step in seconds
+     */
+    private void updateWeight(double dt) {
+        //double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+        double exPerDay = Math.exp(0.9786-0.9281*Math.log(size));
         fcnGrowth.setParameterValue("sex", 0.0);
-        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay*(dt/DAY_SECS)});
+                double[] growthFun= (double[]) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
+        double growthRate = growthFun[0];
+        exEnergy += growthFun[1];
         double growthMult =Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
         if(growthMult>percLostWeight){
             weightCounter += weight*growthMult;
@@ -688,8 +697,9 @@ public class MaleAdolescent extends AbstractBenthicStage {
         } 
         if(molted){
             weight = weight - exTot;
-            molted=false;
-            weightCounter = 0;
+            molted = false;
+            weightCounter = 0.0;
+            exEnergy = 0.0;
         }
     }
 

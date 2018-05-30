@@ -89,6 +89,7 @@ public class FemaleAdult extends AbstractBenthicStage {
     private double starvationMort;
     private boolean isSpawningSeason;
     private double starvCounter;
+    private double exEnergy;
     /** spawning season flag */
     /** flag to clean up after spawning */
     private boolean doOnceAfterSpawningSeason = true;
@@ -765,8 +766,8 @@ public class FemaleAdult extends AbstractBenthicStage {
     private void updateWeight(double dt) {
         //todo - Add in cost of reproduction!
         fcnGrowth.setParameterValue("sex", 1.0);
-        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, 0});
-        double weightInc = Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
+        double[] growthRate = (double[]) fcnGrowth.calculate(new double[]{instar, weight, temperature, 0});
+        double weightInc = Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate[0])));
         if(weightInc >= percLostWeight){
             weight = weight*weightInc;
         } else{
