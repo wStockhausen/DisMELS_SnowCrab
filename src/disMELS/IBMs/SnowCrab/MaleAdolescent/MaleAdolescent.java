@@ -683,7 +683,7 @@ public class MaleAdolescent extends AbstractBenthicStage {
      */
     private void updateWeight(double dt) {
         //double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
-        double exPerDay = Math.exp(0.9786-0.9281*Math.log(size));
+        double exPerDay = Math.exp(0.9786)*Math.pow(size, -0.9281);
         fcnGrowth.setParameterValue("sex", 0.0);
                 double[] growthFun= (double[]) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
         double growthRate = growthFun[0];
