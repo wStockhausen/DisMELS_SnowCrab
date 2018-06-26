@@ -9,6 +9,7 @@
 
 package disMELS.IBMs.SnowCrab.Megalopa;
 
+import SnowCrabFunctions.IntermoltLarvaFunction;
 import java.beans.PropertyChangeSupport;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -53,16 +54,17 @@ public class MegalopaParameters extends AbstractLHSParameters {
     public static final String PARAM_minSettlementDepth     = "min settlement depth (m)";
     public static final String PARAM_maxSettlementDepth     = "max settlement depth (m)";
     public static final String PARAM_randomizeTransitions   = "randomize transitions?";
-    public static final String PARAM_initialSize            = "initial size in stage (mm)";
     public static final String PARAM_initialWeight          = "initial weight in stage (g)";
+    public static final String PARAM_minWeight              = "minimum weight before transition (g)";
     
     
     /** the number of IBMFunction categories defined in the class */
-    public static final int numFunctionCats = 4;
+    public static final int numFunctionCats = 5;
     public static final String FCAT_Growth           = "growth";
     public static final String FCAT_Mortality        = "mortality";
     public static final String FCAT_VerticalMovement = "vertical movement";
     public static final String FCAT_VerticalVelocity = "vertical velocity";
+    public static final String FCAT_MoltTime = "intermolt period";
     
     /** The 'keys' used to store the ibm functions */
     protected static final Set<String> setOfFunctionCategories = new LinkedHashSet<>(2*numFunctionCats);
@@ -102,8 +104,8 @@ public class MegalopaParameters extends AbstractLHSParameters {
         String key;
         key = PARAM_isSuperIndividual;    setOfParamKeys.add(key); mapParams.put(key,new IBMParameterBoolean(key,key,false));
         key = PARAM_horizRWP;             setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
-        key = PARAM_initialSize;          setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,4.4));
-        key = PARAM_initialWeight;        setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
+        key = PARAM_minWeight;            setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,.01));
+        key = PARAM_initialWeight;        setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0006));
         key = PARAM_minStageDuration;     setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
         key = PARAM_maxStageDuration;     setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,365.0));
         key = PARAM_minSettlementDepth;   setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
@@ -118,6 +120,7 @@ public class MegalopaParameters extends AbstractLHSParameters {
         setOfFunctionCategories.add(FCAT_Mortality);
         setOfFunctionCategories.add(FCAT_VerticalMovement);
         setOfFunctionCategories.add(FCAT_VerticalVelocity);
+        setOfFunctionCategories.add(FCAT_MoltTime);
         
         //create the map from function categories to potential functions in each category
         String cat; Map<String,IBMFunctionInterface> mapOfPotentialFunctions; IBMFunctionInterface ifi;
@@ -150,6 +153,11 @@ public class MegalopaParameters extends AbstractLHSParameters {
         ifi = new PowerLawSwimmingSpeedFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new ConstantMovementRateFunction(); 
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+            
+        cat = FCAT_MoltTime;  
+        mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        ifi = new IntermoltLarvaFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
     }
     

@@ -18,7 +18,7 @@ import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
  */
 public class IntermoltPeriodFunction extends AbstractIBMFunction implements IBMFunctionInterface {
     /** function classification */
-    public static final String DEFAULT_type = "intermolt period function";
+    public static final String DEFAULT_type = "generic";
     /** user-friendly function name */
     public static final String DEFAULT_name = "Snow crab intermolt period function";
     /** function description */
@@ -117,9 +117,10 @@ public class IntermoltPeriodFunction extends AbstractIBMFunction implements IBMF
         int i = 0;
         double cW = lvars[i++];
         double T   = lvars[i++];
+        T = 5.0;
         double K = aK*(1-Math.exp(bK*cW));
         double alpha = aAlpha*(1-Math.exp(bAlpha*cW));
-        Double D = new Double(K/T-alpha);
+        Double D = new Double(K/(T-alpha));
         return D;
     }
 }

@@ -1,19 +1,19 @@
 /*
- * FemalePrimiparousParametersBeanInfo.java
+ * FemaleAdultParametersBeanInfo.java
  */
-package disMELS.IBMs.SnowCrab.FemalePrimiparous;
+package disMELS.IBMs.SnowCrab.FemaleAdult;
 
 import java.beans.*;
 
 /**
- * BeanInfo for FemalePrimiparousParameters class.
+ * BeanInfo for FemaleAdultParameters class.
  */
-public class FemalePrimiparousParametersBeanInfo extends SimpleBeanInfo {
+public class FemaleAdultParametersBeanInfo extends SimpleBeanInfo {
 
     // Bean descriptor//GEN-FIRST:BeanDescriptor
     /*lazy BeanDescriptor*/
     private static BeanDescriptor getBdescriptor(){
-        BeanDescriptor beanDescriptor = new BeanDescriptor  ( disMELS.IBMs.SnowCrab.FemalePrimiparous.FemalePrimiparousParameters.class , null ); // NOI18N//GEN-HEADEREND:BeanDescriptor
+        BeanDescriptor beanDescriptor = new BeanDescriptor  ( disMELS.IBMs.SnowCrab.FemaleAdult.FemaleAdultParameters.class , null ); // NOI18N//GEN-HEADEREND:BeanDescriptor
 
         // Here you can add code for customizing the BeanDescriptor.
 
@@ -32,12 +32,12 @@ public class FemalePrimiparousParametersBeanInfo extends SimpleBeanInfo {
         PropertyDescriptor[] properties = new PropertyDescriptor[6];
     
         try {
-            properties[PROPERTY_CSV] = new PropertyDescriptor ( "CSV", disMELS.IBMs.SnowCrab.FemalePrimiparous.FemalePrimiparousParameters.class, "getCSV", null ); // NOI18N
-            properties[PROPERTY_CSVHeader] = new PropertyDescriptor ( "CSVHeader", disMELS.IBMs.SnowCrab.FemalePrimiparous.FemalePrimiparousParameters.class, "getCSVHeader", null ); // NOI18N
-            properties[PROPERTY_IBMFunctionCategories] = new PropertyDescriptor ( "IBMFunctionCategories", disMELS.IBMs.SnowCrab.FemalePrimiparous.FemalePrimiparousParameters.class, "getIBMFunctionCategories", null ); // NOI18N
-            properties[PROPERTY_IBMParameterNames] = new PropertyDescriptor ( "IBMParameterNames", disMELS.IBMs.SnowCrab.FemalePrimiparous.FemalePrimiparousParameters.class, "getIBMParameterNames", null ); // NOI18N
-            properties[PROPERTY_keys] = new PropertyDescriptor ( "keys", disMELS.IBMs.SnowCrab.FemalePrimiparous.FemalePrimiparousParameters.class, "getKeys", null ); // NOI18N
-            properties[PROPERTY_typeName] = new PropertyDescriptor ( "typeName", disMELS.IBMs.SnowCrab.FemalePrimiparous.FemalePrimiparousParameters.class, "getTypeName", "setTypeName" ); // NOI18N
+            properties[PROPERTY_CSV] = new PropertyDescriptor ( "CSV", disMELS.IBMs.SnowCrab.FemaleAdult.FemaleAdultParameters.class, "getCSV", null ); // NOI18N
+            properties[PROPERTY_CSVHeader] = new PropertyDescriptor ( "CSVHeader", disMELS.IBMs.SnowCrab.FemaleAdult.FemaleAdultParameters.class, "getCSVHeader", null ); // NOI18N
+            properties[PROPERTY_IBMFunctionCategories] = new PropertyDescriptor ( "IBMFunctionCategories", disMELS.IBMs.SnowCrab.FemaleAdult.FemaleAdultParameters.class, "getIBMFunctionCategories", null ); // NOI18N
+            properties[PROPERTY_IBMParameterNames] = new PropertyDescriptor ( "IBMParameterNames", disMELS.IBMs.SnowCrab.FemaleAdult.FemaleAdultParameters.class, "getIBMParameterNames", null ); // NOI18N
+            properties[PROPERTY_keys] = new PropertyDescriptor ( "keys", disMELS.IBMs.SnowCrab.FemaleAdult.FemaleAdultParameters.class, "getKeys", null ); // NOI18N
+            properties[PROPERTY_typeName] = new PropertyDescriptor ( "typeName", disMELS.IBMs.SnowCrab.FemaleAdult.FemaleAdultParameters.class, "getTypeName", "setTypeName" ); // NOI18N
         }
         catch(IntrospectionException e) {
             e.printStackTrace();
@@ -55,7 +55,7 @@ public class FemalePrimiparousParametersBeanInfo extends SimpleBeanInfo {
         EventSetDescriptor[] eventSets = new EventSetDescriptor[1];
     
         try {
-            eventSets[EVENT_propertyChangeListener] = new EventSetDescriptor ( disMELS.IBMs.SnowCrab.FemalePrimiparous.FemalePrimiparousParameters.class, "propertyChangeListener", java.beans.PropertyChangeListener.class, new String[] {"propertyChange"}, "addPropertyChangeListener", "removePropertyChangeListener" ); // NOI18N
+            eventSets[EVENT_propertyChangeListener] = new EventSetDescriptor ( disMELS.IBMs.SnowCrab.FemaleAdult.FemaleAdultParameters.class, "propertyChangeListener", java.beans.PropertyChangeListener.class, new String[] {"propertyChange"}, "addPropertyChangeListener", "removePropertyChangeListener" ); // NOI18N
         }
         catch(IntrospectionException e) {
             e.printStackTrace();
@@ -95,13 +95,13 @@ public class FemalePrimiparousParametersBeanInfo extends SimpleBeanInfo {
         MethodDescriptor[] methods = new MethodDescriptor[23];
     
         try {
-            methods[METHOD_clone0] = new MethodDescriptor(disMELS.IBMs.SnowCrab.FemalePrimiparous.FemalePrimiparousParameters.class.getMethod("clone", new Class[] {})); // NOI18N
+            methods[METHOD_clone0] = new MethodDescriptor(disMELS.IBMs.SnowCrab.FemaleAdult.FemaleAdultParameters.class.getMethod("clone", new Class[] {})); // NOI18N
             methods[METHOD_clone0].setDisplayName ( "" );
-            methods[METHOD_createInstance1] = new MethodDescriptor(disMELS.IBMs.SnowCrab.FemalePrimiparous.FemalePrimiparousParameters.class.getMethod("createInstance", new Class[] {java.lang.String[].class})); // NOI18N
+            methods[METHOD_createInstance1] = new MethodDescriptor(disMELS.IBMs.SnowCrab.FemaleAdult.FemaleAdultParameters.class.getMethod("createInstance", new Class[] {java.lang.String[].class})); // NOI18N
             methods[METHOD_createInstance1].setDisplayName ( "" );
-            methods[METHOD_getIBMFunction2] = new MethodDescriptor(disMELS.IBMs.SnowCrab.FemalePrimiparous.FemalePrimiparousParameters.class.getMethod("getIBMFunction", new Class[] {java.lang.String.class, java.lang.String.class})); // NOI18N
+            methods[METHOD_getIBMFunction2] = new MethodDescriptor(disMELS.IBMs.SnowCrab.FemaleAdult.FemaleAdultParameters.class.getMethod("getIBMFunction", new Class[] {java.lang.String.class, java.lang.String.class})); // NOI18N
             methods[METHOD_getIBMFunction2].setDisplayName ( "" );
-            methods[METHOD_getIBMFunctionNamesByCategory3] = new MethodDescriptor(disMELS.IBMs.SnowCrab.FemalePrimiparous.FemalePrimiparousParameters.class.getMethod("getIBMFunctionNamesByCategory", new Class[] {java.lang.String.class})); // NOI18N
+            methods[METHOD_getIBMFunctionNamesByCategory3] = new MethodDescriptor(disMELS.IBMs.SnowCrab.FemaleAdult.FemaleAdultParameters.class.getMethod("getIBMFunctionNamesByCategory", new Class[] {java.lang.String.class})); // NOI18N
             methods[METHOD_getIBMFunctionNamesByCategory3].setDisplayName ( "" );
             methods[METHOD_getIBMParameter4] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSParameters.class.getMethod("getIBMParameter", new Class[] {java.lang.String.class})); // NOI18N
             methods[METHOD_getIBMParameter4].setDisplayName ( "" );
@@ -127,7 +127,7 @@ public class FemalePrimiparousParametersBeanInfo extends SimpleBeanInfo {
             methods[METHOD_getValue14].setDisplayName ( "" );
             methods[METHOD_getValue15] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSParameters.class.getMethod("getValue", new Class[] {java.lang.String.class})); // NOI18N
             methods[METHOD_getValue15].setDisplayName ( "" );
-            methods[METHOD_selectIBMFunctionForCategory16] = new MethodDescriptor(disMELS.IBMs.SnowCrab.FemalePrimiparous.FemalePrimiparousParameters.class.getMethod("selectIBMFunctionForCategory", new Class[] {java.lang.String.class, java.lang.String.class})); // NOI18N
+            methods[METHOD_selectIBMFunctionForCategory16] = new MethodDescriptor(disMELS.IBMs.SnowCrab.FemaleAdult.FemaleAdultParameters.class.getMethod("selectIBMFunctionForCategory", new Class[] {java.lang.String.class, java.lang.String.class})); // NOI18N
             methods[METHOD_selectIBMFunctionForCategory16].setDisplayName ( "" );
             methods[METHOD_setIBMFunction17] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSParameters.class.getMethod("setIBMFunction", new Class[] {java.lang.String.class, java.lang.String.class, wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface.class})); // NOI18N
             methods[METHOD_setIBMFunction17].setDisplayName ( "" );
@@ -139,7 +139,7 @@ public class FemalePrimiparousParametersBeanInfo extends SimpleBeanInfo {
             methods[METHOD_setValue20].setDisplayName ( "" );
             methods[METHOD_setValue21] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSParameters.class.getMethod("setValue", new Class[] {java.lang.String.class, long.class})); // NOI18N
             methods[METHOD_setValue21].setDisplayName ( "" );
-            methods[METHOD_setValue22] = new MethodDescriptor(disMELS.IBMs.SnowCrab.FemalePrimiparous.FemalePrimiparousParameters.class.getMethod("setValue", new Class[] {java.lang.String.class, java.lang.Object.class})); // NOI18N
+            methods[METHOD_setValue22] = new MethodDescriptor(disMELS.IBMs.SnowCrab.FemaleAdult.FemaleAdultParameters.class.getMethod("setValue", new Class[] {java.lang.String.class, java.lang.Object.class})); // NOI18N
             methods[METHOD_setValue22].setDisplayName ( "" );
         }
         catch( Exception e) {}//GEN-HEADEREND:Methods

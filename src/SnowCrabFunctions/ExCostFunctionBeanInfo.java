@@ -10,17 +10,16 @@ import wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunctionPersistenceD
 
 /**
  *
- * @author william.stockhausen
+ * @author christine.stawitz
  */
-public class CrabBioenergeticsGrowthFunctionBeanInfo extends SimpleBeanInfo {
+public class ExCostFunctionBeanInfo extends SimpleBeanInfo {
 
     // Bean descriptor//GEN-FIRST:BeanDescriptor
     /*lazy BeanDescriptor*/
     private static BeanDescriptor getBdescriptor(){
-        BeanDescriptor beanDescriptor = new BeanDescriptor  ( SnowCrabFunctions.CrabBioenergeticsGrowthFunction.class , null ); // NOI18N//GEN-HEADEREND:BeanDescriptor
+        BeanDescriptor beanDescriptor = new BeanDescriptor  ( SnowCrabFunctions.ExCostFunction.class , null ); // NOI18N//GEN-HEADEREND:BeanDescriptor
         // Here you can add code for customizing the BeanDescriptor.
-        beanDescriptor.setValue("persistenceDelegate",new AbstractIBMFunctionPersistenceDelegate());
-        
+         beanDescriptor.setValue("persistenceDelegate",new AbstractIBMFunctionPersistenceDelegate());
         return beanDescriptor;     }//GEN-LAST:BeanDescriptor
 
 
@@ -33,7 +32,7 @@ public class CrabBioenergeticsGrowthFunctionBeanInfo extends SimpleBeanInfo {
         PropertyDescriptor[] properties = new PropertyDescriptor[1];
     
         try {
-            properties[PROPERTY_functionName] = new PropertyDescriptor ( "functionName", SnowCrabFunctions.CrabBioenergeticsGrowthFunction.class, "getFunctionName", "setFunctionName" ); // NOI18N
+            properties[PROPERTY_functionName] = new PropertyDescriptor ( "functionName", SnowCrabFunctions.ExCostFunction.class, "getFunctionName", "setFunctionName" ); // NOI18N
         }
         catch(IntrospectionException e) {
             e.printStackTrace();
@@ -74,7 +73,7 @@ public class CrabBioenergeticsGrowthFunctionBeanInfo extends SimpleBeanInfo {
             methods[METHOD_hasParameters2].setDisplayName ( "" );
             methods[METHOD_hasSubfunctions3] = new MethodDescriptor(wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction.class.getMethod("hasSubfunctions", new Class[] {})); // NOI18N
             methods[METHOD_hasSubfunctions3].setDisplayName ( "" );
-            methods[METHOD_setParameterValue4] = new MethodDescriptor(SnowCrabFunctions.CrabBioenergeticsGrowthFunction.class.getMethod("setParameterValue", new Class[] {java.lang.String.class, java.lang.Object.class})); // NOI18N
+            methods[METHOD_setParameterValue4] = new MethodDescriptor(SnowCrabFunctions.ExCostFunction.class.getMethod("setParameterValue", new Class[] {java.lang.String.class, java.lang.Object.class})); // NOI18N
             methods[METHOD_setParameterValue4].setDisplayName ( "" );
             methods[METHOD_setSubfunction5] = new MethodDescriptor(wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction.class.getMethod("setSubfunction", new Class[] {java.lang.String.class, wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface.class})); // NOI18N
             methods[METHOD_setSubfunction5].setDisplayName ( "" );

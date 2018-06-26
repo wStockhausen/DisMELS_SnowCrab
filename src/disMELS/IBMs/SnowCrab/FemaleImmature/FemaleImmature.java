@@ -13,8 +13,10 @@ import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
 import disMELS.IBMs.SnowCrab.AbstractBenthicStage;
 import disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescent;
+import disMELS.IBMs.SnowCrab.Megalopa.MegalopaAttributes;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
+import static wts.models.DisMELS.framework.LifeStageInterface.DAY_SECS;
 import wts.roms.model.LagrangianParticle;
 
 /**
@@ -72,9 +74,21 @@ public class FemaleImmature extends AbstractBenthicStage {
     protected double initialWeight;
     /** flag to use stochastic transitions */
     protected boolean randomizeTransitions;
-    /** stage transition rate */
-    protected double stageTransRate;
-    
+    /*** Ratio at which crabs become male or female*/
+    protected double sexRatio;
+        /** IBM function selected for mortality */
+    private IBMFunctionInterface fcnMort = null; 
+     /** IBM function selected for growth (in weight)*/
+    private IBMFunctionInterface fcnGrowth = null; 
+    /** IBM function selected for molt */
+    private IBMFunctionInterface fcnMolt = null;
+        /** IBM function selected for molt time*/
+    private IBMFunctionInterface fcnMoltTime = null;
+
+    /** IBM function selected for fecundity */
+    private IBMFunctionInterface fcnFecundity = null; 
+    private IBMFunctionInterface fcnExCost = null;
+ 
         //fields that reflect (new) attribute values
     //none
             //other fields
@@ -82,11 +96,11 @@ public class FemaleImmature extends AbstractBenthicStage {
     private double numTrans;  
     /** day of year */
     private double dayOfYear;
+    private double starvationMort;
+    private boolean molted;
+    private double exTot;
     
-    /** IBM function selected for development */
-    private IBMFunctionInterface fcnGrowth = null; 
-    /** IBM function selected for mortality */
-    private IBMFunctionInterface fcnMort = null; 
+    private double sCost;
     
     /** logger for class */
     private static final Logger logger = Logger.getLogger(FemaleImmature.class.getName());
@@ -248,7 +262,50 @@ public class FemaleImmature extends AbstractBenthicStage {
     @Override
     public void setAttributes(LifeStageAttributesInterface newAtts) {
         //copy attributes, regardless of life stage associated w/ newAtts
-        for (String key: newAtts.getKeys()) atts.setValue(key,newAtts.getValue(key));
+    if(newAtts instanceof FemaleImmatureAttributes){            
+            FemaleImmatureAttributes spAtts = (FemaleImmatureAttributes) newAtts;
+            for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
+        } else if(newAtts instanceof MegalopaAttributes){
+            MegalopaAttributes spAtts = (MegalopaAttributes) newAtts;
+            String key = MegalopaAttributes.PROP_weight; atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_age; atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_startTime; atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_time; atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_track; atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_id; atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_parentID; atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_origID; atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_horizType; atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_vertType;   atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_horizPos1;  atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_horizPos2;  atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_vertPos;   atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_gridCellID; atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_track;      atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_active;     atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_alive;      atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_temperature;      atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_ph;     atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_salinity;      atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_number;     
+            //Need to cut numbers in half
+            Double value = (Double) spAtts.getValue(key)*sexRatio;
+            atts.setValue(key, value);
+            key = MegalopaAttributes.PROP_shellthick; atts.setValue(key, spAtts.getValue(key));
+
+            size = params.getValue(FemaleImmatureParameters.PARAM_initialSize, size);
+            instar = 1;
+            ageInStage = 0.0;
+            ageInInstar = 0.0;
+            
+            atts.setValue(FemaleImmatureAttributes.PROP_size, size);
+            atts.setValue(FemaleImmatureAttributes.PROP_instar, instar);
+            atts.setValue(FemaleImmatureAttributes.PROP_ageInInstar, ageInInstar);
+            atts.setValue(FemaleImmatureAttributes.PROP_ageInStage, ageInStage);
+        } else {
+            //TODO: should throw an error here
+            logger.info("AdultStage.setAttributes(): no match for attributes type");
+        }
         id = atts.getValue(LifeStageAttributesInterface.PROP_id, id);
         updateVariables();
     }
@@ -362,6 +419,9 @@ public class FemaleImmature extends AbstractBenthicStage {
     private void setIBMFunctions(){
         fcnGrowth  = params.getSelectedIBMFunctionForCategory(FemaleImmatureParameters.FCAT_Growth);
         fcnMort    = params.getSelectedIBMFunctionForCategory(FemaleImmatureParameters.FCAT_Mortality);
+        fcnExCost  = params.getSelectedIBMFunctionForCategory(FemaleImmatureParameters.FCAT_ExCost);
+        fcnMolt  = params.getSelectedIBMFunctionForCategory(FemaleImmatureParameters.FCAT_Molt);
+        fcnMoltTime    = params.getSelectedIBMFunctionForCategory(FemaleImmatureParameters.FCAT_MoltTiming);
     }
     
     /*
@@ -384,6 +444,10 @@ public class FemaleImmature extends AbstractBenthicStage {
                 params.getValue(FemaleImmatureParameters.PARAM_minSize,minSize);
         randomizeTransitions = 
                 params.getValue(FemaleImmatureParameters.PARAM_randomizeTransitions,true);
+        sCost =
+                params.getValue(FemaleImmatureParameters.PARAM_sCost,sCost);
+        sexRatio =
+                params.getValue(FemaleImmatureParameters.PARAM_sexRatio, sexRatio);
     }
     
     /**
@@ -419,7 +483,7 @@ public class FemaleImmature extends AbstractBenthicStage {
         output.clear();
         List<LifeStageInterface> nLHSs=null;
         if (((ageInStage+dtp)>=minStageDuration)&&(size>=minSize)) {
-            if ((numTrans>0)||!isSuperIndividual){
+            if ((numTrans>0)){
                 nLHSs = createNextLHSs();
                 if (nLHSs!=null) output.addAll(nLHSs);
             }
@@ -444,6 +508,7 @@ public class FemaleImmature extends AbstractBenthicStage {
                  */
                 nLHSs = LHS_Factory.createNextLHSsFromSuperIndividual(typeName,this,numTrans);
                 numTrans = 0.0;//reset numTrans to zero
+                starvationMort = 0.0;
             } else {
                 /** 
                  * Since this is a single individual making a transition, we should
@@ -487,6 +552,8 @@ public class FemaleImmature extends AbstractBenthicStage {
         zPos       = atts.getValue(LifeStageAttributesInterface.PROP_vertPos,zPos);
         time       = startTime;
         numTrans   = 0.0; //set numTrans to zero
+        starvationMort = 0.0;
+        molted = false;
         if (debug) {
             logger.info("\n---------------Setting initial position------------");
             logger.info(hType+cc+vType+cc+startTime+cc+xPos+cc+yPos+cc+zPos);
@@ -547,7 +614,9 @@ public class FemaleImmature extends AbstractBenthicStage {
     public void step(double dt) throws ArrayIndexOutOfBoundsException {
         //determine daytime/nighttime for vertical migration & calc indiv. W
         dayOfYear = globalInfo.getCalendar().getYearDay();
-//        isDaytime = DateTimeFunctions.isDaylight(lon,lat,dayOfYear);
+        starvationMort = 0.0;
+        numTrans = 0.0;
+        molted = false;
         //movement here
         //TODO: revise so no advection by currents!
         double[] pos;
@@ -567,6 +636,7 @@ public class FemaleImmature extends AbstractBenthicStage {
             pos = lp.getIJK();
         time = time+dt;
         updateSize(dt);
+        updateWeight(dt);
         updateNum(dt);
         updateAge(dt);
         updatePosition(pos);
@@ -600,7 +670,6 @@ public class FemaleImmature extends AbstractBenthicStage {
         return uv;
     }
     
-
     /**
      *
      * @param dt - time step in seconds
@@ -608,6 +677,7 @@ public class FemaleImmature extends AbstractBenthicStage {
     private void updateAge(double dt) {
         age        = age+dt/DAY_SECS;
         ageInStage = ageInStage+dt/DAY_SECS;
+        ageInInstar = ageInInstar+dt/DAY_SECS;
         if (ageInStage>maxStageDuration) {
             alive = false;
             active = false;
@@ -619,7 +689,17 @@ public class FemaleImmature extends AbstractBenthicStage {
      * @param dt - time step in seconds
      */
     private void updateSize(double dt) {
-        //TODO: implement!
+        double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+        exTot = (Double) fcnExCost.calculate(size);
+        if((ageInInstar+dt/DAY_SECS)>D){
+            size = (Double) fcnMolt.calculate(size);
+            instar += 1;
+            ageInInstar = 0.0;
+            molted = true;
+            if(size>60.0){
+                numTrans += number;
+            }
+        }
     }
 
     /**
@@ -628,7 +708,20 @@ public class FemaleImmature extends AbstractBenthicStage {
      * @param dt - time step in seconds
      */
     private void updateWeight(double dt) {
-        //TODO: implement!
+        double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+        double exPerDay = exTot/D;
+        fcnGrowth.setParameterValue("sex", 1.0);
+        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
+        if(growthRate>0){
+            weight = weight*Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
+        } else{
+            double totRate = Math.max(-1.0,growthRate/weight);
+            starvationMort = -Math.log(-(.0099+totRate))*(dt/DAY_SECS);
+        } 
+        if(molted){
+            weight = weight - exTot;
+            molted = false;
+        }
     }
 
     /**
@@ -651,15 +744,26 @@ public class FemaleImmature extends AbstractBenthicStage {
              */
             mortalityRate = (Double)fcnMort.calculate(temperature);//using temperature as covariate for mortality
         }
-        double totRate = mortalityRate;
-        if ((ageInStage>=minStageDuration)) {
-            totRate += stageTransRate;
+        double totRate = mortalityRate + starvationMort;
+        if ((ageInStage>=minStageDuration)&&numTrans>0) {
+            if(number!=numTrans){
+            double matRate = numTrans/number;
+            double instMatRate = -Math.log(1-matRate);
+            totRate += instMatRate;
             //apply mortality rate to previous number transitioning and
             //add in new transitioners
-            numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
-                    (stageTransRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
+            
+                    numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
+                    (instMatRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
+            } else{
+                number = number-numTrans;
+        }
         }
         number = number*Math.exp(-dt*totRate/DAY_SECS);
+        if(number==0){
+            active=false;alive=false;number=number+numTrans;
+        }
+
     }
     
     private void updatePosition(double[] pos) {
@@ -766,8 +870,14 @@ public class FemaleImmature extends AbstractBenthicStage {
         //update superclass attributes
         super.updateAttributes();
         //update new attributes
-//        //no new attributes, but would look like:
-//        atts.setValue(FemaleImmatureAttributes.PROP_size,size);
+        atts.setValue(FemaleImmatureAttributes.PROP_size,size);
+        atts.setValue(FemaleImmatureAttributes.PROP_weight,weight);
+        atts.setValue(FemaleImmatureAttributes.PROP_ageInInstar,ageInInstar);
+        atts.setValue(FemaleImmatureAttributes.PROP_number, number);
+        atts.setValue(FemaleImmatureAttributes.PROP_instar,instar);
+        atts.setValue(FemaleImmatureAttributes.PROP_salinity,salinity);
+        atts.setValue(FemaleImmatureAttributes.PROP_temperature,temperature);
+        atts.setValue(FemaleImmatureAttributes.PROP_ph,ph);
     }
 
     /**
@@ -778,8 +888,14 @@ public class FemaleImmature extends AbstractBenthicStage {
         //update superclass variables
         super.updateVariables();
         //update new variables
-//        //no new variables, but would look like:
-//        size        = atts.getValue(FemaleImmatureAttributes.PROP_size,size);
+       size        = atts.getValue(FemaleImmatureAttributes.PROP_size,size);
+       weight      = atts.getValue(FemaleImmatureAttributes.PROP_weight, weight);
+       ageInInstar = atts.getValue(FemaleImmatureAttributes.PROP_ageInInstar, ageInInstar);
+       number      = atts.getValue(FemaleImmatureAttributes.PROP_number, number);
+       instar      = atts.getValue(FemaleImmatureAttributes.PROP_instar, instar);
+       salinity    = atts.getValue(FemaleImmatureAttributes.PROP_salinity,salinity);
+       temperature = atts.getValue(FemaleImmatureAttributes.PROP_temperature,temperature);
+       ph        = atts.getValue(FemaleImmatureAttributes.PROP_ph,ph);
     }
 
 }

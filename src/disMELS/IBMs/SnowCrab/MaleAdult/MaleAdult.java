@@ -11,6 +11,9 @@ import java.util.List;
 import java.util.logging.Logger;
 import org.openide.util.lookup.ServiceProvider;
 import disMELS.IBMs.SnowCrab.AbstractBenthicStage;
+import disMELS.IBMs.SnowCrab.MaleAdolescent.MaleAdolescentAttributes;
+import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
+import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.models.utilities.CalendarIF;
@@ -63,11 +66,15 @@ public class MaleAdult extends AbstractBenthicStage {
     private double numTrans;  
      /** day of year */
     private double dayOfYear;
+    private double starvationMort;
    
     /** IBM function selected for growth */
     private IBMFunctionInterface fcnGrowth = null; 
+
     /** IBM function selected for mortality */
-    private IBMFunctionInterface fcnMortality = null; 
+
+    private IBMFunctionInterface fcnMort = null;
+
     
     /** flag to print debugging info */
     public static boolean debug = false;
@@ -227,7 +234,9 @@ public class MaleAdult extends AbstractBenthicStage {
         if (newAtts instanceof MaleAdultAttributes) {
             MaleAdultAttributes spAtts = (MaleAdultAttributes) newAtts;
             for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
-        } else {
+        } else if(newAtts instanceof MaleAdolescentAttributes){
+            for (String key: newAtts.getKeys()) atts.setValue(key,newAtts.getValue(key));
+        }{
             //TODO: should throw an error here
             logger.info("AdultStage.setAttributes(): no match for attributes type");
         }
@@ -343,7 +352,8 @@ public class MaleAdult extends AbstractBenthicStage {
      * Sets the IBM functions from the parameters object
      */
     private void setIBMFunctions(){
-        fcnMortality      = params.getSelectedIBMFunctionForCategory(MaleAdultParameters.FCAT_Mortality);
+        fcnMort      = params.getSelectedIBMFunctionForCategory(MaleAdultParameters.FCAT_Mortality);
+        fcnGrowth         = params.getSelectedIBMFunctionForCategory(MaleAdultParameters.FCAT_Growth);
     }
     
     /*
@@ -390,7 +400,6 @@ public class MaleAdult extends AbstractBenthicStage {
         return output;
     }
 
-    // TODO: define what this means!
     private List<LifeStageInterface> createNextLHSs() {
         List<LifeStageInterface> nLHSs = null;
         try {
@@ -408,6 +417,7 @@ public class MaleAdult extends AbstractBenthicStage {
                  */
                 nLHSs = LHS_Factory.createNextLHSsFromSuperIndividual(typeName,this,numTrans);
                 numTrans = 0.0;//reset numTrans to zero
+                starvationMort = 0.0;
             } else {
                 /** 
                  * Since this is a single individual making a transition, we should
@@ -464,6 +474,7 @@ public class MaleAdult extends AbstractBenthicStage {
         zPos       = atts.getValue(LifeStageAttributesInterface.PROP_vertPos,zPos);
         time       = startTime;
         numTrans   = 0.0; //set numTrans to zero
+        starvationMort = 0.0;
         if (debug) {
             logger.info("\n---------------Setting initial position------------");
             logger.info(hType+cc+vType+cc+startTime+cc+xPos+cc+yPos+cc+zPos);
@@ -481,9 +492,29 @@ public class MaleAdult extends AbstractBenthicStage {
             double K = 0;  //benthic adult starts out on bottom
             double z = i3d.interpolateBathymetricDepth(IJ);
             if (debug) logger.info("Bathymetric depth = "+z);
+            double ssh = i3d.interpolateSSH(IJ);
+
+            if (vType==Types.VERT_K) {
+                if (zPos<0) {K = 0;} else
+                if (zPos>i3d.getGrid().getN()) {K = i3d.getGrid().getN();} else
+                K = zPos;
+            } else if (vType==Types.VERT_Z) {//depths negative
+                if (zPos<-z) {K = 0;} else                     //at bottom
+                if (zPos>ssh) {K = i3d.getGrid().getN();} else //at surface
+                K = i3d.calcKfromZ(IJ[0],IJ[1],zPos);          //at requested depth
+            } else if (vType==Types.VERT_H) {//depths positive
+                if (zPos>z) {K = 0;} else                       //at bottom
+                if (zPos<-ssh) {K = i3d.getGrid().getN();} else //at surface
+                K = i3d.calcKfromZ(IJ[0],IJ[1],-zPos);          //at requested depth
+            } else if (vType==Types.VERT_DH) {//distance off bottom
+                if (zPos<0) {K = 0;} else                        //at bottom
+                if (zPos>z+ssh) {K = i3d.getGrid().getN();} else //at surface
+                K = i3d.calcKfromZ(IJ[0],IJ[1],-(z-zPos));       //at requested distance off bottom
+            }
             lp.setIJK(IJ[0],IJ[1],K);
             //reset track array
             track.clear();
+            trackLL.clear();
             //set horizType to lat/lon and vertType to depth
             atts.setValue(LifeStageAttributesInterface.PROP_horizType,Types.HORIZ_LL);
             atts.setValue(LifeStageAttributesInterface.PROP_vertType,Types.VERT_H);
@@ -506,6 +537,8 @@ public class MaleAdult extends AbstractBenthicStage {
     public void step(double dt) throws ArrayIndexOutOfBoundsException {
         //determine daytime/nighttime for vertical migration & calc indiv. W
         dayOfYear = globalInfo.getCalendar().getYearDay();
+        starvationMort = 0.0;
+        numTrans = 0.0;
 //        isDaytime = DateTimeFunctions.isDaylight(lon,lat,dayOfYear);
         //movement here
         //TODO: revise so no advection by currents!
@@ -525,9 +558,9 @@ public class MaleAdult extends AbstractBenthicStage {
             lp.doCorrectorStep();
             pos = lp.getIJK();
         time = time+dt;
+        updateAge(dt);
         updateWeight(dt);
         updateNum(dt);
-        updateAge(dt);
         updatePosition(pos);
         interpolateEnvVars(pos);
         //check for exiting grid
@@ -562,6 +595,7 @@ public class MaleAdult extends AbstractBenthicStage {
     private void updateAge(double dt) {
         age        = age+dt/DAY_SECS;
         ageInStage = ageInStage+dt/DAY_SECS;
+        ageInInstar = ageInInstar+dt/DAY_SECS;
         if (ageInStage>maxStageDuration) {
             alive = false;
             active = false;
@@ -573,8 +607,14 @@ public class MaleAdult extends AbstractBenthicStage {
      * 
      * @param dt - time step in seconds
      */
-    private void updateWeight(double dt) {
-        //TODO: implement!
+    private void updateWeight(double dt){
+        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, 0.0});
+        if(growthRate>0){
+            weight = weight*Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
+        } else{
+            double totRate = Math.max(-1.0,growthRate/weight);
+            starvationMort = -Math.log(-(.0099+totRate))*(dt/DAY_SECS);
+        } 
     }
 
     /**
@@ -582,20 +622,26 @@ public class MaleAdult extends AbstractBenthicStage {
      * @param dt - time step in seconds
      */
     private void updateNum(double dt) {
-        //The following works for
-        //  wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction
-        //  wts.models.DisMELS.IBMFunctions.Miscellaneous.PowerLawFunction
-        double mortalityRate = (Double)fcnMortality.calculate(size);//in unis of [days]^-1
-        double totRate = mortalityRate;
-        //TODO: add in stage transitions, if necessary
-//        if ((ageInStage>=minStageDuration)&&(size>=minSizeAtTrans)) {
-//            totRate += stageTransRate;
-//            //apply mortality rate to previous number transitioning and
-//            //add in new transitioners
-//            numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
-//                    (stageTransRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
-//        }
+        double mortalityRate=0.0D;
+         if (fcnMort instanceof ConstantMortalityRate){
+            /**
+             * @param vars - null
+             * @return     - Double - the corresponding mortality rate (per day) 
+             */
+            mortalityRate = (Double)fcnMort.calculate(null);
+        } else 
+        if (fcnMort instanceof TemperatureDependentMortalityRate_Houde1989){
+            /**
+             * @param vars - Double - temperature (deg C)
+             * @return     - Double - the corresponding mortality rate (per day) 
+             */
+            mortalityRate = (Double)fcnMort.calculate(temperature);//using temperature as covariate for mortality
+        }
+        double totRate = mortalityRate + starvationMort;
         number = number*Math.exp(-dt*totRate/DAY_SECS);
+        if(number==0){
+            active=false;alive=false;number=number+numTrans;
+        }
     }
 
     private void updatePosition(double[] pos) {
@@ -688,25 +734,39 @@ public class MaleAdult extends AbstractBenthicStage {
         return atts.getCSVHeaderShortNames();
     }
     
-//    /**
-//     * Updates attribute values defined for this class. 
-//     */
-//    @Override
-//    protected void updateAttributes() {
-//        //update superclass attributes
-//        super.updateAttributes();
-//        //update new attributes
-////        //no new attributes, but would look like:
-////        atts.setValue(MaleImmatureAttributes.PROP_size,size);
-//    }
-//
-//    /**
-//     * Updates local variables from the attributes.  
-//     */
-//    @Override
-//    protected void updateVariables() {
-//        //update superclass variables
-//        super.updateVariables();
-//        //update new variables
-//    }
+    /**
+     * Updates attribute values defined for this abstract class. 
+     */
+    @Override
+    protected void updateAttributes() {
+        //update superclass attributes
+        super.updateAttributes();
+        //update new attributes
+        atts.setValue(MaleAdultAttributes.PROP_size,size);
+        atts.setValue(MaleAdultAttributes.PROP_weight,weight);
+        atts.setValue(MaleAdultAttributes.PROP_number,number);
+        atts.setValue(MaleAdultAttributes.PROP_ageInInstar,ageInInstar);
+        atts.setValue(MaleAdultAttributes.PROP_instar,instar);
+        atts.setValue(MaleAdultAttributes.PROP_salinity,salinity);
+        atts.setValue(MaleAdultAttributes.PROP_temperature,temperature);
+        atts.setValue(MaleAdultAttributes.PROP_ph,ph);
+}
+
+    /**
+     * Updates local variables from the attributes.  
+     */
+    @Override
+    protected void updateVariables() {
+        //update superclass variables
+        super.updateVariables();
+        //update new variables
+       size        = atts.getValue(MaleAdultAttributes.PROP_size,size);
+       weight      = atts.getValue(MaleAdultAttributes.PROP_weight, weight);
+       ageInInstar = atts.getValue(MaleAdultAttributes.PROP_ageInInstar, ageInInstar);
+       number      = atts.getValue(MaleAdultAttributes.PROP_number, number);
+       instar      = atts.getValue(MaleAdultAttributes.PROP_instar, instar);
+       salinity    = atts.getValue(MaleAdultAttributes.PROP_salinity,salinity);
+       temperature = atts.getValue(MaleAdultAttributes.PROP_temperature,temperature);
+       ph        = atts.getValue(MaleAdultAttributes.PROP_ph,ph);
+    }
 }

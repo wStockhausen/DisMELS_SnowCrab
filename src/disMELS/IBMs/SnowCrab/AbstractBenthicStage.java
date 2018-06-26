@@ -124,6 +124,7 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
     /** in situ pH */
     protected double ph = 0; 
     
+    
     /**
      * Partially instantiates an instance of a class inheriting from AbstractBenthicStage
      * 

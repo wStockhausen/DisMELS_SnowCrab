@@ -1,11 +1,11 @@
 /*
- * FemalePrimiparousParameters.java
+ * FemaleAdultParameters.java
  *
  * Created on October 17, 2017.
  *
  */
 
-package disMELS.IBMs.SnowCrab.FemalePrimiparous;
+package disMELS.IBMs.SnowCrab.FemaleAdult;
 
 import java.beans.PropertyChangeSupport;
 import java.util.LinkedHashMap;
@@ -24,6 +24,7 @@ import wts.models.DisMELS.framework.IBMFunctions.IBMParameter;
 import wts.models.DisMELS.framework.IBMFunctions.IBMParameterBoolean;
 import wts.models.DisMELS.framework.IBMFunctions.IBMParameterDouble;
 import wts.models.DisMELS.framework.LifeStageParametersInterface;
+import SnowCrabFunctions.CrabBioenergeticsGrowthFunction;
 
 /**
  * DisMELS class representing parameters for adolescent female snow crab.
@@ -33,7 +34,7 @@ import wts.models.DisMELS.framework.LifeStageParametersInterface;
  * @author William Stockhausen
  */
 @ServiceProvider(service=LifeStageParametersInterface.class)
-public class FemalePrimiparousParameters extends AbstractLHSParameters {
+public class FemaleAdultParameters extends AbstractLHSParameters {
     
     public static final long serialVersionUID = 1L;
     
@@ -54,10 +55,9 @@ public class FemalePrimiparousParameters extends AbstractLHSParameters {
     public static final String PARAM_randomizeSpawning     = "randomize spawning?";
     
     /** the number of IBMFunction categories defined in the class */
-    public static final int numFunctionCats = 4;
+    public static final int numFunctionCats = 3;
     public static final String FCAT_Growth         = "growth";
     public static final String FCAT_Mortality      = "mortality";
-    public static final String FCAT_Maturity       = "maturity";
     public static final String FCAT_Fecundity      = "fecundity";
     
     /** The 'keys' used to store the ibm functions */
@@ -65,7 +65,7 @@ public class FemalePrimiparousParameters extends AbstractLHSParameters {
     /** The 'keys' used to store the ibm parameters */
     protected static final Set<String> setOfParamKeys = new LinkedHashSet<>(2*numParams);
     
-    private static final Logger logger = Logger.getLogger(FemalePrimiparousParameters.class.getName());
+    private static final Logger logger = Logger.getLogger(FemaleAdultParameters.class.getName());
     
     /** Utility field used by bound properties.  */
     private transient PropertyChangeSupport propertySupport;
@@ -73,7 +73,7 @@ public class FemalePrimiparousParameters extends AbstractLHSParameters {
     /**
      * Creates a new instance of AdultStageParameters.
      */
-    public FemalePrimiparousParameters() {
+    public FemaleAdultParameters() {
         super("",numParams,numFunctionCats);
         createMapToValues();
         createMapToSelectedFunctions();
@@ -83,7 +83,7 @@ public class FemalePrimiparousParameters extends AbstractLHSParameters {
     /**
      * Creates a new instance of AdultStageParameters
      */
-    public FemalePrimiparousParameters(String typeName) {
+    public FemaleAdultParameters(String typeName) {
         super(typeName,numParams,numFunctionCats);
         createMapToValues();
         createMapToSelectedFunctions();
@@ -116,14 +116,14 @@ public class FemalePrimiparousParameters extends AbstractLHSParameters {
         //create the set of function category keys for this class
         setOfFunctionCategories.add(FCAT_Growth);
         setOfFunctionCategories.add(FCAT_Mortality);
-        setOfFunctionCategories.add(FCAT_Maturity);
         setOfFunctionCategories.add(FCAT_Fecundity);
         
         //create the map from function categories to potential functions in each category
         String cat; Map<String,IBMFunctionInterface> mapOfPotentialFunctions; IBMFunctionInterface ifi;
         cat = FCAT_Growth;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        mapOfPotentialFunctions = new LinkedHashMap<>(4); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new vonBertalanffyGrowthFunction(); mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new CrabBioenergeticsGrowthFunction(); mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_Mortality;  
         mapOfPotentialFunctions = new LinkedHashMap<>(4); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
@@ -138,20 +138,6 @@ public class FemalePrimiparousParameters extends AbstractLHSParameters {
             ifi.setParameterDescription(PowerLawFunction.PARAM_stdVal,"mortality rate at standard size (z0) [1/day]");
             ifi.setParameterDescription(PowerLawFunction.PARAM_stdX,"standard size z0 [cm]");
             ifi.setParameterDescription(PowerLawFunction.PARAM_exponent,"exponent (<0 for decreasing function of size)");
-            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
-        
-        cat = FCAT_Maturity;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(4); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
-        ifi = new ConstantFunction(); 
-            ifi.setFunctionName("Constant fraction mature");
-            ifi.setDescription("constant fraction mature");
-            ifi.setParameterDescription(ConstantFunction.PARAM_constant,"constant fraction mature");
-            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
-        ifi = new LogisticFunction(); 
-            ifi.setFunctionName("Logistic maturity function");
-            ifi.setDescription("Logistic (ize-specific) maturity function");
-            ifi.setParameterDescription(LogisticFunction.PARAM_x50,"size at 50% maturity (cm)");
-            ifi.setParameterDescription(LogisticFunction.PARAM_slope,"slope at 50% maturity (1/cm)");
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_Fecundity;  
@@ -215,9 +201,9 @@ public class FemalePrimiparousParameters extends AbstractLHSParameters {
      */
     @Override
     public Object clone() {
-        FemalePrimiparousParameters clone = null;
+        FemaleAdultParameters clone = null;
         try {
-            clone = (FemalePrimiparousParameters) super.clone();
+            clone = (FemaleAdultParameters) super.clone();
             for (String pKey: setOfParamKeys) {
                 clone.setValue(pKey,this.getValue(pKey));
             }
@@ -249,9 +235,9 @@ public class FemalePrimiparousParameters extends AbstractLHSParameters {
      *              in the same order as the keys.
      */
     @Override
-    public FemalePrimiparousParameters createInstance(final String[] strv) {
+    public FemaleAdultParameters createInstance(final String[] strv) {
         int c = 0;
-        FemalePrimiparousParameters params = new FemalePrimiparousParameters(strv[c++]);
+        FemaleAdultParameters params = new FemaleAdultParameters(strv[c++]);
         for (String key: setOfParamKeys) params.setValueFromString(key,strv[c++]);
         return params;
     }

@@ -52,8 +52,6 @@ public class AbstractPelagicStageAttributesCustomizer extends AttributesCustomiz
         jtfAgeInStage = new javax.swing.JTextField();
         jtfNumber = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
-        jtfSize = new javax.swing.JTextField();
-        jLabel5 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         jtfWeight = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
@@ -225,15 +223,6 @@ public class AbstractPelagicStageAttributesCustomizer extends AttributesCustomiz
 
         jLabel6.setText("number");
 
-        jtfSize.setText("1.0");
-        jtfSize.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtfSizeActionPerformed(evt);
-            }
-        });
-
-        jLabel5.setText("size (mm)");
-
         jLabel7.setText("weight (g)");
 
         jtfWeight.setText("0.0");
@@ -262,8 +251,7 @@ public class AbstractPelagicStageAttributesCustomizer extends AttributesCustomiz
                     .add(jPanel6Layout.createSequentialGroup()
                         .add(jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jtfAge, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 80, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                            .add(jLabel2)
-                            .add(jLabel5))
+                            .add(jLabel2))
                         .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                         .add(jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.LEADING)
                             .add(jLabel7)
@@ -275,8 +263,7 @@ public class AbstractPelagicStageAttributesCustomizer extends AttributesCustomiz
                             .add(jtfNumber, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 80, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                             .add(jLabel10)))
                     .add(jPanel6Layout.createSequentialGroup()
-                        .add(jtfSize, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 80, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
+                        .add(86, 86, 86)
                         .add(jtfWeight, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 80, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                         .add(11, 11, 11)
                         .add(jtfShellThick, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 80, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
@@ -296,12 +283,10 @@ public class AbstractPelagicStageAttributesCustomizer extends AttributesCustomiz
                     .add(jtfNumber, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jLabel5)
                     .add(jLabel7)
                     .add(jLabel10))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jtfSize, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jtfWeight, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jtfShellThick, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
@@ -408,11 +393,6 @@ public class AbstractPelagicStageAttributesCustomizer extends AttributesCustomiz
         }
     }//GEN-LAST:event_jcbVertTypeActionPerformed
 
-    private void jtfSizeActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfSizeActionPerformed
-        Double n = new Double(jtfSize.getText());
-        attributes.setValue(AbstractPelagicStageAttributes.PROP_size,n);
-    }//GEN-LAST:event_jtfSizeActionPerformed
-
     private void jtfWeightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfWeightActionPerformed
         Double n = new Double(jtfWeight.getText());
         attributes.setValue(AbstractPelagicStageAttributes.PROP_weight,n);
@@ -451,7 +431,6 @@ public class AbstractPelagicStageAttributesCustomizer extends AttributesCustomiz
             jtfAge.setText(attributes.getValue(AbstractPelagicStageAttributes.PROP_age,d).toString());
             jtfAgeInStage.setText(attributes.getValue(AbstractPelagicStageAttributes.PROP_ageInStage,d).toString());
             jtfNumber.setText(attributes.getValue(AbstractPelagicStageAttributes.PROP_number,d).toString());
-            jtfSize.setText(attributes.getValue(AbstractPelagicStageAttributes.PROP_size,d).toString());
             jtfWeight.setText(attributes.getValue(AbstractPelagicStageAttributes.PROP_weight,d).toString());
             jtfShellThick.setText(attributes.getValue(AbstractPelagicStageAttributes.PROP_shellthick,d).toString());
         }
@@ -475,7 +454,6 @@ public class AbstractPelagicStageAttributesCustomizer extends AttributesCustomiz
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
     private javax.swing.JLabel jLabel4;
-    private javax.swing.JLabel jLabel5;
     private javax.swing.JLabel jLabel6;
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
@@ -489,7 +467,6 @@ public class AbstractPelagicStageAttributesCustomizer extends AttributesCustomiz
     private javax.swing.JTextField jtfAgeInStage;
     private javax.swing.JTextField jtfNumber;
     private javax.swing.JTextField jtfShellThick;
-    private javax.swing.JTextField jtfSize;
     private javax.swing.JTextField jtfTime;
     private javax.swing.JTextField jtfWeight;
     private javax.swing.JTextField jtfX;

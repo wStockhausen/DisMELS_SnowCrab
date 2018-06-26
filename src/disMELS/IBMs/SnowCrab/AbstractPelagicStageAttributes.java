@@ -18,9 +18,7 @@ public abstract class AbstractPelagicStageAttributes implements LifeStageAttribu
     
     // attributes in addition to those from LisfeStageAttributesInterface
     /** the number of new attributes defined by this class */
-    public static final int PROP_NumNewAtts = 6;
-    /** the property key for the size of the individual */
-    public static final String PROP_size        = "size";
+    public static final int PROP_NumNewAtts = 5;
     /** the property key for the weight of the individual */
     public static final String PROP_weight      = "weight (g)";
     /** the property key for the shell thickness for the individual */
@@ -84,7 +82,6 @@ public abstract class AbstractPelagicStageAttributes implements LifeStageAttribu
             key = PROP_age;        keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"age"));
             key = PROP_ageInStage; keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"ageInStage"));
             key = PROP_number;     keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"number"));
-            key = PROP_size;       keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"size"));
             key = PROP_weight;     keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"weight"));
             key = PROP_shellthick; keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"shellthickness"));
             key = PROP_temperature;keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"temperature"));
@@ -110,7 +107,6 @@ public abstract class AbstractPelagicStageAttributes implements LifeStageAttribu
         mapValues.put(PROP_age,       new Double(0));
         mapValues.put(PROP_ageInStage,new Double(0));
         mapValues.put(PROP_number,    new Double(1));
-        mapValues.put(PROP_size,       new Double(0));
         mapValues.put(PROP_weight,     new Double(0));
         mapValues.put(PROP_shellthick, new Double(-1));
         mapValues.put(PROP_temperature,new Double(-1));

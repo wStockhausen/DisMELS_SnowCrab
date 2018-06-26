@@ -14,7 +14,7 @@ public class FemaleAdolescentAttributesBeanInfo extends SimpleBeanInfo {
     // Bean descriptor//GEN-FIRST:BeanDescriptor
     /*lazy BeanDescriptor*/
     private static BeanDescriptor getBdescriptor(){
-        BeanDescriptor beanDescriptor = new BeanDescriptor  ( FemaleAdolescentAttributes.class , AbstractBenthicStageAttributesCustomizer.class ); // NOI18N//GEN-HEADEREND:BeanDescriptor
+        BeanDescriptor beanDescriptor = new BeanDescriptor  ( disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes.class , AbstractBenthicStageAttributesCustomizer.class ); // NOI18N//GEN-HEADEREND:BeanDescriptor
 
         // Here you can add code for customizing the BeanDescriptor.
 
@@ -42,21 +42,21 @@ public class FemaleAdolescentAttributesBeanInfo extends SimpleBeanInfo {
         PropertyDescriptor[] properties = new PropertyDescriptor[15];
     
         try {
-            properties[PROPERTY_active] = new PropertyDescriptor ( "active", FemaleAdolescentAttributes.class, "isActive", "setActive" ); // NOI18N
-            properties[PROPERTY_alive] = new PropertyDescriptor ( "alive", FemaleAdolescentAttributes.class, "isAlive", "setAlive" ); // NOI18N
-            properties[PROPERTY_arrayList] = new PropertyDescriptor ( "arrayList", FemaleAdolescentAttributes.class, "getArrayList", null ); // NOI18N
-            properties[PROPERTY_attributes] = new PropertyDescriptor ( "attributes", FemaleAdolescentAttributes.class, "getAttributes", null ); // NOI18N
-            properties[PROPERTY_classes] = new PropertyDescriptor ( "classes", FemaleAdolescentAttributes.class, "getClasses", null ); // NOI18N
-            properties[PROPERTY_CSV] = new PropertyDescriptor ( "CSV", FemaleAdolescentAttributes.class, "getCSV", null ); // NOI18N
-            properties[PROPERTY_CSVHeader] = new PropertyDescriptor ( "CSVHeader", FemaleAdolescentAttributes.class, "getCSVHeader", null ); // NOI18N
-            properties[PROPERTY_CSVHeaderShortNames] = new PropertyDescriptor ( "CSVHeaderShortNames", FemaleAdolescentAttributes.class, "getCSVHeaderShortNames", null ); // NOI18N
-            properties[PROPERTY_geometry] = new PropertyDescriptor ( "geometry", FemaleAdolescentAttributes.class, "getGeometry", "setGeometry" ); // NOI18N
-            properties[PROPERTY_ID] = new PropertyDescriptor ( "ID", FemaleAdolescentAttributes.class, "getID", null ); // NOI18N
-            properties[PROPERTY_keys] = new PropertyDescriptor ( "keys", FemaleAdolescentAttributes.class, "getKeys", null ); // NOI18N
-            properties[PROPERTY_shortNames] = new PropertyDescriptor ( "shortNames", FemaleAdolescentAttributes.class, "getShortNames", null ); // NOI18N
-            properties[PROPERTY_startTime] = new PropertyDescriptor ( "startTime", FemaleAdolescentAttributes.class, "getStartTime", "setStartTime" ); // NOI18N
-            properties[PROPERTY_typeName] = new PropertyDescriptor ( "typeName", FemaleAdolescentAttributes.class, "getTypeName", null ); // NOI18N
-            properties[PROPERTY_values] = new PropertyDescriptor ( "values", FemaleAdolescentAttributes.class, null, "setValues" ); // NOI18N
+            properties[PROPERTY_active] = new PropertyDescriptor ( "active", disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes.class, "isActive", "setActive" ); // NOI18N
+            properties[PROPERTY_alive] = new PropertyDescriptor ( "alive", disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes.class, "isAlive", "setAlive" ); // NOI18N
+            properties[PROPERTY_arrayList] = new PropertyDescriptor ( "arrayList", disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes.class, "getArrayList", null ); // NOI18N
+            properties[PROPERTY_attributes] = new PropertyDescriptor ( "attributes", disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes.class, "getAttributes", null ); // NOI18N
+            properties[PROPERTY_classes] = new PropertyDescriptor ( "classes", disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes.class, "getClasses", null ); // NOI18N
+            properties[PROPERTY_CSV] = new PropertyDescriptor ( "CSV", disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes.class, "getCSV", null ); // NOI18N
+            properties[PROPERTY_CSVHeader] = new PropertyDescriptor ( "CSVHeader", disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes.class, "getCSVHeader", null ); // NOI18N
+            properties[PROPERTY_CSVHeaderShortNames] = new PropertyDescriptor ( "CSVHeaderShortNames", disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes.class, "getCSVHeaderShortNames", null ); // NOI18N
+            properties[PROPERTY_geometry] = new PropertyDescriptor ( "geometry", disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes.class, "getGeometry", "setGeometry" ); // NOI18N
+            properties[PROPERTY_ID] = new PropertyDescriptor ( "ID", disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes.class, "getID", null ); // NOI18N
+            properties[PROPERTY_keys] = new PropertyDescriptor ( "keys", disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes.class, "getKeys", null ); // NOI18N
+            properties[PROPERTY_shortNames] = new PropertyDescriptor ( "shortNames", disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes.class, "getShortNames", null ); // NOI18N
+            properties[PROPERTY_startTime] = new PropertyDescriptor ( "startTime", disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes.class, "getStartTime", "setStartTime" ); // NOI18N
+            properties[PROPERTY_typeName] = new PropertyDescriptor ( "typeName", disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes.class, "getTypeName", null ); // NOI18N
+            properties[PROPERTY_values] = new PropertyDescriptor ( "values", disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes.class, null, "setValues" ); // NOI18N
         }
         catch(IntrospectionException e) {
             e.printStackTrace();
@@ -74,7 +74,7 @@ public class FemaleAdolescentAttributesBeanInfo extends SimpleBeanInfo {
         EventSetDescriptor[] eventSets = new EventSetDescriptor[1];
     
         try {
-            eventSets[EVENT_propertyChangeListener] = new EventSetDescriptor ( FemaleAdolescentAttributes.class, "propertyChangeListener", java.beans.PropertyChangeListener.class, new String[] {"propertyChange"}, "addPropertyChangeListener", "removePropertyChangeListener" ); // NOI18N
+            eventSets[EVENT_propertyChangeListener] = new EventSetDescriptor ( disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes.class, "propertyChangeListener", java.beans.PropertyChangeListener.class, new String[] {"propertyChange"}, "addPropertyChangeListener", "removePropertyChangeListener" ); // NOI18N
         }
         catch(IntrospectionException e) {
             e.printStackTrace();
@@ -86,68 +86,23 @@ public class FemaleAdolescentAttributesBeanInfo extends SimpleBeanInfo {
     // Method identifiers//GEN-FIRST:Methods
     private static final int METHOD_clone0 = 0;
     private static final int METHOD_createInstance1 = 1;
-    private static final int METHOD_getValue2 = 2;
-    private static final int METHOD_getValue3 = 3;
-    private static final int METHOD_getValue4 = 4;
-    private static final int METHOD_getValue5 = 5;
-    private static final int METHOD_getValue6 = 6;
-    private static final int METHOD_getValue7 = 7;
-    private static final int METHOD_getValue8 = 8;
-    private static final int METHOD_getValue9 = 9;
-    private static final int METHOD_getValue10 = 10;
-    private static final int METHOD_getValue11 = 11;
-    private static final int METHOD_getValueAsString12 = 12;
-    private static final int METHOD_setValue13 = 13;
-    private static final int METHOD_setValue14 = 14;
-    private static final int METHOD_setValue15 = 15;
-    private static final int METHOD_setValue16 = 16;
-    private static final int METHOD_setValue17 = 17;
-    private static final int METHOD_setValueFromString18 = 18;
+    private static final int METHOD_getValueAsString2 = 2;
+    private static final int METHOD_setValueFromString3 = 3;
 
     // Method array 
     /*lazy MethodDescriptor*/
     private static MethodDescriptor[] getMdescriptor(){
-        MethodDescriptor[] methods = new MethodDescriptor[19];
+        MethodDescriptor[] methods = new MethodDescriptor[4];
     
         try {
-            methods[METHOD_clone0] = new MethodDescriptor(FemaleAdolescentAttributes.class.getMethod("clone", new Class[] {})); // NOI18N
+            methods[METHOD_clone0] = new MethodDescriptor(disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes.class.getMethod("clone", new Class[] {})); // NOI18N
             methods[METHOD_clone0].setDisplayName ( "" );
-            methods[METHOD_createInstance1] = new MethodDescriptor(FemaleAdolescentAttributes.class.getMethod("createInstance", new Class[] {java.lang.String[].class})); // NOI18N
+            methods[METHOD_createInstance1] = new MethodDescriptor(disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes.class.getMethod("createInstance", new Class[] {java.lang.String[].class})); // NOI18N
             methods[METHOD_createInstance1].setDisplayName ( "" );
-            methods[METHOD_getValue2] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes.class.getMethod("getValue", new Class[] {java.lang.String.class, java.lang.Boolean.class})); // NOI18N
-            methods[METHOD_getValue2].setDisplayName ( "" );
-            methods[METHOD_getValue3] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes.class.getMethod("getValue", new Class[] {java.lang.String.class, java.lang.Double.class})); // NOI18N
-            methods[METHOD_getValue3].setDisplayName ( "" );
-            methods[METHOD_getValue4] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes.class.getMethod("getValue", new Class[] {java.lang.String.class, java.lang.Integer.class})); // NOI18N
-            methods[METHOD_getValue4].setDisplayName ( "" );
-            methods[METHOD_getValue5] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes.class.getMethod("getValue", new Class[] {java.lang.String.class, java.lang.Long.class})); // NOI18N
-            methods[METHOD_getValue5].setDisplayName ( "" );
-            methods[METHOD_getValue6] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes.class.getMethod("getValue", new Class[] {java.lang.String.class, java.lang.String.class})); // NOI18N
-            methods[METHOD_getValue6].setDisplayName ( "" );
-            methods[METHOD_getValue7] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes.class.getMethod("getValue", new Class[] {java.lang.String.class, boolean.class})); // NOI18N
-            methods[METHOD_getValue7].setDisplayName ( "" );
-            methods[METHOD_getValue8] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes.class.getMethod("getValue", new Class[] {java.lang.String.class, double.class})); // NOI18N
-            methods[METHOD_getValue8].setDisplayName ( "" );
-            methods[METHOD_getValue9] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes.class.getMethod("getValue", new Class[] {java.lang.String.class, int.class})); // NOI18N
-            methods[METHOD_getValue9].setDisplayName ( "" );
-            methods[METHOD_getValue10] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes.class.getMethod("getValue", new Class[] {java.lang.String.class, long.class})); // NOI18N
-            methods[METHOD_getValue10].setDisplayName ( "" );
-            methods[METHOD_getValue11] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes.class.getMethod("getValue", new Class[] {java.lang.String.class})); // NOI18N
-            methods[METHOD_getValue11].setDisplayName ( "" );
-            methods[METHOD_getValueAsString12] = new MethodDescriptor(FemaleAdolescentAttributes.class.getMethod("getValueAsString", new Class[] {java.lang.String.class})); // NOI18N
-            methods[METHOD_getValueAsString12].setDisplayName ( "" );
-            methods[METHOD_setValue13] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes.class.getMethod("setValue", new Class[] {java.lang.String.class, java.lang.Object.class})); // NOI18N
-            methods[METHOD_setValue13].setDisplayName ( "" );
-            methods[METHOD_setValue14] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes.class.getMethod("setValue", new Class[] {java.lang.String.class, double.class})); // NOI18N
-            methods[METHOD_setValue14].setDisplayName ( "" );
-            methods[METHOD_setValue15] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes.class.getMethod("setValue", new Class[] {java.lang.String.class, float.class})); // NOI18N
-            methods[METHOD_setValue15].setDisplayName ( "" );
-            methods[METHOD_setValue16] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes.class.getMethod("setValue", new Class[] {java.lang.String.class, int.class})); // NOI18N
-            methods[METHOD_setValue16].setDisplayName ( "" );
-            methods[METHOD_setValue17] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes.class.getMethod("setValue", new Class[] {java.lang.String.class, long.class})); // NOI18N
-            methods[METHOD_setValue17].setDisplayName ( "" );
-            methods[METHOD_setValueFromString18] = new MethodDescriptor(FemaleAdolescentAttributes.class.getMethod("setValueFromString", new Class[] {java.lang.String.class, java.lang.String.class})); // NOI18N
-            methods[METHOD_setValueFromString18].setDisplayName ( "" );
+            methods[METHOD_getValueAsString2] = new MethodDescriptor(disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes.class.getMethod("getValueAsString", new Class[] {java.lang.String.class})); // NOI18N
+            methods[METHOD_getValueAsString2].setDisplayName ( "" );
+            methods[METHOD_setValueFromString3] = new MethodDescriptor(disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes.class.getMethod("setValueFromString", new Class[] {java.lang.String.class, java.lang.String.class})); // NOI18N
+            methods[METHOD_setValueFromString3].setDisplayName ( "" );
         }
         catch( Exception e) {}//GEN-HEADEREND:Methods
 

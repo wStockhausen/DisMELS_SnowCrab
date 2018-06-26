@@ -7,6 +7,7 @@
 
 package disMELS.IBMs.SnowCrab.MaleAdult;
 
+import SnowCrabFunctions.CrabBioenergeticsGrowthFunction;
 import java.beans.PropertyChangeSupport;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -42,8 +43,9 @@ public class MaleAdultParameters extends AbstractLHSParameters {
     public static final String PARAM_maxStageDuration      = "max stage duration [d]";
     
     /** the number of IBMFunction categories defined in the class */
-    public static final int numFunctionCats   = 3;
+    public static final int numFunctionCats   = 2;
     public static final String FCAT_Mortality = "mortality";
+    public static final String FCAT_Growth    = "growth";
     
     /** The 'keys' used to store the ibm functions */
     protected static final Set<String> setOfFunctionCategories = new LinkedHashSet<>(2*numFunctionCats);
@@ -106,6 +108,11 @@ public class MaleAdultParameters extends AbstractLHSParameters {
             ifi.setParameterDescription(PowerLawFunction.PARAM_stdVal,"mortality rate at standard size (z0) [1/day]");
             ifi.setParameterDescription(PowerLawFunction.PARAM_stdX,"standard size z0 [cm]");
             ifi.setParameterDescription(PowerLawFunction.PARAM_exponent,"exponent (<0 for decreasing function of size)");
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+            
+        cat = FCAT_Growth;  
+        mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        ifi = new CrabBioenergeticsGrowthFunction();  //generic function, so change defaults
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
     }

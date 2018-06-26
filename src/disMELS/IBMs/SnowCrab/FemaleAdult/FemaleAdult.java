@@ -1,8 +1,8 @@
 /*
- * FemalePrimiparous.java
+ * FemaleAdult.java
  */
 
-package disMELS.IBMs.SnowCrab.FemalePrimiparous;
+package disMELS.IBMs.SnowCrab.FemaleAdult;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import java.util.ArrayList;
@@ -12,10 +12,15 @@ import org.openide.util.lookup.ServiceProvider;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
 import disMELS.IBMs.SnowCrab.AbstractBenthicStage;
-import disMELS.IBMs.SnowCrab.FemaleMultiparous.FemaleMultiparous;
+import disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes;
+import disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes;
+import disMELS.IBMs.SnowCrab.Zooea1.Zooea1;
+import disMELS.IBMs.SnowCrab.Zooea1.Zooea1Attributes;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import static wts.models.DisMELS.framework.LifeStageInterface.DAY_SECS;
+import wts.models.utilities.CalendarIF;
+import wts.models.utilities.DateTimeFunctions;
 import wts.roms.model.LagrangianParticle;
 
 
@@ -24,30 +29,30 @@ import wts.roms.model.LagrangianParticle;
  * that have terminally molted, mated and extruded their first egg clutch.
  */
 @ServiceProvider(service=LifeStageInterface.class)
-public class FemalePrimiparous extends AbstractBenthicStage {
+public class FemaleAdult extends AbstractBenthicStage {
     
         //Static fields    
             //  Static fields new to this class
     /* flag to do debug operations */
     public static boolean debugOps = false;
     /* Class for attributes */
-    public static final String attributesClass = FemalePrimiparousAttributes.class.getName();
+    public static final String attributesClass = FemaleAdultAttributes.class.getName();
     /* Class for parameters */
-    public static final String parametersClass = FemalePrimiparousParameters.class.getName();
+    public static final String parametersClass = FemaleAdultParameters.class.getName();
     /* Class for feature type for point positions */
     public static final String pointFTClass = wts.models.DisMELS.framework.LHSPointFeatureType.class.getName();
 //            "wts.models.DisMELS.LHS.BenthicAdult.AdultStagePointFT";
     /* Classes for next LHS */
-    public static final String[] nextLHSClasses = new String[]{FemaleMultiparous.class.getName()};
+    public static final String[] nextLHSClasses = new String[]{FemaleAdult.class.getName()};
     /* Classes for spawned LHS */
-    public static final String[] spawnedLHSClasses = new String[]{};
+    public static final String[] spawnedLHSClasses = new String[]{Zooea1.class.getName()};
     
         //Instance fields
             //  Fields hiding ones from superclass
     /** life stage attributes object */
-    protected FemalePrimiparousAttributes atts = null;
+    protected FemaleAdultAttributes atts = null;
     /** life stage parameters object */
-    protected FemalePrimiparousParameters params = null;
+    protected FemaleAdultParameters params = null;
             //  Fields new to class
             //fields that reflect parameter values
     /** flag indicating instance is a super-individual */
@@ -66,7 +71,10 @@ public class FemalePrimiparous extends AbstractBenthicStage {
     protected boolean randomizeTransitions;
     /** stage transition rate */
     protected double stageTransRate;    
-    
+        /** elapsed time to spawn (days) */
+    protected double timeToSpawn = 366;
+     protected double firstDayOfSpawning;
+     protected double lengthOfSpawningSeason;
         //fields that reflect (new) attribute values
     //none
     
@@ -75,20 +83,28 @@ public class FemalePrimiparous extends AbstractBenthicStage {
     private double numTrans;  
      /** day of year */
     private double dayOfYear;
+    private double starvationMort;
+        private boolean isSpawningSeason;
+    /** spawning season flag */
+    /** flag to clean up after spawning */
+    private boolean doOnceAfterSpawningSeason = true;
    
     /** IBM function selected for mortality */
     private IBMFunctionInterface fcnMort = null; 
+    private IBMFunctionInterface fcnGrowth = null;
+    private IBMFunctionInterface fcnFecundity = null;
+ 
     
     /** flag to print debugging info */
     public static boolean debug = false;
     /** logger for class */
-    private static final Logger logger = Logger.getLogger(FemalePrimiparous.class.getName());
+    private static final Logger logger = Logger.getLogger(FemaleAdult.class.getName());
     
     /**
      * This constructor is provided only to facilitate the ServiceProvider functionality.
      * DO NOT USE IT!!
      */
-    public FemalePrimiparous() {
+    public FemaleAdult() {
         super("");
         super.atts = atts;
         super.params = params;
@@ -98,15 +114,15 @@ public class FemalePrimiparous extends AbstractBenthicStage {
      * Creates a new life stage instance with parameters based on the typeName and
      * "default" attributes.
      */
-    public FemalePrimiparous(String typeName) 
+    public FemaleAdult(String typeName) 
                 throws InstantiationException, IllegalAccessException {
         super(typeName);
-        atts   = new FemalePrimiparousAttributes(typeName);
+        atts   = new FemaleAdultAttributes(typeName);
         atts.setValue(LifeStageAttributesInterface.PROP_id,id);
         atts.setValue(LifeStageAttributesInterface.PROP_parentID,id);
         atts.setValue(LifeStageAttributesInterface.PROP_origID,id);
         setAttributesFromSubClass(atts);  //set object in the superclass
-        params = (FemalePrimiparousParameters) LHS_Factory.createParameters(typeName);
+        params = (FemaleAdultParameters) LHS_Factory.createParameters(typeName);
         setParametersFromSubClass(params);//set object in the superclass
         setParameters(params);
     }
@@ -125,10 +141,10 @@ public class FemalePrimiparous extends AbstractBenthicStage {
      * @throws java.lang.IllegalAccessException
      */
     @Override
-    public FemalePrimiparous createInstance(String[] strv) 
+    public FemaleAdult createInstance(String[] strv) 
                         throws InstantiationException, IllegalAccessException {
         LifeStageAttributesInterface theAtts = LHS_Factory.createAttributes(strv);
-        FemalePrimiparous lhs = createInstance(theAtts);
+        FemaleAdult lhs = createInstance(theAtts);
         return lhs;
     }
 
@@ -150,11 +166,11 @@ public class FemalePrimiparous extends AbstractBenthicStage {
      * @throws java.lang.IllegalAccessException
      */
     @Override
-    public FemalePrimiparous createInstance(LifeStageAttributesInterface theAtts)
+    public FemaleAdult createInstance(LifeStageAttributesInterface theAtts)
                         throws InstantiationException, IllegalAccessException {
-        FemalePrimiparous lhs = null;
-        if (theAtts instanceof FemalePrimiparousAttributes) {
-            lhs = new FemalePrimiparous(theAtts.getTypeName());
+        FemaleAdult lhs = null;
+        if (theAtts instanceof FemaleAdultAttributes) {
+            lhs = new FemaleAdult(theAtts.getTypeName());
             long newID = lhs.id;//save id of new instance
             lhs.setAttributes(theAtts);
             if (lhs.atts.getID()==-1) {
@@ -179,7 +195,7 @@ public class FemalePrimiparous extends AbstractBenthicStage {
      *  Returns the associated attributes.  
      */
     @Override
-    public FemalePrimiparousAttributes getAttributes() {
+    public FemaleAdultAttributes getAttributes() {
         return atts;
     }
 
@@ -234,12 +250,15 @@ public class FemalePrimiparous extends AbstractBenthicStage {
      */
     @Override
     public void setAttributes(LifeStageAttributesInterface newAtts) {
-        if (newAtts instanceof FemalePrimiparousAttributes) {
-            FemalePrimiparousAttributes spAtts = (FemalePrimiparousAttributes) newAtts;
+        if (newAtts instanceof FemaleAdolescentAttributes) {
+            FemaleAdolescentAttributes spAtts = (FemaleAdolescentAttributes) newAtts;
             for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
-        } else {
+        } else if(newAtts instanceof FemaleAdultAttributes){
+        FemaleAdultAttributes spAtts = (FemaleAdultAttributes) newAtts;
+            for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
+        }else {
             //TODO: should throw an error here
-            logger.info("FemalePrimiparousAttributes.setAttributes(): no match for attributes type");
+            logger.info("FemaleAdultAttributes.setAttributes(): no match for attributes type");
         }
         id = atts.getValue(LifeStageAttributesInterface.PROP_id, id);
         updateVariables();
@@ -329,18 +348,18 @@ public class FemalePrimiparous extends AbstractBenthicStage {
      *  Returns the associated parameters.  
      */
     @Override
-    public FemalePrimiparousParameters getParameters() {
+    public FemaleAdultParameters getParameters() {
         return params;
     }
 
     /**
      * Sets the parameters for the instance to a cloned version of the input.
-     * @param newParams - should be instance of FemalePrimiparousParameters
+     * @param newParams - should be instance of FemaleAdultParameters
      */
     @Override
     public void setParameters(LifeStageParametersInterface newParams) {
-        if (newParams instanceof FemalePrimiparousParameters) {
-            params = (FemalePrimiparousParameters) newParams;
+        if (newParams instanceof FemaleAdultParameters) {
+            params = (FemaleAdultParameters) newParams;
             setParametersFromSubClass(params);
             setParameterValues();
             setIBMFunctions();
@@ -353,8 +372,10 @@ public class FemalePrimiparous extends AbstractBenthicStage {
      * Sets the IBM functions from the parameters object
      */
     private void setIBMFunctions(){
-        fcnMort = params.getSelectedIBMFunctionForCategory(FemalePrimiparousParameters.FCAT_Mortality);
-    }
+        fcnMort = params.getSelectedIBMFunctionForCategory(FemaleAdultParameters.FCAT_Mortality);
+        fcnGrowth = params.getSelectedIBMFunctionForCategory(FemaleAdultParameters.FCAT_Growth);
+        fcnFecundity = params.getSelectedIBMFunctionForCategory(FemaleAdultParameters.FCAT_Fecundity);
+  }
     
     /*
      * Copy the values from the params map to the param variables.
@@ -374,6 +395,10 @@ public class FemalePrimiparous extends AbstractBenthicStage {
                 params.getValue(params.PARAM_meanStageTransDelay,meanStageTransDelay);
         randomizeTransitions = 
                 params.getValue(params.PARAM_randomizeTransitions,randomizeTransitions);
+        firstDayOfSpawning =
+                params.getValue(params.PARAM_firstDaySpawning, firstDayOfSpawning);
+        lengthOfSpawningSeason =
+                params.getValue(params.PARAM_lengthSpawningSeason, lengthOfSpawningSeason);
     }
     
     /**
@@ -383,11 +408,11 @@ public class FemalePrimiparous extends AbstractBenthicStage {
      */
     @Override
     public Object clone() {
-        FemalePrimiparous clone = null;
+        FemaleAdult clone = null;
         try {
-            clone       = (FemalePrimiparous) super.clone();
-            clone.setAttributes((FemalePrimiparousAttributes) atts.clone());
-            clone.setParameters((FemalePrimiparousParameters) params.clone());
+            clone       = (FemaleAdult) super.clone();
+            clone.setAttributes((FemaleAdultAttributes) atts.clone());
+            clone.setParameters((FemaleAdultParameters) params.clone());
             clone.lp    = (LagrangianParticle) lp.clone();
             clone.track = (ArrayList<Coordinate>) track.clone();
         } catch (CloneNotSupportedException ex) {
@@ -400,10 +425,10 @@ public class FemalePrimiparous extends AbstractBenthicStage {
     public List<LifeStageInterface> getMetamorphosedIndividuals(double dt) {
         double dtp = 0.25*(dt/DAY_SECS);//use 1/4 timestep (converted from sec to d)
         output.clear();
-        List<LifeStageInterface> nLHSs=null;
+        List<LifeStageInterface> nLHS;
         if ((ageInStage+dtp>=minStageDuration)&&(size>=minSizeAtTrans)) {
-            nLHSs = createNextLHSs();
-            if (nLHSs!=null) output.addAll(nLHSs);
+            nLHS = createNextLHSs();
+            if (nLHS!=null) output.addAll(nLHS);
         }
         return output;
     }
@@ -425,6 +450,7 @@ public class FemalePrimiparous extends AbstractBenthicStage {
                  */
                 nLHSs = LHS_Factory.createNextLHSsFromSuperIndividual(typeName,this,numTrans);
                 numTrans = 0.0;//reset numTrans to zero
+                starvationMort = 0.0;
             } else {
                 /** 
                  * Since this is a single individual making a transition, we should
@@ -450,7 +476,112 @@ public class FemalePrimiparous extends AbstractBenthicStage {
     @Override
     public List<LifeStageInterface> getSpawnedIndividuals() {
         output.clear();
+        //logger.info("Adult "+id+": "+isSpawningSeason+", "+elapsedTimeToSpawn);
+        if (isSpawningSeason && (timeToSpawn<0)) doSpawning();
         return output;
+    }
+    
+    private void doSpawning() {
+        try {
+            //create number of new individuals = fecundity
+            //logger.info("Adult"+id+" spawning: fecundity = "+fecundity);
+            LifeStageInterface nLHS = null;
+            LifeStageAttributesInterface newAttsI = null;
+            Double fecundity = (Double) fcnFecundity.calculate(size);
+            for (int i=0;i<fecundity;i++) {
+                /** 
+                 * For each individual, we need to:
+                 *          1) create new LHS instance.
+                 *          2. assign new id to new instance (gets done automatically).
+                 *          3) assign current LHS id to new LHS as parentID
+                 *          4) assign current LHS id to new LHS origID
+                 *          5) set number in new LHS to 1.TODO: change this to a variable.
+                 *          6) set age and ageInStage to 0 in new instance.
+                 *          7) copy other attributes.
+                 */
+                nLHS = LHS_Factory.createSpawnedLHS(typeName);
+                newAttsI = nLHS.getAttributes();
+                if (newAttsI instanceof Zooea1Attributes) {
+                    Zooea1Attributes newAtts = (Zooea1Attributes) newAttsI;
+                    //newAtts.setValue(LifeStageAttributesInterface.PROP_id,         -1);<-don't need to update this
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_parentID,   atts.getValue(LifeStageAttributesInterface.PROP_id));
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_origID,     atts.getValue(LifeStageAttributesInterface.PROP_id));
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_startTime,  time);
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_time,       atts.getValue(LifeStageAttributesInterface.PROP_time));
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_horizType,  atts.getValue(LifeStageAttributesInterface.PROP_horizType));
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_vertType,   atts.getValue(LifeStageAttributesInterface.PROP_vertType));
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_horizPos1,  atts.getValue(LifeStageAttributesInterface.PROP_horizPos1));
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_horizPos2,  atts.getValue(LifeStageAttributesInterface.PROP_horizPos2));
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_vertPos,    atts.getValue(LifeStageAttributesInterface.PROP_vertPos));
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_gridCellID, atts.getValue(LifeStageAttributesInterface.PROP_gridCellID));
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_track,      atts.getValue(LifeStageAttributesInterface.PROP_track));
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_active,     true);
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_alive,      true);
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_age,        0.0);
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_ageInStage, 0.0);
+                    newAtts.setValue(LifeStageAttributesInterface.PROP_number,     1.0);//TODO:change this to fecundity/numSpawnPerIndiv
+                    newAtts.setValue(Zooea1Attributes.PROP_salinity,   atts.getValue(atts.PROP_salinity));
+                    newAtts.setValue(Zooea1Attributes.PROP_temperature,atts.getValue(atts.PROP_temperature));
+                    newAtts.setValue(Zooea1Attributes.PROP_ph,atts.getValue(atts.PROP_ph));
+                    //copy LagrangianParticle information
+                    nLHS.setLagrangianParticle(lp);
+                    //start track at last position of oldLHS track
+                    nLHS.startTrack(track.get(track.size()-1),COORDINATE_TYPE_PROJECTED);
+                    nLHS.startTrack(trackLL.get(trackLL.size()-1),COORDINATE_TYPE_GEOGRAPHIC);
+                    //update local variables to capture changes made here
+                    nLHS.setAttributes(newAtts);
+                } else {
+                    //should throw error
+                    logger.info("AdultStage.doSpawning(): no match for attributes type:"+newAttsI.toString());
+                }
+                output.add(nLHS);
+                nLHS = null;
+            }
+
+                //spawning only occurs once per season, so set to infinity
+                timeToSpawn = Double.POSITIVE_INFINITY;
+
+        } catch (IllegalAccessException | InstantiationException ex) {
+            ex.printStackTrace();
+        }
+    }
+    
+    /**
+     * Initializes time-dependent and time-independent variables
+     * @param time
+     */
+    private void initializeTimedependentVariables() {
+        //temporarily set calendar time to variable time
+        CalendarIF cal = globalInfo.getCalendar();
+        long modTime = cal.getTimeOffset();
+        cal.setTimeOffset((long) time);
+        dayOfYear = cal.getYearDay();
+        
+        //set up spawning
+        isSpawningSeason = DateTimeFunctions.isBetweenDOY(dayOfYear,
+                                                          firstDayOfSpawning,
+                                                          firstDayOfSpawning+lengthOfSpawningSeason);        
+        if (!isSpawningSeason) {
+            //we're starting outside the spawning season, set up for next one
+            setupSpawningSeason();
+        } else {
+            //we're starting in the middle of a spawning season
+     doOnceAfterSpawningSeason = true;
+                    timeToSpawn = (lengthOfSpawningSeason-(dayOfYear-firstDayOfSpawning))/2.0;
+                
+            
+        }
+        
+        //reset calendar time to model time
+        cal.setTimeOffset(modTime);
+    }
+    
+     private void setupSpawningSeason() {
+        doOnceAfterSpawningSeason = false;
+        //Set up time of first spawning
+
+        timeToSpawn = (lengthOfSpawningSeason/2.0)*DAY_SECS;
+ 
     }
     
     /**
@@ -474,6 +605,7 @@ public class FemalePrimiparous extends AbstractBenthicStage {
         zPos       = atts.getValue(LifeStageAttributesInterface.PROP_vertPos,zPos);
         time       = startTime;
         numTrans   = 0.0; //set numTrans to zero
+        starvationMort = 0.0;
         if (debug) {
             logger.info("\n---------------Setting initial position------------");
             logger.info(hType+cc+vType+cc+startTime+cc+xPos+cc+yPos+cc+zPos);
@@ -491,9 +623,29 @@ public class FemalePrimiparous extends AbstractBenthicStage {
             double K = 0;  //benthic adult starts out on bottom
             double z = i3d.interpolateBathymetricDepth(IJ);
             if (debug) logger.info("Bathymetric depth = "+z);
+            double ssh = i3d.interpolateSSH(IJ);
+
+            if (vType==Types.VERT_K) {
+                if (zPos<0) {K = 0;} else
+                if (zPos>i3d.getGrid().getN()) {K = i3d.getGrid().getN();} else
+                K = zPos;
+            } else if (vType==Types.VERT_Z) {//depths negative
+                if (zPos<-z) {K = 0;} else                     //at bottom
+                if (zPos>ssh) {K = i3d.getGrid().getN();} else //at surface
+                K = i3d.calcKfromZ(IJ[0],IJ[1],zPos);          //at requested depth
+            } else if (vType==Types.VERT_H) {//depths positive
+                if (zPos>z) {K = 0;} else                       //at bottom
+                if (zPos<-ssh) {K = i3d.getGrid().getN();} else //at surface
+                K = i3d.calcKfromZ(IJ[0],IJ[1],-zPos);          //at requested depth
+            } else if (vType==Types.VERT_DH) {//distance off bottom
+                if (zPos<0) {K = 0;} else                        //at bottom
+                if (zPos>z+ssh) {K = i3d.getGrid().getN();} else //at surface
+                K = i3d.calcKfromZ(IJ[0],IJ[1],-(z-zPos));       //at requested distance off bottom
+            }
             lp.setIJK(IJ[0],IJ[1],K);
             //reset track array
             track.clear();
+            trackLL.clear();
             //set horizType to lat/lon and vertType to depth
             atts.setValue(LifeStageAttributesInterface.PROP_horizType,Types.HORIZ_LL);
             atts.setValue(LifeStageAttributesInterface.PROP_vertType,Types.VERT_H);
@@ -507,14 +659,27 @@ public class FemalePrimiparous extends AbstractBenthicStage {
             }
             interpolateEnvVars(pos);
             updateAttributes(); 
-        }
-        updateVariables();//set instance variables to attribute values
+        };//set instance variables to attribute values
+        initializeTimedependentVariables();
     }
     
     @Override
     public void step(double dt) throws ArrayIndexOutOfBoundsException {
         //determine daytime/nighttime
         dayOfYear = globalInfo.getCalendar().getYearDay();
+        starvationMort = 0.0;
+        numTrans = 0.0;
+//        isDaytime = DateTimeFunctions.isDaylight(lon,lat,dayOfYear);
+        isSpawningSeason = DateTimeFunctions.isBetweenDOY(dayOfYear,firstDayOfSpawning,firstDayOfSpawning+lengthOfSpawningSeason);
+        if (isSpawningSeason) {
+            timeToSpawn = timeToSpawn-dt;
+            doOnceAfterSpawningSeason = true;
+        } else {
+            if (doOnceAfterSpawningSeason) {
+                setupSpawningSeason();
+            }
+        }
+        starvationMort = 0.0;
         //movement here
         //TODO: revise so no advection by currents!
         double[] pos;
@@ -533,9 +698,9 @@ public class FemalePrimiparous extends AbstractBenthicStage {
             lp.doCorrectorStep();
             pos = lp.getIJK();
         time = time+dt;
-        updateSize(dt);
-        updateNum(dt);
         updateAge(dt);
+        updateWeight(dt);
+        updateNum(dt);
         updatePosition(pos);
         interpolateEnvVars(pos);
         //check for exiting grid
@@ -570,15 +735,13 @@ public class FemalePrimiparous extends AbstractBenthicStage {
     private void updateAge(double dt) {
         age        = age+dt/DAY_SECS;
         ageInStage = ageInStage+dt/DAY_SECS;
+        ageInInstar = ageInInstar+dt/DAY_SECS;
         if (ageInStage>maxStageDuration) {
             alive = false;
             active = false;
         }
     }
 
-    private void updateSize(double dt) {
-        //TODO: implement!
-    }
 
     /**
      * Updates weight.
@@ -586,8 +749,17 @@ public class FemalePrimiparous extends AbstractBenthicStage {
      * @param dt - time step in seconds
      */
     private void updateWeight(double dt) {
-        //TODO: implement!
+        //todo - Add in cost of reproduction!
+        fcnGrowth.setParameterValue("sex", 1.0);
+        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, 0});
+        if(growthRate>0){
+            weight = weight*Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
+        } else{
+            double totRate = Math.max(-1.0,growthRate/weight);
+            starvationMort = -Math.log(-(.0099+totRate))*(dt/DAY_SECS);
+        }
     }
+
 
     /**
      *
@@ -609,15 +781,12 @@ public class FemalePrimiparous extends AbstractBenthicStage {
              */
             mortalityRate = (Double)fcnMort.calculate(temperature);//using temperature as covariate for mortality
         }
-        double totRate = mortalityRate;
-        if ((ageInStage>=minStageDuration)) {
-            totRate += stageTransRate;
-            //apply mortality rate to previous number transitioning and
-            //add in new transitioners
-            numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
-                    (stageTransRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
-        }
+        double totRate = mortalityRate + starvationMort;
+       
         number = number*Math.exp(-dt*totRate/DAY_SECS);
+        if(number==0){
+            active=false;alive=false;number=number+numTrans;
+        }
     }
 
     private void updatePosition(double[] pos) {
@@ -718,8 +887,13 @@ public class FemalePrimiparous extends AbstractBenthicStage {
         //update superclass attributes
         super.updateAttributes();
         //update new attributes
-//        //no new attributes, but would look like:
-//        atts.setValue(MaleImmatureAttributes.PROP_size,size);
+        atts.setValue(FemaleAdultAttributes.PROP_size,size);
+        atts.setValue(FemaleAdultAttributes.PROP_weight,weight);
+        atts.setValue(FemaleAdultAttributes.PROP_ageInInstar,ageInInstar);
+        atts.setValue(FemaleAdultAttributes.PROP_instar,instar);
+        atts.setValue(FemaleAdultAttributes.PROP_salinity,salinity);
+        atts.setValue(FemaleAdultAttributes.PROP_temperature,temperature);
+        atts.setValue(FemaleAdultAttributes.PROP_ph,ph);
     }
 
     /**
@@ -730,7 +904,12 @@ public class FemalePrimiparous extends AbstractBenthicStage {
         //update superclass variables
         super.updateVariables();
         //update new variables
-//        //no new variables, but would look like:
-//        size        = atts.getValue(FemaleImmatureAttributes.PROP_size,size);
+       size        = atts.getValue(FemaleAdultAttributes.PROP_size,size);
+       weight      = atts.getValue(FemaleAdultAttributes.PROP_weight, weight);
+       ageInInstar = atts.getValue(FemaleAdultAttributes.PROP_ageInInstar, ageInInstar);
+       instar      = atts.getValue(FemaleAdultAttributes.PROP_instar, instar);
+       salinity    = atts.getValue(FemaleAdultAttributes.PROP_salinity,salinity);
+       temperature = atts.getValue(FemaleAdultAttributes.PROP_temperature,temperature);
+       ph        = atts.getValue(FemaleAdultAttributes.PROP_ph,ph);
     }
 }
