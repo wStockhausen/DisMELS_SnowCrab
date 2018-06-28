@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.openide.util.lookup.ServiceProvider;
+import wts.models.DisMELS.IBMFunctions.Growth.LinearGrowthFunction;
 import wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction;
 import wts.models.DisMELS.IBMFunctions.Miscellaneous.PowerLawFunction;
 import wts.models.DisMELS.framework.AbstractLHSParameters;
@@ -97,6 +98,9 @@ public class MaleAdultParameters extends AbstractLHSParameters {
     @Override
     protected final void createMapToSelectedFunctions() {
         //create the set of function category keys for this class
+                //create the set of function category keys for this class
+        setOfFunctionCategories.add(FCAT_Growth);
+
         setOfFunctionCategories.add(FCAT_Mortality);
         
         //create the map from function categories to potential functions in each category
@@ -117,10 +121,11 @@ public class MaleAdultParameters extends AbstractLHSParameters {
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
             
         cat = FCAT_Growth;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        mapOfPotentialFunctions = new LinkedHashMap<>(4); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new CrabBioenergeticsGrowthFunction();  //generic function, so change defaults
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
-        
+        ifi = new ConstantFunction();
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
     }
     
     /**

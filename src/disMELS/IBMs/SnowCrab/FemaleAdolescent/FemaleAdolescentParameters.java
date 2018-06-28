@@ -26,6 +26,7 @@ import SnowCrabFunctions.CrabBioenergeticsGrowthFunction;
 import SnowCrabFunctions.MoltIncrementFunction;
 import SnowCrabFunctions.IntermoltPeriodFunction;
 import SnowCrabFunctions.ExCostFunction;
+import wts.models.DisMELS.IBMFunctions.Growth.LinearGrowthFunction;
 
 /**
  * DisMELS class representing attributes for adolescent female snow crab. 
@@ -131,9 +132,16 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
         //create the map from function categories to potential functions in each category
         String cat; Map<String,IBMFunctionInterface> mapOfPotentialFunctions; IBMFunctionInterface ifi;
         cat = FCAT_Growth;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        mapOfPotentialFunctions = new LinkedHashMap<>(6); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new CrabBioenergeticsGrowthFunction(); 
         mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new ConstantFunction();  //generic function, so change defaults
+            ifi.setFunctionName("Constant growth rate"); 
+            ifi.setDescription("Constant growth rate [mm/day]"); 
+            ifi.setParameterDescription(ConstantFunction.PARAM_constant,"Constant growth rate [mm/day]");
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new LinearGrowthFunction();
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_Mortality;  
         mapOfPotentialFunctions = new LinkedHashMap<>(4); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
@@ -148,6 +156,8 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
             ifi.setParameterDescription(PowerLawFunction.PARAM_stdVal,"mortality rate at standard size (z0) [1/day]");
             ifi.setParameterDescription(PowerLawFunction.PARAM_stdX,"standard size z0 [cm]");
             ifi.setParameterDescription(PowerLawFunction.PARAM_exponent,"exponent (<0 for decreasing function of size)");
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+              ifi = new LinearGrowthFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_Maturity;  

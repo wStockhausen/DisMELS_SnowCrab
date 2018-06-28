@@ -657,6 +657,9 @@ public class MaleAdult extends AbstractBenthicStage {
         if((starvCounter)>maxStarvTime){
             active=false;alive=false;number=0;
         }
+        //if(starvCounter>maxStarvTime){
+        //    active=false; alive=false; number = 0;
+        //}
     }
 
     private void updatePosition(double[] pos) {
