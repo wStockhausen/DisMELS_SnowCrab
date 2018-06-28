@@ -584,6 +584,7 @@ public class MaleAdolescent extends AbstractBenthicStage {
         dayOfYear = globalInfo.getCalendar().getYearDay();
         starvationMort = 0.0;
         numTrans = 0.0;
+        molted = false;
         //movement here
         double[] pos;
             double[] uv = calcUV(dt);
@@ -651,21 +652,26 @@ public class MaleAdolescent extends AbstractBenthicStage {
         if(instar<8){
             D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
         } else{
+            //Set percentage of skip molters at 5%
+            if(rng.computeUniformVariate(0, 1)<=0.95){
             D = 365.0;
+            } else{
+               D = 730.0; 
+        }
         }
         exTot = (Double) fcnExCost.calculate(size);
         if((ageInInstar+dt/DAY_SECS)>D){
-            boolean mat = (Boolean) fcnMaturity.calculate(new double[]{size,temperature});
-            
             Double newSize = (Double) fcnMolt.calculate(size);
-            Double minWeightGain = aLW*((1-confInt)*Math.pow(newSize,bLW) - ((1+confInt)*Math.pow(size,bLW)));
-            Double maxWeightGain = aLW*((1+confInt)*Math.pow(newSize,bLW) - ((1-confInt)*Math.pow(size,bLW)));
-            if(weightCounter<minWeightGain){
-                active=false;alive=false;number=0;
-            }
-            if(weightCounter>maxWeightGain){
+            boolean mat = (Boolean) fcnMaturity.calculate(new double[]{size,temperature});
+            //     Double minWeightGain = aLW*((1-confInt)*Math.pow(newSize,bLW) - ((1+confInt)*Math.pow(size,bLW)));
+            //Double maxWeightGain = aLW*((1+confInt)*Math.pow(newSize,bLW) - ((1-confInt)*Math.pow(size,bLW)));
+            //if(weightCounter<minWeightGain){
+            //    active=false;alive=false;number=0;
+            //}
+            
+            
                 weight = aLW*Math.pow(newSize,bLW);
-            }
+
             size = newSize;
             instar += 1;
             ageInInstar = 0.0;
@@ -682,23 +688,15 @@ public class MaleAdolescent extends AbstractBenthicStage {
      * @param dt - time step in seconds
      */
     private void updateWeight(double dt) {
-        //double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
-        double exPerDay = Math.exp(0.9786)*Math.pow(size, -0.9281);
-        fcnGrowth.setParameterValue("sex", 0.0);
-                double[] growthFun= (double[]) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
-        double growthRate = growthFun[0];
-        exEnergy += growthFun[1];
-        double growthMult =Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
-        if(growthMult>percLostWeight){
-            weightCounter += weight*growthMult;
-            weight = weight*growthMult;
-        } else{
-            starvCounter=starvCounter+dt;
-        } 
+        
+        //double exPerDay = Math.exp(0.9786)*Math.pow(size, -0.9281);
+        //fcnGrowth.setParameterValue("sex", 0.0);
+        double growthRate= (Double) fcnGrowth.calculate(new double[]{1.0});
+        //double growthRate = growthFun[0];
+        //exEnergy += growthFun[1];
+        weight = weight*Math.exp(((dt/DAY_SECS)*growthRate));
         if(molted){
-            weight = weight - exTot;
             molted = false;
-            weightCounter = 0.0;
             exEnergy = 0.0;
         }
     }
@@ -741,10 +739,10 @@ public class MaleAdolescent extends AbstractBenthicStage {
         if(number<0.01){
             active=false;alive=false;number=number+numTrans;
         }
-        if((starvCounter)>maxStarvTime){
-            active=false;alive=false;number=0;
+        //if(starvCounter>maxStarvTime){
+        //    active=false; alive=false; number = 0;
+        //}
         }
-    }
 
     private void updatePosition(double[] pos) {
         depth = -i3d.calcZfromK(pos[0],pos[1],pos[2]);

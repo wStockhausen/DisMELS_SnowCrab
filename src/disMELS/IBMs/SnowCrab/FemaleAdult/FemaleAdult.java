@@ -765,14 +765,14 @@ public class FemaleAdult extends AbstractBenthicStage {
      */
     private void updateWeight(double dt) {
         //todo - Add in cost of reproduction!
-        fcnGrowth.setParameterValue("sex", 1.0);
-        double[] growthRate = (double[]) fcnGrowth.calculate(new double[]{instar, weight, temperature, 0});
-        double weightInc = Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate[0])));
-        if(weightInc >= percLostWeight){
-            weight = weight*weightInc;
-        } else{
-            starvCounter = starvCounter + dt;
-        }
+        //fcnGrowth.setParameterValue("sex", 1.0);
+        double growthRate = (Double) fcnGrowth.calculate(new double[]{1.0});
+        weight = Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
+        //if(weightInc >= percLostWeight){
+        //    weight = weight*weightInc;
+        //} else{
+        //    starvCounter = starvCounter + dt;
+        //}
 
     }
 
@@ -808,9 +808,9 @@ public class FemaleAdult extends AbstractBenthicStage {
                 number = 0;
             }
         }
-        if((starvCounter)>maxStarvTime){
-            active=false;alive=false;number=0;
-        }
+        //if((starvCounter)>maxStarvTime){
+         //   active=false;alive=false;number=0;
+        //}
     }
 
     private void updatePosition(double[] pos) {
