@@ -766,8 +766,7 @@ public class FemaleAdult extends AbstractBenthicStage {
     private void updateWeight(double dt) {
         //todo - Add in cost of reproduction!
         //fcnGrowth.setParameterValue("sex", 1.0);
-        double growthRate = (Double) fcnGrowth.calculate(new double[]{1.0});
-        weight = Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
+         weight= (Double) fcnGrowth.calculate(new double[]{dt/DAY_SECS, weight});
         //if(weightInc >= percLostWeight){
         //    weight = weight*weightInc;
         //} else{

@@ -751,10 +751,10 @@ public class MaleImmature extends AbstractBenthicStage {
         
         //double exPerDay = Math.exp(0.9786)*Math.pow(size, -0.9281);
         //fcnGrowth.setParameterValue("sex", 0.0);
-        double growthRate= (Double) fcnGrowth.calculate(new double[]{1.0});
+        //double growthRate= (Double) fcnGrowth.calculate(new double[]{1.0});
         //double growthRate = growthFun[0];
         //exEnergy += growthFun[1];
-        weight = weight*Math.exp(((dt/DAY_SECS)*growthRate));
+         weight= (Double) fcnGrowth.calculate(new double[]{dt/DAY_SECS, weight});
         if(molted){
             molted = false;
             exEnergy = 0.0;
