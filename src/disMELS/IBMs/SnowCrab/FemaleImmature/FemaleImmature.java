@@ -295,10 +295,7 @@ public class FemaleImmature extends AbstractBenthicStage {
             key = MegalopaAttributes.PROP_temperature;      atts.setValue(key, spAtts.getValue(key));
             key = MegalopaAttributes.PROP_ph;     atts.setValue(key, spAtts.getValue(key));
             key = MegalopaAttributes.PROP_salinity;      atts.setValue(key, spAtts.getValue(key));
-            key = MegalopaAttributes.PROP_number;     
-            //Need to cut numbers in half
-            Double value = (Double) spAtts.getValue(key)*sexRatio;
-            atts.setValue(key, value);
+            key = MegalopaAttributes.PROP_number;     atts.setValue(key, spAtts.getValue(key));
             key = MegalopaAttributes.PROP_shellthick; atts.setValue(key, spAtts.getValue(key));
 
             size = params.getValue(FemaleImmatureParameters.PARAM_initialSize, size);

@@ -121,11 +121,13 @@ public class MaleAdultParameters extends AbstractLHSParameters {
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
             
         cat = FCAT_Growth;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(4); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        mapOfPotentialFunctions = new LinkedHashMap<>(6); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new CrabBioenergeticsGrowthFunction();  //generic function, so change defaults
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new ConstantFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new LinearGrowthFunction();
+        mapOfPotentialFunctions.put(ifi.getFunctionName(), ifi);
     }
     
     /**

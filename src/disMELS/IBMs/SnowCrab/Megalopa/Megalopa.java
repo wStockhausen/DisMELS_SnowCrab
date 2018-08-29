@@ -43,8 +43,7 @@ public class Megalopa extends AbstractPelagicStage {
 //            wts.models.DisMELS.IBMs.Arrowtooth.EggStage.EggStagePointFT.class.getName();
     /* Classes for next LHS */
     public static final String[] nextLHSClasses = new String[]{Megalopa.class.getName(),
-                                                               FemaleImmature.class.getName(),
-                                                               MaleImmature.class.getName()};
+                                                               FemaleImmature.class.getName()};
     /* Classes for spawned LHS */
     public static final String[] spawnedLHSClasses = new String[]{};
     
@@ -722,7 +721,10 @@ public class Megalopa extends AbstractPelagicStage {
             weight += rate*dt/DAY_SECS;
         }
         if(weight>minWeight){
+            Double bool = rng.computeUniformVariate(0, 1);
+            if(bool>0.5){
             numTrans += 1;
+        }
         }
     }
 

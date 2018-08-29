@@ -296,9 +296,7 @@ public class MaleImmature extends AbstractBenthicStage {
             key = MegalopaAttributes.PROP_track;      atts.setValue(key, spAtts.getValue(key));
             key = MegalopaAttributes.PROP_active;     atts.setValue(key, spAtts.getValue(key));
             key = MegalopaAttributes.PROP_alive;      atts.setValue(key, spAtts.getValue(key));
-            key = MegalopaAttributes.PROP_number;     
-            Double value = (Double) spAtts.getValue(key)*sexRatio;
-            atts.setValue(key, value);
+            key = MegalopaAttributes.PROP_number;    atts.setValue(key, spAtts.getValue(key));
             key = MegalopaAttributes.PROP_shellthick; atts.setValue(key, spAtts.getValue(key));
             key = MegalopaAttributes.PROP_ph;      atts.setValue(key, spAtts.getValue(key));
             key = MegalopaAttributes.PROP_temperature;      atts.setValue(key, spAtts.getValue(key));
