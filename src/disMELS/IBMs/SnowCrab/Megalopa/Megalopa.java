@@ -722,9 +722,7 @@ public class Megalopa extends AbstractPelagicStage {
         }
         if(weight>minWeight){
             Double bool = rng.computeUniformVariate(0, 1);
-            if(bool>0.5){
             numTrans += 1;
-        }
         }
     }
 
