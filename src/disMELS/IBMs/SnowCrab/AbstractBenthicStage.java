@@ -97,6 +97,8 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
     protected double  lon=0;
     /** current depth, in meters */
     protected double  depth=0;
+    /** current bathymetric depth, in meters */
+    protected double  bathym=0;
     /** current ROMS grid cell, as a string */
     protected String  gridCellID="";
     /** total age, in days */
@@ -278,7 +280,7 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
     }
 
     /**
-     * Returns the reportfor the implementing class as a CSV formatted string.
+     * Returns the report for the implementing class as a CSV formatted string.
      *
      * @return - the attributes and track as a csv-formatted String
      */
@@ -293,6 +295,12 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
     @Override
    public abstract String getReportHeader();
     
+   /**
+    * Sets the tolerance used to determine whether an individual is "at" the
+    * edge of the grid.
+    * 
+    * @param newTol 
+    */
     @Override
     public void setGridEdgeTolerance(double newTol){
         tolGridEdge = newTol;
@@ -370,6 +378,7 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
         key = LifeStageAttributesInterface.PROP_horizPos1;  atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_horizPos2;  atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_vertPos;    atts.setValue(key,newAtts.getValue(key));
+        key = LifeStageAttributesInterface.PROP_bathym;     atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_gridCellID; atts.setValue(key,newAtts.getValue(key));
         
         key = LifeStageAttributesInterface.PROP_age;        atts.setValue(key,newAtts.getValue(key));
@@ -402,6 +411,7 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
         atts.setValue(AbstractBenthicStageAttributes.PROP_horizPos1,lon);
         atts.setValue(AbstractBenthicStageAttributes.PROP_horizPos2,lat);
         atts.setValue(AbstractBenthicStageAttributes.PROP_vertPos,depth);
+        atts.setValue(AbstractBenthicStageAttributes.PROP_bathym,bathym);
         atts.setValue(AbstractBenthicStageAttributes.PROP_gridCellID,gridCellID);
         atts.setValue(AbstractBenthicStageAttributes.PROP_age,age);
         atts.setValue(AbstractBenthicStageAttributes.PROP_ageInStage,ageInStage);
@@ -430,6 +440,7 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
         lon        = atts.getValue(AbstractBenthicStageAttributes.PROP_horizPos1,lon);
         lat        = atts.getValue(AbstractBenthicStageAttributes.PROP_horizPos2,lat);
         depth      = atts.getValue(AbstractBenthicStageAttributes.PROP_vertPos,depth);
+        bathym     = atts.getValue(AbstractBenthicStageAttributes.PROP_bathym,bathym);
         gridCellID = atts.getValue(AbstractBenthicStageAttributes.PROP_gridCellID,gridCellID);
         age        = atts.getValue(AbstractBenthicStageAttributes.PROP_age,age);
         ageInStage = atts.getValue(AbstractBenthicStageAttributes.PROP_ageInStage,ageInStage);

@@ -7,12 +7,10 @@ package disMELS.IBMs.SnowCrab.FemaleAdolescent;
 import SnowCrabFunctions.MaturityOgiveFunction;
 import java.beans.PropertyChangeSupport;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.openide.util.lookup.ServiceProvider;
-import wts.models.DisMELS.IBMFunctions.Growth.vonBertalanffyGrowthFunction;
 import wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction;
 import wts.models.DisMELS.IBMFunctions.Miscellaneous.LogisticFunction;
 import wts.models.DisMELS.IBMFunctions.Miscellaneous.PowerLawFunction;
@@ -61,23 +59,15 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
     public static final String FCAT_MoltTiming       = "intermolt period";
     public static final String FCAT_ExCost      = "exuviae cost";
     
-    /** The 'keys' used to store the ibm functions */
-    protected static final Set<String> setOfFunctionCategories = new LinkedHashSet<>(2*numFunctionCats);
-    /** The 'keys' used to store the ibm parameters */
-    protected static final Set<String> setOfParamKeys = new LinkedHashSet<>(2*numParams);
-    
     private static final Logger logger = Logger.getLogger(FemaleAdolescentParameters.class.getName());
-    
-    /** Utility field used by bound properties.  */
-    private transient PropertyChangeSupport propertySupport;
     
     /**
      * Creates a new instance of AdultStageParameters.
      */
     public FemaleAdolescentParameters() {
         super("",numParams,numFunctionCats);
-        createMapToValues();
-        createMapToSelectedFunctions();
+        createMapToParameters();
+        createMapToPotentialFunctions();
         propertySupport =  new PropertyChangeSupport(this);
     }
     
@@ -86,8 +76,8 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
      */
     public FemaleAdolescentParameters(String typeName) {
         super(typeName,numParams,numFunctionCats);
-        createMapToValues();
-        createMapToSelectedFunctions();
+        createMapToParameters();
+        createMapToPotentialFunctions();
         propertySupport =  new PropertyChangeSupport(this);
     }
     
@@ -95,37 +85,33 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
      * This creates the basic parameters mapParams.
      */
     @Override
-    protected final void createMapToValues() {
+    protected final void createMapToParameters() {
         String key;
-        key = PARAM_isSuperIndividual;    setOfParamKeys.add(key); mapParams.put(key,new IBMParameterBoolean(key,key,false));
-        key = PARAM_horizRWP;             setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
-        key = PARAM_minStageDuration;     setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
-        key = PARAM_maxStageDuration;     setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,365.0));
-        key = PARAM_minSizeAtTrans;       setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
-        key = PARAM_meanStageTransDelay;  setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
-        key = PARAM_randomizeTransitions; setOfParamKeys.add(key); mapParams.put(key,new IBMParameterBoolean(key,key,false));
+        key = PARAM_isSuperIndividual;     mapParams.put(key,new IBMParameterBoolean(key,key,false));
+        key = PARAM_horizRWP;              mapParams.put(key,new IBMParameterDouble(key,key,0.0));
+        key = PARAM_minStageDuration;      mapParams.put(key,new IBMParameterDouble(key,key,0.0));
+        key = PARAM_maxStageDuration;      mapParams.put(key,new IBMParameterDouble(key,key,365.0));
+        key = PARAM_minSizeAtTrans;        mapParams.put(key,new IBMParameterDouble(key,key,0.0));
+        key = PARAM_meanStageTransDelay;   mapParams.put(key,new IBMParameterDouble(key,key,0.0));
+        key = PARAM_randomizeTransitions;  mapParams.put(key,new IBMParameterBoolean(key,key,false));
     }
 
     @Override
-    protected final void createMapToSelectedFunctions() {
-        //create the set of function category keys for this class
-        setOfFunctionCategories.add(FCAT_Growth);
-        setOfFunctionCategories.add(FCAT_Mortality);
-        setOfFunctionCategories.add(FCAT_Maturity);
-        setOfFunctionCategories.add(FCAT_Fecundity);
-        setOfFunctionCategories.add(FCAT_Molt);
-        setOfFunctionCategories.add(FCAT_MoltTiming);
-        setOfFunctionCategories.add(FCAT_ExCost);
-        
+    protected final void createMapToPotentialFunctions() {
         //create the map from function categories to potential functions in each category
-        String cat; Map<String,IBMFunctionInterface> mapOfPotentialFunctions; IBMFunctionInterface ifi;
+        String cat; 
+        Map<String,IBMFunctionInterface> mapOfPotentialFunctions; 
+        IBMFunctionInterface ifi;
+        
         cat = FCAT_Growth;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        mapOfPotentialFunctions = new LinkedHashMap<>(2); 
+        mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new CrabBioenergeticsGrowthFunction(); 
         mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_Mortality;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(4); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        mapOfPotentialFunctions = new LinkedHashMap<>(4); 
+        mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new ConstantFunction();  //generic function, so change defaults
             ifi.setFunctionName("Constant mortality rate"); 
             ifi.setDescription("Constant mortality rate [1/day]"); 
@@ -140,7 +126,8 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_Maturity;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(6); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        mapOfPotentialFunctions = new LinkedHashMap<>(6); 
+        mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new ConstantFunction(); 
             ifi.setFunctionName("Constant fraction mature");
             ifi.setDescription("constant fraction mature");
@@ -156,7 +143,8 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_Fecundity;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(4); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        mapOfPotentialFunctions = new LinkedHashMap<>(4); 
+        mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new ConstantFunction(); 
             ifi.setFunctionName("Constant fecundity");
             ifi.setDescription("constant fecundity");
@@ -172,57 +160,22 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
             
                         
        cat = FCAT_Molt;
-       mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+       mapOfPotentialFunctions = new LinkedHashMap<>(2); 
+       mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
        ifi = new MoltIncrementFunction();
                mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
                
        cat = FCAT_MoltTiming;
-       mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+       mapOfPotentialFunctions = new LinkedHashMap<>(2); 
+       mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
        ifi = new IntermoltPeriodFunction();
                mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
                
        cat = FCAT_ExCost;
-       mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+       mapOfPotentialFunctions = new LinkedHashMap<>(2); 
+       mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
        ifi = new ExCostFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
-    }
-    
-    /**
-     * Returns the IBMFunctionInterface object corresponding to the 
-     * given category and function key. 
-     * 
-     * As a DEFAULT IMPLEMENTATION, this method throws an UnsupportedOperationException 
-     * 
-     * This method SHOULD BE OVERRIDDEN by subclasses that use IBMFunctions.
-     * 
-     * @param cat  - usage category 
-     * @param name - function name
-     * @return   - the model function
-     */
-    @Override
-    public IBMFunctionInterface getIBMFunction(String cat, String key){
-        return mapOfPotentialFunctionsByCategory.get(cat).get(key);    
-    }
-
-    @Override
-    public Set<String> getIBMFunctionCategories(){
-        return mapOfPotentialFunctionsByCategory.keySet();
-    }
-    
-    @Override
-    public Set<String> getIBMFunctionNamesByCategory(String cat){
-        return mapOfPotentialFunctionsByCategory.get(cat).keySet();
-    }
-    
-    @Override
-   public void selectIBMFunctionForCategory(String cat, String key){
-        IBMFunctionInterface ifi = mapOfPotentialFunctionsByCategory.get(cat).get(key);
-        mapOfSelectedFunctionsByCategory.put(cat,ifi);
-    }
-
-    @Override
-    public Set<String> getIBMParameterNames() {
-        return setOfParamKeys;
     }
     
     /**
@@ -235,11 +188,11 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
         FemaleAdolescentParameters clone = null;
         try {
             clone = (FemaleAdolescentParameters) super.clone();
-            for (String pKey: setOfParamKeys) {
+            for (String pKey: mapParams.keySet()) {
                 clone.setValue(pKey,this.getValue(pKey));
             }
-            for (String fcKey: setOfFunctionCategories) {
-                Set<String> fKeys = this.getIBMFunctionNamesByCategory(fcKey);
+            for (String fcKey: mapOfPotentialFunctionsByCategory.keySet()) {
+                Set<String> fKeys = this.getIBMFunctionKeysByCategory(fcKey);
                 IBMFunctionInterface sfi = this.getSelectedIBMFunctionForCategory(fcKey);
                 for (String fKey: fKeys){
                     IBMFunctionInterface tfi = this.getIBMFunction(fcKey, fKey);
@@ -248,7 +201,7 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
                     for (String pKey: pKeys) {
                         cfi.setParameterValue(pKey, tfi.getParameter(pKey).getValue());
                     }
-                    if (sfi==tfi) clone.selectIBMFunctionForCategory(fcKey, fKey);
+                    if (sfi==tfi) clone.setSelectedIBMFunctionForCategory(fcKey, fKey);
                 }
             }
             clone.propertySupport = new PropertyChangeSupport(clone);
@@ -269,7 +222,7 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
     public FemaleAdolescentParameters createInstance(final String[] strv) {
         int c = 0;
         FemaleAdolescentParameters params = new FemaleAdolescentParameters(strv[c++]);
-        for (String key: setOfParamKeys) params.setValueFromString(key,strv[c++]);
+        for (String key: mapParams.keySet()) params.setValueFromString(key,strv[c++]);
         return params;
     }
     
@@ -290,7 +243,7 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
     @Override
     public String getCSV() {
         String str = typeName;
-        for (String key: setOfParamKeys) str = str+cc+getIBMParameter(key).getValueAsString();
+        for (String key: mapParams.keySet()) str = str+cc+getIBMParameter(key).getValueAsString();
         return str;
     }
                 
@@ -307,49 +260,7 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
     @Override
     public String getCSVHeader() {
         String str = "LHS type name";
-        for (String key: setOfParamKeys) str = str+cc+key;
+        for (String key: mapParams.keySet()) str = str+cc+key;
         return str;
-    }
-
-    /**
-     * Gets the parameter keys.
-     * 
-     * @return - keys as String array.
-     */
-    @Override
-    public String[] getKeys(){
-        String[] strv = new String[setOfParamKeys.size()];
-        return setOfParamKeys.toArray(strv);
-    }
-
-    /**
-     * Sets parameter value identified by the key and fires a property change.
-     * @param key   - key identifying attribute to be set
-     * @param value - value to set
-     */
-    @Override
-    public void setValue(String key, Object value) {
-        if (mapParams.containsKey(key)) {
-            IBMParameter p = mapParams.get(key);
-            Object old = p.getValue();
-            p.setValue(value);
-            propertySupport.firePropertyChange(key,old,value);
-        }
-    }
-
-    /**
-     * Adds a PropertyChangeListener to the listener list.
-     * @param l The listener to add.
-     */
-    public void addPropertyChangeListener(java.beans.PropertyChangeListener l) {
-        propertySupport.addPropertyChangeListener(l);
-    }
-
-    /**
-     * Removes a PropertyChangeListener from the listener list.
-     * @param l The listener to remove.
-     */
-    public void removePropertyChangeListener(java.beans.PropertyChangeListener l) {
-        propertySupport.removePropertyChangeListener(l);
     }
 }

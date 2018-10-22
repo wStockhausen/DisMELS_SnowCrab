@@ -61,23 +61,15 @@ public class Zooea1Parameters extends AbstractLHSParameters {
     public static final String FCAT_VerticalVelocity = "vertical velocity";
     public static final String FCAT_MoltTime        = "molt timing";
     
-    /** The 'keys' used to store the ibm functions */
-    protected static final Set<String> setOfFunctionCategories = new LinkedHashSet<>(2*numFunctionCats);
-    /** The 'keys' used to store the ibm parameters */
-    protected static final Set<String> setOfParamKeys = new LinkedHashSet<>(2*numParams);
-    
     private static final Logger logger = Logger.getLogger(Zooea1Parameters.class.getName());
-    
-    /** Utility field used by bound properties.  */
-    private transient PropertyChangeSupport propertySupport;
     
     /**
      * Creates a new instance of EggStageParameters.
      */
     public Zooea1Parameters() {
         super("",numParams,numFunctionCats);
-        createMapToValues();
-        createMapToSelectedFunctions();
+        createMapToParameters();
+        createMapToPotentialFunctions();
         propertySupport =  new PropertyChangeSupport(this);
     }
     
@@ -86,8 +78,8 @@ public class Zooea1Parameters extends AbstractLHSParameters {
      */
     public Zooea1Parameters(String typeName) {
         super(typeName,numParams,numFunctionCats);
-        createMapToValues();
-        createMapToSelectedFunctions();
+        createMapToParameters();
+        createMapToPotentialFunctions();
         propertySupport =  new PropertyChangeSupport(this);
     }
     
@@ -95,30 +87,27 @@ public class Zooea1Parameters extends AbstractLHSParameters {
      * This creates the basic parameters mapParams.
      */
     @Override
-    protected final void createMapToValues() {
+    protected final void createMapToParameters() {
         String key;
-        key = PARAM_isSuperIndividual;    setOfParamKeys.add(key); mapParams.put(key,new IBMParameterBoolean(key,key,false));
-        key = PARAM_horizRWP;             setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
-        key = PARAM_minStageDuration;     setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0));
-        key = PARAM_maxStageDuration;     setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,365.0));
-        key = PARAM_minWeight;            setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.0002));
-        key = PARAM_randomizeTransitions; setOfParamKeys.add(key); mapParams.put(key,new IBMParameterBoolean(key,key,false));
-        key = PARAM_initialWeight;        setOfParamKeys.add(key); mapParams.put(key,new IBMParameterDouble(key,key,0.00008));
+        key = PARAM_isSuperIndividual;    mapParams.put(key,new IBMParameterBoolean(key,key,false));
+        key = PARAM_horizRWP;             mapParams.put(key,new IBMParameterDouble(key,key,0.0));
+        key = PARAM_minStageDuration;     mapParams.put(key,new IBMParameterDouble(key,key,0.0));
+        key = PARAM_maxStageDuration;     mapParams.put(key,new IBMParameterDouble(key,key,365.0));
+        key = PARAM_minWeight;            mapParams.put(key,new IBMParameterDouble(key,key,0.0002));
+        key = PARAM_randomizeTransitions; mapParams.put(key,new IBMParameterBoolean(key,key,false));
+        key = PARAM_initialWeight;        mapParams.put(key,new IBMParameterDouble(key,key,0.00008));
     }
 
     @Override
-    protected final void createMapToSelectedFunctions() {
-        //create the set of function category keys for this class
-        setOfFunctionCategories.add(FCAT_Growth);
-        setOfFunctionCategories.add(FCAT_Mortality);
-        setOfFunctionCategories.add(FCAT_VerticalMovement);
-        setOfFunctionCategories.add(FCAT_VerticalVelocity);
-        setOfFunctionCategories.add(FCAT_MoltTime);
-        
+    protected final void createMapToPotentialFunctions() {
         //create the map from function categories to potential functions in each category
-        String cat; Map<String,IBMFunctionInterface> mapOfPotentialFunctions; IBMFunctionInterface ifi;
+        String cat; 
+        Map<String,IBMFunctionInterface> mapOfPotentialFunctions; 
+        IBMFunctionInterface ifi;
+        
         cat = FCAT_Growth;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(8); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        mapOfPotentialFunctions = new LinkedHashMap<>(8); 
+        mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new ExponentialGrowthFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new LinearGrowthFunction();
@@ -130,63 +119,34 @@ public class Zooea1Parameters extends AbstractLHSParameters {
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_Mortality;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(4); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        mapOfPotentialFunctions = new LinkedHashMap<>(4); 
+        mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new ConstantMortalityRate(); 
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new TemperatureDependentMortalityRate_Houde1989(); 
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_VerticalMovement;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(4); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        mapOfPotentialFunctions = new LinkedHashMap<>(4); 
+        mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new DielVerticalMigration_FixedDepthRanges(); 
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_VerticalVelocity;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(4); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        mapOfPotentialFunctions = new LinkedHashMap<>(4); 
+        mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new PowerLawSwimmingSpeedFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new ConstantMovementRateFunction(); 
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
             
         cat = FCAT_MoltTime;
-        mapOfPotentialFunctions = new LinkedHashMap<>(2); mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        mapOfPotentialFunctions = new LinkedHashMap<>(2); 
+        mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new IntermoltLarvaFunction();
         mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
     }
     
-    /**
-     * Returns the IBMFunctionInterface object corresponding to the 
-     * given category and function key. 
-     * 
-     * @param cat  - usage category 
-     * @param name - function name
-     * @return   - the model function
-     */
-    @Override
-    public IBMFunctionInterface getIBMFunction(String cat, String key){
-        return mapOfPotentialFunctionsByCategory.get(cat).get(key);    
-    }
-
-    @Override
-    public Set<String> getIBMFunctionCategories(){
-        return mapOfPotentialFunctionsByCategory.keySet();
-    }
-    
-    @Override
-    public Set<String> getIBMFunctionNamesByCategory(String cat){
-        return mapOfPotentialFunctionsByCategory.get(cat).keySet();
-    }
-    
-    @Override
-   public void selectIBMFunctionForCategory(String cat, String key){
-        IBMFunctionInterface ifi = mapOfPotentialFunctionsByCategory.get(cat).get(key);
-        mapOfSelectedFunctionsByCategory.put(cat,ifi);
-    }
-
-    @Override
-    public Set<String> getIBMParameterNames() {
-        return setOfParamKeys;
-    }
     
     /**
      * Returns a deep copy of the instance.  Values are copied.  
@@ -198,11 +158,11 @@ public class Zooea1Parameters extends AbstractLHSParameters {
         Zooea1Parameters clone = null;
         try {
             clone = (Zooea1Parameters) super.clone();
-            for (String pKey: setOfParamKeys) {
+            for (String pKey: mapParams.keySet()) {
                 clone.setValue(pKey,this.getValue(pKey));
             }
-            for (String fcKey: setOfFunctionCategories) {
-                Set<String> fKeys = this.getIBMFunctionNamesByCategory(fcKey);
+            for (String fcKey: mapOfPotentialFunctionsByCategory.keySet()) {
+                Set<String> fKeys = this.getIBMFunctionKeysByCategory(fcKey);
                 IBMFunctionInterface sfi = this.getSelectedIBMFunctionForCategory(fcKey);
                 for (String fKey: fKeys){
                     IBMFunctionInterface tfi = this.getIBMFunction(fcKey, fKey);
@@ -211,7 +171,7 @@ public class Zooea1Parameters extends AbstractLHSParameters {
                     for (String pKey: pKeys) {
                         cfi.setParameterValue(pKey, tfi.getParameter(pKey).getValue());
                     }
-                    if (sfi==tfi) clone.selectIBMFunctionForCategory(fcKey, fKey);
+                    if (sfi==tfi) clone.setSelectedIBMFunctionForCategory(fcKey, fKey);
                 }
             }
             clone.propertySupport = new PropertyChangeSupport(clone);
@@ -232,7 +192,7 @@ public class Zooea1Parameters extends AbstractLHSParameters {
     public Zooea1Parameters createInstance(final String[] strv) {
         int c = 0;
         Zooea1Parameters params = new Zooea1Parameters(strv[c++]);
-        for (String key: setOfParamKeys) params.setValueFromString(key,strv[c++]);
+        for (String key: mapParams.keySet()) params.setValueFromString(key,strv[c++]);
         return params;
     }
     
@@ -253,7 +213,7 @@ public class Zooea1Parameters extends AbstractLHSParameters {
     @Override
     public String getCSV() {
         String str = typeName;
-        for (String key: setOfParamKeys) str = str+cc+getIBMParameter(key).getValueAsString();
+        for (String key: mapParams.keySet()) str = str+cc+getIBMParameter(key).getValueAsString();
         return str;
     }
                 
@@ -270,49 +230,7 @@ public class Zooea1Parameters extends AbstractLHSParameters {
     @Override
     public String getCSVHeader() {
         String str = "LHS type name";
-        for (String key: setOfParamKeys) str = str+cc+key;
+        for (String key: mapParams.keySet()) str = str+cc+key;
         return str;
-    }
-
-    /**
-     * Gets the parameter keys.
-     * 
-     * @return - keys as String array.
-     */
-    @Override
-    public String[] getKeys(){
-        String[] strv = new String[setOfParamKeys.size()];
-        return setOfParamKeys.toArray(strv);
-    }
-
-    /**
-     * Sets parameter value identified by the key and fires a property change.
-     * @param key   - key identifying attribute to be set
-     * @param value - value to set
-     */
-    @Override
-    public void setValue(String key, Object value) {
-        if (mapParams.containsKey(key)) {
-            IBMParameter p = mapParams.get(key);
-            Object old = p.getValue();
-            p.setValue(value);
-            propertySupport.firePropertyChange(key,old,value);
-        }
-    }
-
-    /**
-     * Adds a PropertyChangeListener to the listener list.
-     * @param l The listener to add.
-     */
-    public void addPropertyChangeListener(java.beans.PropertyChangeListener l) {
-        propertySupport.addPropertyChangeListener(l);
-    }
-
-    /**
-     * Removes a PropertyChangeListener from the listener list.
-     * @param l The listener to remove.
-     */
-    public void removePropertyChangeListener(java.beans.PropertyChangeListener l) {
-        propertySupport.removePropertyChangeListener(l);
     }
 }

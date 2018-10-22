@@ -25,7 +25,7 @@ public abstract class AbstractBenthicStageAttributes implements LifeStageAttribu
     /** the property key for the instar of the individual */
     public static final String PROP_instar      = "instar";
         /** the property key for the age in instar of the individual */
-    public static final String PROP_ageInInstar  = "ageInInstar";
+    public static final String PROP_ageInInstar = "ageInInstar";
         /** the property key for the size (carapace width) of the individual */
     public static final String PROP_size        = "size (mm CW)";
     /** the property key for the size (carapace width) of the individual */
@@ -43,7 +43,7 @@ public abstract class AbstractBenthicStageAttributes implements LifeStageAttribu
     /** Number of attributes defined by this class (including typeName) */
     public static final int numAttributes = LifeStageAttributesInterface.PROP_NumAtts+PROP_NumNewAtts;
     
-    protected static final Set<String> keys = new LinkedHashSet<>(36);
+    protected static final Set<String> keys = new LinkedHashSet<>(2*numAttributes);
     
     /** map to attributes values */
     protected static final Map<String,IBMAttribute> mapAttributes = new HashMap<>(36);
@@ -63,7 +63,7 @@ public abstract class AbstractBenthicStageAttributes implements LifeStageAttribu
      * the attribute keys and information defined in this class to the static Set "keys" 
      * and the static Map mapAttributes.
      * 
-     * Subclasses should call this constructor with a valid life stsage type name from
+     * Subclasses should call this constructor with a valid life stage type name from
      * all constructors to set the type name.  They should then 
      * 
      *@param typeName - the type name as a String.
@@ -85,13 +85,14 @@ public abstract class AbstractBenthicStageAttributes implements LifeStageAttribu
             key = PROP_horizPos1;  keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"horizPos1"));
             key = PROP_horizPos2;  keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"horizPos2"));
             key = PROP_vertPos;    keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"vertPos"));
+            key = PROP_bathym;     keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"bathym"));
             key = PROP_gridCellID; keys.add(key); mapAttributes.put(key,new IBMAttributeString(key,"gridCellID"));
             key = PROP_track;      keys.add(key); mapAttributes.put(key,new IBMAttributeString(key,"track"));
             key = PROP_active;     keys.add(key); mapAttributes.put(key,new IBMAttributeBoolean(key,"active"));
             key = PROP_alive;      keys.add(key); mapAttributes.put(key,new IBMAttributeBoolean(key,"alive"));
             key = PROP_age;        keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"age"));
             key = PROP_ageInStage; keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"ageInStage"));
-            key = PROP_ageInInstar; keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"ageInInstar"));
+            key = PROP_ageInInstar;keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"ageInInstar"));
             key = PROP_number;     keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"number"));
             key = PROP_instar;     keys.add(key); mapAttributes.put(key,new IBMAttributeInteger(key,"instar"));
             key = PROP_size;       keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"size"));
@@ -114,14 +115,15 @@ public abstract class AbstractBenthicStageAttributes implements LifeStageAttribu
         mapValues.put(PROP_horizPos1, new Double(0));
         mapValues.put(PROP_horizPos2, new Double(0));
         mapValues.put(PROP_vertPos,   new Double(0));
+        mapValues.put(PROP_bathym,    new Double(0));
         mapValues.put(PROP_gridCellID,"");
         mapValues.put(PROP_track,     "");
         mapValues.put(PROP_active,    false);
         mapValues.put(PROP_alive,     true);
         mapValues.put(PROP_age,       new Double(0));
         mapValues.put(PROP_ageInStage, new Double(0));
-        mapValues.put(PROP_ageInInstar, new Double(0));
-        mapValues.put(PROP_number,    new Double(1));
+        mapValues.put(PROP_ageInInstar,new Double(0));
+        mapValues.put(PROP_number,     new Double(1));
         mapValues.put(PROP_instar,     new Integer(0));
         mapValues.put(PROP_size,       new Double(0));
         mapValues.put(PROP_weight,     new Double(0));
@@ -179,6 +181,7 @@ public abstract class AbstractBenthicStageAttributes implements LifeStageAttribu
      *  horizPos1
      *  horizPos2
      *  vertPos
+     *  bathym
      *  gridCellID
      *  track
      *  startTime

@@ -75,6 +75,7 @@ public abstract class AbstractPelagicStageAttributes implements LifeStageAttribu
             key = PROP_horizPos1;  keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"horizPos1"));
             key = PROP_horizPos2;  keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"horizPos2"));
             key = PROP_vertPos;    keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"vertPos"));
+            key = PROP_bathym;     keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"bathym"));
             key = PROP_gridCellID; keys.add(key); mapAttributes.put(key,new IBMAttributeString(key,"gridCellID"));
             key = PROP_track;      keys.add(key); mapAttributes.put(key,new IBMAttributeString(key,"track"));
             key = PROP_active;     keys.add(key); mapAttributes.put(key,new IBMAttributeBoolean(key,"active"));
@@ -100,6 +101,7 @@ public abstract class AbstractPelagicStageAttributes implements LifeStageAttribu
         mapValues.put(PROP_horizPos1, new Double(0));
         mapValues.put(PROP_horizPos2, new Double(0));
         mapValues.put(PROP_vertPos,   new Double(0));
+        mapValues.put(PROP_bathym,    new Double(0));
         mapValues.put(PROP_gridCellID,"");
         mapValues.put(PROP_track,     "");
         mapValues.put(PROP_active,    false);
@@ -161,6 +163,7 @@ public abstract class AbstractPelagicStageAttributes implements LifeStageAttribu
      *  horizPos1
      *  horizPos2
      *  vertPos
+     *  bathym
      *  gridCellID
      *  track
      *  startTime

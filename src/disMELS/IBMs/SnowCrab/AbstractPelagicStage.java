@@ -97,6 +97,8 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     protected double  lon=0;
     /** current depth, in meters */
     protected double  depth=0;
+    /** current bathymetric depth, in meters */
+    protected double  bathym=0;
     /** current ROMS grid cell, as a string */
     protected String  gridCellID="";
     /** total age, in days */
@@ -290,6 +292,12 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     @Override
    public abstract String getReportHeader();
     
+   /**
+    * Sets the tolerance used to determine whether an individual is "at" the
+    * edge of the grid.
+    * 
+    * @param newTol 
+    */
     @Override
     public void setGridEdgeTolerance(double newTol){
         tolGridEdge = newTol;
@@ -367,6 +375,7 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
         key = LifeStageAttributesInterface.PROP_horizPos1;  atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_horizPos2;  atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_vertPos;    atts.setValue(key,newAtts.getValue(key));
+        key = LifeStageAttributesInterface.PROP_bathym;     atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_gridCellID; atts.setValue(key,newAtts.getValue(key));
         
         key = LifeStageAttributesInterface.PROP_age;        atts.setValue(key,newAtts.getValue(key));
@@ -395,6 +404,7 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
         atts.setValue(AbstractPelagicStageAttributes.PROP_horizPos1,lon);
         atts.setValue(AbstractPelagicStageAttributes.PROP_horizPos2,lat);
         atts.setValue(AbstractPelagicStageAttributes.PROP_vertPos,depth);
+        atts.setValue(AbstractBenthicStageAttributes.PROP_bathym,bathym);
         atts.setValue(AbstractPelagicStageAttributes.PROP_gridCellID,gridCellID);
         atts.setValue(AbstractPelagicStageAttributes.PROP_age,age);
         atts.setValue(AbstractPelagicStageAttributes.PROP_ageInStage,ageInStage);
