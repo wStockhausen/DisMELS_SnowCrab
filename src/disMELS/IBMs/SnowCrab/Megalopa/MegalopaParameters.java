@@ -12,7 +12,6 @@ package disMELS.IBMs.SnowCrab.Megalopa;
 import SnowCrabFunctions.IntermoltLarvaFunction;
 import java.beans.PropertyChangeSupport;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -37,6 +36,21 @@ import wts.models.DisMELS.framework.LifeStageParametersInterface;
  * for the GOA IERP Modeling project.
  * 
  * This class uses the IBMParameters/IBMFunctions approach to specifying stage-specific parameters.
+ * 
+ *  Potential growth functions (FCAT_Growth)
+ *      ExponentialGrowthFunction()
+ *      LinearGrowthFunction()
+ *      ConstantFunction()
+ *  Potential mortality functions (FCAT_Mortality)
+ *      ConstantMortalityRate()
+ *      TemperatureDependentMortalityRate_Houde1989()
+ *  Potential vertical movement functions (FCAT_VerticalMovement)
+ *      DielVerticalMigration_FixedDepthRanges()
+ *  Potential vertical velocity functions (FCAT_VerticalVelocity)
+ *      PowerLawSwimmingSpeedFunction()
+ *      ConstantMovementRateFunction()
+ *  Potential molt timing functions (FCAT_MoltTime)
+ *      IntermoltLarvaFunction()
  * 
  * @author William Stockhausen
  */

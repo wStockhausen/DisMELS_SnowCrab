@@ -366,8 +366,6 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
         key = LifeStageAttributesInterface.PROP_parentID;   atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_origID;     atts.setValue(key,newAtts.getValue(key));
         
-        key = LifeStageAttributesInterface.PROP_active;     atts.setValue(key,newAtts.getValue(key));
-        key = LifeStageAttributesInterface.PROP_alive;      atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_startTime;  atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_time;       atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_horizType;  atts.setValue(key,newAtts.getValue(key));
@@ -377,7 +375,9 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
         key = LifeStageAttributesInterface.PROP_vertPos;    atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_bathym;     atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_gridCellID; atts.setValue(key,newAtts.getValue(key));
-        
+        //track
+        key = LifeStageAttributesInterface.PROP_active;     atts.setValue(key,newAtts.getValue(key));
+        key = LifeStageAttributesInterface.PROP_alive;      atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_age;        atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_ageInStage; atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_number;     atts.setValue(key,newAtts.getValue(key));
@@ -398,17 +398,25 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     protected void updateAttributes() {
         //note that the following do not need to be updated
         //  id, parentID, origID, startTime, horizType, vertType
-        atts.setValue(AbstractPelagicStageAttributes.PROP_active,active);
-        atts.setValue(AbstractPelagicStageAttributes.PROP_alive,alive);
+        //id, 
+        //parentID, 
+        //origID, 
+        //startTime
         atts.setValue(AbstractPelagicStageAttributes.PROP_time,time);
+        //horizType, 
+        //vertType
         atts.setValue(AbstractPelagicStageAttributes.PROP_horizPos1,lon);
         atts.setValue(AbstractPelagicStageAttributes.PROP_horizPos2,lat);
         atts.setValue(AbstractPelagicStageAttributes.PROP_vertPos,depth);
         atts.setValue(AbstractBenthicStageAttributes.PROP_bathym,bathym);
         atts.setValue(AbstractPelagicStageAttributes.PROP_gridCellID,gridCellID);
+        //track
+        atts.setValue(AbstractPelagicStageAttributes.PROP_active,active);
+        atts.setValue(AbstractPelagicStageAttributes.PROP_alive,alive);
         atts.setValue(AbstractPelagicStageAttributes.PROP_age,age);
         atts.setValue(AbstractPelagicStageAttributes.PROP_ageInStage,ageInStage);
         atts.setValue(AbstractPelagicStageAttributes.PROP_number,number);
+        
         atts.setValue(AbstractPelagicStageAttributes.PROP_weight,weight);
         atts.setValue(AbstractPelagicStageAttributes.PROP_shellthick,shellthick);
         atts.setValue(AbstractPelagicStageAttributes.PROP_salinity,salinity);
@@ -422,17 +430,19 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
      *  id, parentID, origID, hType, vType
      */
     protected void updateVariables() {
-        active     = atts.getValue(AbstractPelagicStageAttributes.PROP_active,active);
-        alive      = atts.getValue(AbstractPelagicStageAttributes.PROP_alive,alive);
         startTime  = atts.getValue(AbstractPelagicStageAttributes.PROP_startTime,startTime);
         time       = atts.getValue(AbstractPelagicStageAttributes.PROP_time,time);
         lon        = atts.getValue(AbstractPelagicStageAttributes.PROP_horizPos1,lon);
         lat        = atts.getValue(AbstractPelagicStageAttributes.PROP_horizPos2,lat);
         depth      = atts.getValue(AbstractPelagicStageAttributes.PROP_vertPos,depth);
         gridCellID = atts.getValue(AbstractPelagicStageAttributes.PROP_gridCellID,gridCellID);
+        active     = atts.getValue(AbstractPelagicStageAttributes.PROP_active,active);
+        
+        alive      = atts.getValue(AbstractPelagicStageAttributes.PROP_alive,alive);
         age        = atts.getValue(AbstractPelagicStageAttributes.PROP_age,age);
         ageInStage = atts.getValue(AbstractPelagicStageAttributes.PROP_ageInStage,ageInStage);
         number     = atts.getValue(AbstractPelagicStageAttributes.PROP_number,number);
+        
         weight      = atts.getValue(AbstractPelagicStageAttributes.PROP_weight,weight);
         salinity    = atts.getValue(AbstractPelagicStageAttributes.PROP_salinity,salinity);
         temperature = atts.getValue(AbstractPelagicStageAttributes.PROP_temperature,temperature);

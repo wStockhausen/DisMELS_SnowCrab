@@ -9,7 +9,7 @@ import java.beans.*;
 
 /**
  *
- * @author WilliamStockhausen
+ * @author william.stockhausen
  */
 public class Zooea2ParametersBeanInfo extends SimpleBeanInfo {
 

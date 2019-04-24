@@ -132,8 +132,10 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
     
     /** value of pVal parameter */
     private static final double[][] pVal = new double[][]{
-        {0.91, 0.85, 0.82, 0.86, 0.87, 0.89, 0.89, 0.92, 0.96, 0.99, 1.1, 1.18, 1.1},
-        {0.89, 0.8, 0.77, 0.71, 0.75, 0.78, 0.79, 0.85, 0.95, 1.0, 1.17, 1.25, 1.3}
+//        {0.91, 0.85, 0.82, 0.86, 0.87, 0.89, 0.89, 0.92, 0.96, 0.99, 1.1, 1.18, 1.1},
+//        {0.89, 0.8, 0.77, 0.71, 0.75, 0.78, 0.79, 0.85, 0.95, 1.0, 1.17, 1.25, 1.3}
+        {1.23, 1.16, 1.12, 1.18, 1.18, 1.19, 1.23, 1.28, 1.3, 1.3, 1.3, 1.3, 1.3},
+        {1.23, 1.16, 1.12, 1.18, 1.18, 1.19, 1.23, 1.28, 1.3, 1.3, 1.3, 1.3, 1.3}
     };
     
     /** value of aC parameter */
@@ -302,13 +304,12 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
      * @return     - the function value (w[dt]) as a Double 
      */
     @Override
-    public Double calculate(Object vars) {
+    public double[] calculate(Object vars) {
         double[] lvars = (double[]) vars;//cast object to required double[]
         int i = 0;
         int instar = Math.max((int) lvars[i++],1);
         double w0 = lvars[i++];
         double T   = lvars[i++];
-        T = 5.0;
         double ex = lvars[i++];
         double maxC = aC*Math.pow(w0,bC-1.0);//max consumption
         double p = pVal[(int) sex][instar-1];
@@ -318,12 +319,16 @@ public class CrabBioenergeticsGrowthFunction extends AbstractIBMFunction impleme
         double f = FA*c;     //weight-specific egestion
         double SDA = (24.0*aSDA*Math.exp(bSDA*T))/(1000.0);
         double s = (SDA*f);//temperature-specific loss due to specific dynamic action
+        double eFrac = ex*f;
         double m = r+s;       //weight-specific metabolic loss rate
         double e = UA*w0; //weight-specific excretion
         double w = f+e;       //weight-specific waste rate
-        double g = (c-(m+w+ex))/(calPerGram*wRat*w0);   //weight-specific total daily growth rate / weight 
+//        double g = (c-(m+w+ex))/(calPerGram*wRat*w0);   //weight-specific total daily growth rate / weight 
+        double g = (c-(m+w+eFrac))/(calPerGram*wRat*w0);   //weight-specific total daily growth rate / weight 
         if (sigRt>0) g += rng.computeNormalVariate()*sigRt; 
-        return g;
+//        return g;
+        double[] returnVal = new double[]{g, eFrac/(calPerGram*wRat)};
+        return returnVal;
     }
 
     private double calcF(double T, double Tm, double T0, double a){

@@ -13,12 +13,17 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.openide.util.lookup.ServiceProvider;
+import wts.models.DisMELS.IBMFunctions.Growth.vonBertalanffyGrowthFunction;
+import wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction;
+import wts.models.DisMELS.IBMFunctions.Miscellaneous.LogisticFunction;
+import wts.models.DisMELS.IBMFunctions.Miscellaneous.PowerLawFunction;
 import wts.models.DisMELS.IBMFunctions.Growth.ExponentialGrowthFunction;
 import wts.models.DisMELS.IBMFunctions.Growth.LinearGrowthFunction;
 import wts.models.DisMELS.IBMFunctions.Growth.vonBertalanffyGrowthFunction;
 import wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
+import wts.models.DisMELS.IBMFunctions.Movement.DielVerticalMigration_FixedDepthRanges;
 import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunction;
 import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.PowerLawSwimmingSpeedFunction;
 import wts.models.DisMELS.framework.AbstractLHSParameters;
@@ -46,7 +51,7 @@ public class MaleAdolescentParameters extends AbstractLHSParameters {
     public static final long serialVersionUID = 1L;
     
     /** the number of IBMParameter objects defined in the class */
-    public static final int numParams = 13;
+    public static final int numParams = 12;
     public static final String PARAM_isSuperIndividual     = "is a super-individual?";
     public static final String PARAM_horizRWP              = "horizontal random walk parameter [m^2]/[s]";
     public static final String PARAM_minStageDuration      = "min stage duration [d]";
@@ -54,6 +59,11 @@ public class MaleAdolescentParameters extends AbstractLHSParameters {
     public static final String PARAM_minSizeAtTrans        = "min size at transition (cm)";
     public static final String PARAM_meanStageTransDelay   = "mean stage transition delay (d)";
     public static final String PARAM_randomizeTransitions  = "randomize stage transitions?";
+    public static final String PARAM_percLostWeight        = "maximum percentage of body weight that can be lost";
+    public static final String PARAM_maxStarvTime          = "maximum time crab can starve before dying [s]";
+    public static final String PARAM_aLengthWeight          = "intercept of length-weight relationship";
+    public static final String PARAM_bLengthWeight          = "slope of length-weight relationship";
+    public static final String PARAM_confInt                = "mean width of length-weight confidence interval";
     
     /** the number of IBMFunction categories defined in the class */
     public static final int numFunctionCats = 7;
@@ -100,6 +110,11 @@ public class MaleAdolescentParameters extends AbstractLHSParameters {
         key = PARAM_minSizeAtTrans;       mapParams.put(key,new IBMParameterDouble(key,key,0.0));
         key = PARAM_meanStageTransDelay;  mapParams.put(key,new IBMParameterDouble(key,key,0.0));
         key = PARAM_randomizeTransitions; mapParams.put(key,new IBMParameterBoolean(key,key,false));
+        key = PARAM_maxStarvTime;         mapParams.put(key, new IBMParameterDouble(key, key, 518400));
+        key = PARAM_percLostWeight;       mapParams.put(key, new IBMParameterDouble(key, key, 0.9385));
+        key = PARAM_aLengthWeight;        mapParams.put(key, new IBMParameterDouble(key, key, 0.00005));
+        key = PARAM_bLengthWeight;        mapParams.put(key, new IBMParameterDouble(key, key, 2.903));
+        key = PARAM_confInt;              mapParams.put(key, new IBMParameterDouble(key, key, 0.127));
     }
 
     @Override

@@ -74,34 +74,35 @@ public abstract class AbstractBenthicStageAttributes implements LifeStageAttribu
         if (mapAttributes.isEmpty()){
             //assign static-level attributes information for this class
             String key;
-            key = PROP_typeName;   keys.add(key); mapAttributes.put(key,new IBMAttributeString(key,"typeName"));
-            key = PROP_id;         keys.add(key); mapAttributes.put(key,new IBMAttributeLong(key,"id"));
-            key = PROP_parentID;   keys.add(key); mapAttributes.put(key,new IBMAttributeLong(key,"parentID"));
-            key = PROP_origID;     keys.add(key); mapAttributes.put(key,new IBMAttributeLong(key,"origID"));
+            key = PROP_typeName;   keys.add(key); mapAttributes.put(key,new IBMAttributeString(  key,"typeName"));
+            key = PROP_id;         keys.add(key); mapAttributes.put(key,new IBMAttributeLong(    key,"id"));
+            key = PROP_parentID;   keys.add(key); mapAttributes.put(key,new IBMAttributeLong(    key,"parentID"));
+            key = PROP_origID;     keys.add(key); mapAttributes.put(key,new IBMAttributeLong(    key,"origID"));
             key = PROP_startTime;  keys.add(key); mapAttributes.put(key,new IBMAttributeROMSDate(key,"startTime"));
             key = PROP_time;       keys.add(key); mapAttributes.put(key,new IBMAttributeROMSDate(key,"time"));
-            key = PROP_horizType;  keys.add(key); mapAttributes.put(key,new IBMAttributeInteger(key,"horizType"));
-            key = PROP_vertType;   keys.add(key); mapAttributes.put(key,new IBMAttributeInteger(key,"vertType"));
-            key = PROP_horizPos1;  keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"horizPos1"));
-            key = PROP_horizPos2;  keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"horizPos2"));
-            key = PROP_vertPos;    keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"vertPos"));
-            key = PROP_bathym;     keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"bathym"));
-            key = PROP_gridCellID; keys.add(key); mapAttributes.put(key,new IBMAttributeString(key,"gridCellID"));
-            key = PROP_track;      keys.add(key); mapAttributes.put(key,new IBMAttributeString(key,"track"));
-            key = PROP_active;     keys.add(key); mapAttributes.put(key,new IBMAttributeBoolean(key,"active"));
-            key = PROP_alive;      keys.add(key); mapAttributes.put(key,new IBMAttributeBoolean(key,"alive"));
-            key = PROP_age;        keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"age"));
-            key = PROP_ageInStage; keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"ageInStage"));
-            key = PROP_ageInInstar;keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"ageInInstar"));
-            key = PROP_number;     keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"number"));
-            key = PROP_instar;     keys.add(key); mapAttributes.put(key,new IBMAttributeInteger(key,"instar"));
-            key = PROP_size;       keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"size"));
-            key = PROP_weight;     keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"weight"));
-            key = PROP_shellcond;  keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"shellcondition"));
-            key = PROP_shellthick; keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"shellthickness"));
-            key = PROP_temperature;keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"temperature"));
-            key = PROP_salinity;   keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"salinity"));
-            key = PROP_ph;         keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"pH"));
+            key = PROP_horizType;  keys.add(key); mapAttributes.put(key,new IBMAttributeInteger( key,"horizType"));
+            key = PROP_vertType;   keys.add(key); mapAttributes.put(key,new IBMAttributeInteger( key,"vertType"));
+            key = PROP_horizPos1;  keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"horizPos1"));
+            key = PROP_horizPos2;  keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"horizPos2"));
+            key = PROP_vertPos;    keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"vertPos"));
+            key = PROP_bathym;     keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"bathym"));
+            key = PROP_gridCellID; keys.add(key); mapAttributes.put(key,new IBMAttributeString(  key,"gridCellID"));
+            key = PROP_track;      keys.add(key); mapAttributes.put(key,new IBMAttributeString(  key,"track"));
+            key = PROP_active;     keys.add(key); mapAttributes.put(key,new IBMAttributeBoolean( key,"active"));
+            key = PROP_alive;      keys.add(key); mapAttributes.put(key,new IBMAttributeBoolean( key,"alive"));
+            key = PROP_age;        keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"age"));
+            key = PROP_ageInStage; keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"ageInStage"));
+            key = PROP_number;     keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"number"));
+            //the above are generic to DisMELS IBMs. the below are specfic to snow crab.
+            key = PROP_instar;     keys.add(key); mapAttributes.put(key,new IBMAttributeInteger( key,"instar"));
+            key = PROP_ageInInstar;keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"ageInInstar"));
+            key = PROP_size;       keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"size"));
+            key = PROP_weight;     keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"weight"));
+            key = PROP_shellcond;  keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"shellcondition"));
+            key = PROP_shellthick; keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"shellthickness"));
+            key = PROP_temperature;keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"temperature"));
+            key = PROP_salinity;   keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"salinity"));
+            key = PROP_ph;         keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"pH"));
         }
         //assign instance-level attributes values for this class
         mapValues = new HashMap<>(2*numAttributes);
@@ -122,9 +123,10 @@ public abstract class AbstractBenthicStageAttributes implements LifeStageAttribu
         mapValues.put(PROP_alive,     true);
         mapValues.put(PROP_age,       new Double(0));
         mapValues.put(PROP_ageInStage, new Double(0));
-        mapValues.put(PROP_ageInInstar,new Double(0));
         mapValues.put(PROP_number,     new Double(1));
+        
         mapValues.put(PROP_instar,     new Integer(0));
+        mapValues.put(PROP_ageInInstar,new Double(0));
         mapValues.put(PROP_size,       new Double(0));
         mapValues.put(PROP_weight,     new Double(0));
         mapValues.put(PROP_shellcond,  new Double(-1));
@@ -176,6 +178,8 @@ public abstract class AbstractBenthicStageAttributes implements LifeStageAttribu
      *  id
      *  parentID
      *  oirigID
+     *  startTime
+     *  time
      *  horizType
      *  vertType
      *  horizPos1
@@ -184,15 +188,13 @@ public abstract class AbstractBenthicStageAttributes implements LifeStageAttribu
      *  bathym
      *  gridCellID
      *  track
-     *  startTime
-     *  time
      *  active
      *  alive
      *  age
      *  ageInStage
-     *  ageInInstar
      *  number
      *  instar
+     *  ageInInstar
      *  size
      *  weight
      *  shell condition

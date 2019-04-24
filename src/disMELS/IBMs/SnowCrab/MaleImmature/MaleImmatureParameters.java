@@ -23,6 +23,7 @@ import wts.models.DisMELS.IBMFunctions.Growth.vonBertalanffyGrowthFunction;
 import wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
+import wts.models.DisMELS.IBMFunctions.Movement.DielVerticalMigration_FixedDepthRanges;
 import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunction;
 import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.PowerLawSwimmingSpeedFunction;
 import wts.models.DisMELS.framework.AbstractLHSParameters;
@@ -56,6 +57,11 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
     public static final String PARAM_initialWeight          = "initial weight in stage (g)";
     public static final String PARAM_sCost                  = "number of days of exuviae cost";
     public static final String PARAM_sexRatio               = "ratio of males to females";
+    public static final String PARAM_maxStarvTime           = "maximum time a crab can starve [s]";
+    public static final String PARAM_percLostWeight         = "maximum percentage of weight that can be lost";
+    public static final String PARAM_aLengthWeight          = "intercept of length-weight relationship";
+    public static final String PARAM_bLengthWeight          = "slope of length-weight relationship";
+    public static final String PARAM_confInt                = "mean width of length-weight confidence interval";
     
     
     /** the number of IBMFunction categories defined in the class */
@@ -106,6 +112,11 @@ public class MaleImmatureParameters extends AbstractLHSParameters {
         key = PARAM_randomizeTransitions; mapParams.put(key,new IBMParameterBoolean(key,key,false));
         key = PARAM_sCost;                mapParams.put(key,new IBMParameterDouble(key,key,0.0));
         key = PARAM_sexRatio;             mapParams.put(key,new IBMParameterDouble(key,key,0.5));
+        key = PARAM_maxStarvTime;         mapParams.put(key, new IBMParameterDouble(key, key, 514800));
+        key = PARAM_percLostWeight;       mapParams.put(key, new IBMParameterDouble(key, key, 0.9385));
+        key = PARAM_aLengthWeight;        mapParams.put(key, new IBMParameterDouble(key, key, .00005));
+        key = PARAM_bLengthWeight;        mapParams.put(key, new IBMParameterDouble(key, key, 2.903));
+        key = PARAM_confInt;              mapParams.put(key, new IBMParameterDouble(key, key, .104));
     }
 
     @Override

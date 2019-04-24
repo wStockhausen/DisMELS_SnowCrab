@@ -65,6 +65,12 @@ public class MaleAdolescent extends AbstractBenthicStage {
     protected double meanStageTransDelay;
     /** flag to use stochastic transitions */
     protected boolean randomizeTransitions;
+    protected double maxStarvTime;
+    protected double percLostWeight;
+    private   double starvCounter;
+    protected double aLW;
+    protected double bLW;
+    protected double confInt;
         
             //other fields
     /** number of individuals transitioning to next stage */
@@ -72,8 +78,10 @@ public class MaleAdolescent extends AbstractBenthicStage {
      /** day of year */
     private double dayOfYear;
     private double starvationMort;
-    private double exTot;
     private boolean molted;
+    private double exEnergy;
+    private double exTot;
+    private double weightCounter;
    
     /** IBM function selected for growth */
     private IBMFunctionInterface fcnGrowth = null; 
@@ -385,10 +393,20 @@ public class MaleAdolescent extends AbstractBenthicStage {
                 params.getValue(params.PARAM_maxStageDuration,maxStageDuration);
         minSizeAtTrans = 
                 params.getValue(params.PARAM_minSizeAtTrans,minSizeAtTrans);
-        meanStageTransDelay = 
+        meanStageTransDelay  = 
                 params.getValue(params.PARAM_meanStageTransDelay,meanStageTransDelay);
         randomizeTransitions = 
                 params.getValue(params.PARAM_randomizeTransitions,randomizeTransitions);
+        percLostWeight       =
+                params.getValue(params.PARAM_percLostWeight, percLostWeight);
+        maxStarvTime         = 
+                params.getValue(params.PARAM_maxStarvTime, maxStarvTime);
+        aLW                  =
+                params.getValue(params.PARAM_aLengthWeight, aLW);
+        bLW                  =   
+                params.getValue(params.PARAM_bLengthWeight, bLW);
+        confInt              = 
+                params.getValue(params.PARAM_confInt, confInt);
     }
     
     /**
@@ -501,6 +519,8 @@ public class MaleAdolescent extends AbstractBenthicStage {
         time       = startTime;
         numTrans   = 0.0; //set numTrans to zero
         starvationMort = 0.0;
+        weightCounter = 0.0;
+        exEnergy = 0.0;
         molted = false;
         exTot = 0.0;
         if (debug) {
@@ -629,12 +649,28 @@ public class MaleAdolescent extends AbstractBenthicStage {
     }
 
     private void updateSize(double dt) {
-        double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+//        double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+        double D;
+        if(instar<8){
+            D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+        } else{
+            D = 365.0;
+        }
         exTot = (Double) fcnExCost.calculate(size);
         if((ageInInstar+dt/DAY_SECS)>D){
             boolean mat = (Boolean) fcnMaturity.calculate(new double[]{size,temperature});
             
-            size = (Double) fcnMolt.calculate(size);
+//            size = (Double) fcnMolt.calculate(size);
+            Double newSize = (Double) fcnMolt.calculate(size);
+            Double minWeightGain = aLW*((1-confInt)*Math.pow(newSize,bLW) - ((1+confInt)*Math.pow(size,bLW)));
+            Double maxWeightGain = aLW*((1+confInt)*Math.pow(newSize,bLW) - ((1-confInt)*Math.pow(size,bLW)));
+            if(weightCounter<minWeightGain){
+                active=false;alive=false;number=0;
+            }
+            if(weightCounter>maxWeightGain){
+                weight = aLW*Math.pow(newSize,bLW);
+            }
+            size = newSize;
             instar += 1;
             ageInInstar = 0.0;
             molted = true;
@@ -645,19 +681,32 @@ public class MaleAdolescent extends AbstractBenthicStage {
     }
     
     private void updateWeight(double dt){
-        double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
-        double exPerDay = exTot/D;
+//        double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+//        double exPerDay = exTot/D;
+        double exPerDay = Math.exp(0.9786)*Math.pow(size, -0.9281);
         fcnGrowth.setParameterValue("sex", 0.0);
-        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
-        if(growthRate>0){
-            weight = weight*Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
+//        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
+//        if(growthRate>0){
+//            weight = weight*Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
+//        } else{
+//            double totRate = Math.max(-1.0,growthRate/weight);
+//            starvationMort = -Math.log(-(.0099+totRate))*(dt/DAY_SECS);
+//        } 
+        double[] growthFun= (double[]) fcnGrowth.calculate(new double[]{instar, weight, temperature, exPerDay});
+        double growthRate = growthFun[0];
+        exEnergy += growthFun[1];
+        double growthMult =Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
+        if(growthMult>percLostWeight){
+            weightCounter += weight*growthMult;
+            weight = weight*growthMult;
         } else{
-            double totRate = Math.max(-1.0,growthRate/weight);
-            starvationMort = -Math.log(-(.0099+totRate))*(dt/DAY_SECS);
+            starvCounter=starvCounter+dt;
         } 
         if(molted){
             weight = weight - exTot;
-            molted=false;
+            molted = false;
+            weightCounter = 0.0;
+            exEnergy = 0.0;
         }
     }
 
@@ -696,8 +745,14 @@ public class MaleAdolescent extends AbstractBenthicStage {
         }
         }
         number = number*Math.exp(-dt*totRate/DAY_SECS);
-        if(number==0){
+//        if(number==0){
+//            active=false;alive=false;number=number+numTrans;
+//        }
+        if(number<0.01){
             active=false;alive=false;number=number+numTrans;
+        }
+        if((starvCounter)>maxStarvTime){
+            active=false;alive=false;number=0;
         }
     }
 

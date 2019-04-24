@@ -15,6 +15,7 @@ import java.util.logging.Logger;
 import org.openide.util.lookup.ServiceProvider;
 import wts.models.DisMELS.IBMFunctions.Growth.vonBertalanffyGrowthFunction;
 import wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction;
+import wts.models.DisMELS.IBMFunctions.Miscellaneous.LogisticFunction;
 import wts.models.DisMELS.IBMFunctions.Miscellaneous.PowerLawFunction;
 import wts.models.DisMELS.framework.AbstractLHSParameters;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
@@ -37,7 +38,7 @@ public class FemaleAdultParameters extends AbstractLHSParameters {
     public static final long serialVersionUID = 1L;
     
     /** the number of IBMParameter objects defined in the class */
-    public static final int numParams = 13;
+    public static final int numParams = 18;
     public static final String PARAM_isSuperIndividual     = "is a super-individual?";
     public static final String PARAM_horizRWP              = "horizontal random walk parameter [m^2]/[s]";
     public static final String PARAM_minStageDuration      = "min stage duration [d]";
@@ -51,6 +52,11 @@ public class FemaleAdultParameters extends AbstractLHSParameters {
     public static final String PARAM_recoveryPeriod        = "recovery period after spawning (d)";
     public static final String PARAM_meanTimeToSpawn       = "mean time to spawn after recory (d)?";
     public static final String PARAM_randomizeSpawning     = "randomize spawning?";
+    public static final String PARAM_percLostWeight        = "maximum percentage of weight lost [0-1]";
+    public static final String PARAM_maxStarvTime          = "maximum amount of time crab can starve before dying (s)";
+    public static final String PARAM_aLengthWeight         = "intercept of length-weight relationship";
+    public static final String PARAM_bLengthWeight         = "slope of length-weight relationship";
+    public static final String PARAM_walkSpeed             = "speed of crab walking along bottom [m^2]/[s]";
     
     /** the number of IBMFunction categories defined in the class */
     public static final int numFunctionCats = 3;
@@ -99,6 +105,9 @@ public class FemaleAdultParameters extends AbstractLHSParameters {
         key = PARAM_recoveryPeriod;        mapParams.put(key,new IBMParameterDouble(key,key,0.0));
         key = PARAM_meanTimeToSpawn;       mapParams.put(key,new IBMParameterDouble(key,key,0.0));
         key = PARAM_randomizeSpawning;     mapParams.put(key,new IBMParameterBoolean(key,key,false));
+        key = PARAM_percLostWeight;        mapParams.put(key, new IBMParameterDouble(key, key, 0.9385));
+        key = PARAM_maxStarvTime;          mapParams.put(key, new IBMParameterDouble(key, key, 518400.0));
+        key = PARAM_walkSpeed;             mapParams.put(key, new IBMParameterDouble(key, key, 0.1));
     }
 
     @Override

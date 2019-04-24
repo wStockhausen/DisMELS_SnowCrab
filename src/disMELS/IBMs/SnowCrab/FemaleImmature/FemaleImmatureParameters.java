@@ -26,6 +26,7 @@ import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunc
 import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.PowerLawSwimmingSpeedFunction;
 import SnowCrabFunctions.CrabBioenergeticsGrowthFunction;
 import SnowCrabFunctions.ExCostFunction;
+import SnowCrabFunctions.MaturityOgiveFunction;
 import SnowCrabFunctions.MoltIncrementFunction;
 import SnowCrabFunctions.IntermoltPeriodFunction;
 
@@ -42,7 +43,7 @@ public class FemaleImmatureParameters extends AbstractLHSParameters {
     public static final long serialVersionUID = 1L;
     
     /** the number of IBMParameter objects defined in the class */
-    public static final int numParams = 11;
+    public static final int numParams = 16;
     public static final String PARAM_isSuperIndividual      = "is a super-individual?";
     public static final String PARAM_horizRWP               = "horizontal random walk parameter [m^2]/[s]";
     public static final String PARAM_minStageDuration       = "min stage duration [d]";
@@ -54,6 +55,11 @@ public class FemaleImmatureParameters extends AbstractLHSParameters {
     public static final String PARAM_initialWeight          = "initial weight in stage (g)";
     public static final String PARAM_sCost                  = "how long molt cost is spent [d]";
     public static final String PARAM_sexRatio               = "ratio of females to males";
+    public static final String PARAM_percLostWeight         = "maximum percentage of weight lost [0-1]";
+    public static final String PARAM_maxStarvTime           = "maximum amount of time crab can starve before dying (s)";
+    public static final String PARAM_aLengthWeight          = "intercept of length-weight relationship";
+    public static final String PARAM_bLengthWeight          = "slope of length-weight relationship";
+    public static final String PARAM_confInt                = "mean width of length-weight confidence interval";
     
     
     /** the number of IBMFunction categories defined in the class */
@@ -104,6 +110,11 @@ public class FemaleImmatureParameters extends AbstractLHSParameters {
         key = PARAM_randomizeTransitions; mapParams.put(key,new IBMParameterBoolean(key,key,false));
         key = PARAM_sCost;                mapParams.put(key, new IBMParameterDouble(key,key,0.0));
         key = PARAM_sexRatio;             mapParams.put(key, new IBMParameterDouble(key,key,0.5));
+        key = PARAM_percLostWeight;       mapParams.put(key, new IBMParameterDouble(key, key, 0.9385));
+        key = PARAM_maxStarvTime;         mapParams.put(key, new IBMParameterDouble(key, key, 518400.0));
+        key = PARAM_aLengthWeight;        mapParams.put(key, new IBMParameterDouble(key, key, 0.000065));
+        key = PARAM_bLengthWeight;        mapParams.put(key, new IBMParameterDouble(key, key, 2.869));
+        key = PARAM_confInt;              mapParams.put(key, new IBMParameterDouble(key, key, 0.19));
     }
 
     @Override

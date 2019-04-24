@@ -1,5 +1,5 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
+/*//GEN-FIRST:Superclass
+ * To change this license header, choose License Headers in Project Properties.//GEN-LAST:Superclass
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -9,20 +9,20 @@ import java.beans.*;
 
 /**
  *
- * @author WilliamStockhausen
+ * @author William Stockhausen
  */
 public class ExtrudedEggMassParametersBeanInfo extends SimpleBeanInfo {
 
-    // Bean descriptor//GEN-FIRST:BeanDescriptor
+    // Bean descriptor                          
     /*lazy BeanDescriptor*/
     private static BeanDescriptor getBdescriptor(){
-        BeanDescriptor beanDescriptor = new BeanDescriptor  ( disMELS.IBMs.SnowCrab.EggMassExtruded.ExtrudedEggMassParameters.class , null ); // NOI18N//GEN-HEADEREND:BeanDescriptor
+        BeanDescriptor beanDescriptor = new BeanDescriptor  ( disMELS.IBMs.SnowCrab.EggMassExtruded.ExtrudedEggMassParameters.class , null ); // NOI18N                              
         // Here you can add code for customizing the BeanDescriptor.
 
-        return beanDescriptor;     }//GEN-LAST:BeanDescriptor
+        return beanDescriptor;     }                         
 
 
-    // Property identifiers//GEN-FIRST:Properties
+    // Property identifiers                      
     private static final int PROPERTY_CSV = 0;
     private static final int PROPERTY_CSVHeader = 1;
     private static final int PROPERTY_IBMFunctionCategories = 2;
@@ -45,12 +45,12 @@ public class ExtrudedEggMassParametersBeanInfo extends SimpleBeanInfo {
         }
         catch(IntrospectionException e) {
             e.printStackTrace();
-        }//GEN-HEADEREND:Properties
+        }                          
         // Here you can add code for customizing the properties array.
 
-        return properties;     }//GEN-LAST:Properties
+        return properties;     }                     
 
-    // EventSet identifiers//GEN-FIRST:Events
+    // EventSet identifiers                  
     private static final int EVENT_propertyChangeListener = 0;
 
     // EventSet array
@@ -63,12 +63,12 @@ public class ExtrudedEggMassParametersBeanInfo extends SimpleBeanInfo {
         }
         catch(IntrospectionException e) {
             e.printStackTrace();
-        }//GEN-HEADEREND:Events
+        }                      
         // Here you can add code for customizing the event sets array.
 
-        return eventSets;     }//GEN-LAST:Events
+        return eventSets;     }                 
 
-    // Method identifiers//GEN-FIRST:Methods
+    // Method identifiers                   
     private static final int METHOD_clone0 = 0;
     private static final int METHOD_createInstance1 = 1;
     private static final int METHOD_getIBMFunction2 = 2;
@@ -146,28 +146,28 @@ public class ExtrudedEggMassParametersBeanInfo extends SimpleBeanInfo {
             methods[METHOD_setValue22] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSParameters.class.getMethod("setValue", new Class[] {java.lang.String.class, long.class})); // NOI18N
             methods[METHOD_setValue22].setDisplayName ( "" );
         }
-        catch( Exception e) {}//GEN-HEADEREND:Methods
+        catch( Exception e) {}                       
         // Here you can add code for customizing the methods array.
 
-        return methods;     }//GEN-LAST:Methods
+        return methods;     }                  
 
-    private static java.awt.Image iconColor16 = null;//GEN-BEGIN:IconsDef
+    private static java.awt.Image iconColor16 = null;                    
     private static java.awt.Image iconColor32 = null;
     private static java.awt.Image iconMono16 = null;
-    private static java.awt.Image iconMono32 = null;//GEN-END:IconsDef
-    private static String iconNameC16 = null;//GEN-BEGIN:Icons
+    private static java.awt.Image iconMono32 = null;                  
+    private static String iconNameC16 = null;                 
     private static String iconNameC32 = null;
     private static String iconNameM16 = null;
-    private static String iconNameM32 = null;//GEN-END:Icons
+    private static String iconNameM32 = null;               
 
-    private static final int defaultPropertyIndex = -1;//GEN-BEGIN:Idx
-    private static final int defaultEventIndex = -1;//GEN-END:Idx
+    private static final int defaultPropertyIndex = -1;               
+    private static final int defaultEventIndex = -1;             
 
 
-//GEN-FIRST:Superclass
+                      
     // Here you can add code for customizing the Superclass BeanInfo.
 
-//GEN-LAST:Superclass
+                     
     /**
      * Gets the bean's <code>BeanDescriptor</code>s.
      *

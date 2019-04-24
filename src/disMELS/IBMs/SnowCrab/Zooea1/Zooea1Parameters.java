@@ -10,7 +10,6 @@ package disMELS.IBMs.SnowCrab.Zooea1;
 import SnowCrabFunctions.IntermoltLarvaFunction;
 import java.beans.PropertyChangeSupport;
 import java.util.LinkedHashMap;
-import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
@@ -34,6 +33,21 @@ import wts.models.DisMELS.framework.LifeStageParametersInterface;
  * DisMELS class representing parameters for snow crab zooea stage 1.
  * 
  * This class uses the IBMParameters/IBMFunctions approach to specifying stage-specific parameters.
+ * 
+ *  Potential growth functions (FCAT_Growth)
+ *      ExponentialGrowthFunction()
+ *      LinearGrowthFunction()
+ *      ConstantFunction()
+ *  Potential mortality functions (FCAT_Mortality)
+ *      ConstantMortalityRate()
+ *      TemperatureDependentMortalityRate_Houde1989()
+ *  Potential vertical movement functions (FCAT_VerticalMovement)
+ *      DielVerticalMigration_FixedDepthRanges()
+ *  Potential vertical velocity functions (FCAT_VerticalVelocity)
+ *      PowerLawSwimmingSpeedFunction()
+ *      ConstantMovementRateFunction()
+ *  Potential molt timing functions (FCAT_MoltTime)
+ *      IntermoltLarvaFunction()
  * 
  * @author William Stockhausen
  */
@@ -59,7 +73,7 @@ public class Zooea1Parameters extends AbstractLHSParameters {
     public static final String FCAT_Mortality        = "mortality";
     public static final String FCAT_VerticalMovement = "vertical movement";
     public static final String FCAT_VerticalVelocity = "vertical velocity";
-    public static final String FCAT_MoltTime        = "molt timing";
+    public static final String FCAT_MoltTime         = "molt timing";
     
     private static final Logger logger = Logger.getLogger(Zooea1Parameters.class.getName());
     

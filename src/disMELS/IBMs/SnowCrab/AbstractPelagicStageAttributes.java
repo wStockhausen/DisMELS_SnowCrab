@@ -16,7 +16,7 @@ import wts.models.DisMELS.framework.Types;
  */
 public abstract class AbstractPelagicStageAttributes implements LifeStageAttributesInterface {
     
-    // attributes in addition to those from LisfeStageAttributesInterface
+    // attributes in addition to those from LifeStageAttributesInterface
     /** the number of new attributes defined by this class */
     public static final int PROP_NumNewAtts = 5;
     /** the property key for the weight of the individual */
@@ -83,6 +83,7 @@ public abstract class AbstractPelagicStageAttributes implements LifeStageAttribu
             key = PROP_age;        keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"age"));
             key = PROP_ageInStage; keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"ageInStage"));
             key = PROP_number;     keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"number"));
+            
             key = PROP_weight;     keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"weight"));
             key = PROP_shellthick; keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"shellthickness"));
             key = PROP_temperature;keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"temperature"));
@@ -109,6 +110,7 @@ public abstract class AbstractPelagicStageAttributes implements LifeStageAttribu
         mapValues.put(PROP_age,       new Double(0));
         mapValues.put(PROP_ageInStage,new Double(0));
         mapValues.put(PROP_number,    new Double(1));
+        
         mapValues.put(PROP_weight,     new Double(0));
         mapValues.put(PROP_shellthick, new Double(-1));
         mapValues.put(PROP_temperature,new Double(-1));
@@ -157,7 +159,9 @@ public abstract class AbstractPelagicStageAttributes implements LifeStageAttribu
      *  typeName [this is not set]
      *  id
      *  parentID
-     *  oirigID
+     *  origID
+     *  startTime
+     *  time
      *  horizType
      *  vertType
      *  horizPos1
@@ -166,15 +170,12 @@ public abstract class AbstractPelagicStageAttributes implements LifeStageAttribu
      *  bathym
      *  gridCellID
      *  track
-     *  startTime
-     *  time
      *  active
      *  alive
      *  age
      *  ageInStage
      *  number
-     *  instar
-     *  size
+     * 
      *  weight
      *  shell condition
      *  shell thickness

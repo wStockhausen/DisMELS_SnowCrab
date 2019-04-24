@@ -35,6 +35,21 @@ import wts.models.DisMELS.framework.LifeStageParametersInterface;
  * 
  * This class uses the IBMParameters/IBMFunctions approach to specifying stage-specific parameters.
  * 
+ *  Potential growth functions (FCAT_Growth)
+ *      ExponentialGrowthFunction()
+ *      LinearGrowthFunction()
+ *      ConstantFunction()
+ *  Potential mortality functions (FCAT_Mortality)
+ *      ConstantMortalityRate()
+ *      TemperatureDependentMortalityRate_Houde1989()
+ *  Potential vertical movement functions (FCAT_VerticalMovement)
+ *      DielVerticalMigration_FixedDepthRanges()
+ *  Potential vertical velocity functions (FCAT_VerticalVelocity)
+ *      PowerLawSwimmingSpeedFunction()
+ *      ConstantMovementRateFunction()
+ *  Potential molt timing functions (FCAT_MoltTime)
+ *      IntermoltLarvaFunction()
+ * 
  * @author William Stockhausen
  */
 @ServiceProvider(service=LifeStageParametersInterface.class)
@@ -59,7 +74,7 @@ public class Zooea2Parameters extends AbstractLHSParameters {
     public static final String FCAT_Mortality        = "mortality";
     public static final String FCAT_VerticalMovement = "vertical movement";
     public static final String FCAT_VerticalVelocity = "vertical velocity";
-    public static final String FCAT_MoltTime        = "molt timing";
+    public static final String FCAT_MoltTime         = "molt timing";
     
     private static final Logger logger = Logger.getLogger(Zooea2Parameters.class.getName());
     

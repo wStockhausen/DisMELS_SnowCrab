@@ -9,7 +9,7 @@ import java.beans.*;
 
 /**
  *
- * @author WilliamStockhausen
+ * @author William Stockhausen
  */
 public class InternalEggMassParametersBeanInfo extends SimpleBeanInfo {
 

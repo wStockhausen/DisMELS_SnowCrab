@@ -4,6 +4,7 @@
 
 package disMELS.IBMs.SnowCrab.FemaleAdult;
 
+import SnowCrabFunctions.CrabBioenergeticsGrowthFunction;
 import com.vividsolutions.jts.geom.Coordinate;
 import java.util.ArrayList;
 import java.util.List;
@@ -59,6 +60,7 @@ public class FemaleAdult extends AbstractBenthicStage {
     protected boolean isSuperIndividual;
     /** horizontal random walk parameter */
     protected double horizRWP;
+    protected double percLostWeight;
     /** minimum stage duration before metamorphosis to next stage */
     protected double minStageDuration;
     /** maximum stage duration (followed by death) */
@@ -73,8 +75,10 @@ public class FemaleAdult extends AbstractBenthicStage {
     protected double stageTransRate;    
         /** elapsed time to spawn (days) */
     protected double timeToSpawn = 366;
-     protected double firstDayOfSpawning;
-     protected double lengthOfSpawningSeason;
+    protected double firstDayOfSpawning;
+    protected double lengthOfSpawningSeason;
+     protected double maxStarvTime;
+     protected double walkSpeed;
         //fields that reflect (new) attribute values
     //none
     
@@ -84,7 +88,9 @@ public class FemaleAdult extends AbstractBenthicStage {
      /** day of year */
     private double dayOfYear;
     private double starvationMort;
-        private boolean isSpawningSeason;
+    private boolean isSpawningSeason;
+    private double starvCounter;
+    private double exEnergy;
     /** spawning season flag */
     /** flag to clean up after spawning */
     private boolean doOnceAfterSpawningSeason = true;
@@ -399,6 +405,12 @@ public class FemaleAdult extends AbstractBenthicStage {
                 params.getValue(params.PARAM_firstDaySpawning, firstDayOfSpawning);
         lengthOfSpawningSeason =
                 params.getValue(params.PARAM_lengthSpawningSeason, lengthOfSpawningSeason);
+        maxStarvTime = 
+                params.getValue(params.PARAM_maxStarvTime, maxStarvTime);
+        percLostWeight = 
+                params.getValue(params.PARAM_percLostWeight, percLostWeight);
+        walkSpeed =
+                params.getValue(params.PARAM_walkSpeed, walkSpeed);
     }
     
     /**
@@ -427,8 +439,12 @@ public class FemaleAdult extends AbstractBenthicStage {
         output.clear();
         List<LifeStageInterface> nLHS;
         if ((ageInStage+dtp>=minStageDuration)&&(size>=minSizeAtTrans)) {
-            nLHS = createNextLHSs();
-            if (nLHS!=null) output.addAll(nLHS);
+//            nLHS = createNextLHSs();
+//            if (nLHS!=null) output.addAll(nLHS);
+            if(numTrans>0){
+                nLHS = createNextLHSs();
+                if (nLHS!=null) output.addAll(nLHS);
+            }
         }
         return output;
     }
@@ -520,6 +536,7 @@ public class FemaleAdult extends AbstractBenthicStage {
                     newAtts.setValue(LifeStageAttributesInterface.PROP_age,        0.0);
                     newAtts.setValue(LifeStageAttributesInterface.PROP_ageInStage, 0.0);
                     newAtts.setValue(LifeStageAttributesInterface.PROP_number,     1.0);//TODO:change this to fecundity/numSpawnPerIndiv
+                    newAtts.setValue(Zooea1Attributes.PROP_weight,     0.00008);
                     newAtts.setValue(Zooea1Attributes.PROP_salinity,   atts.getValue(atts.PROP_salinity));
                     newAtts.setValue(Zooea1Attributes.PROP_temperature,atts.getValue(atts.PROP_temperature));
                     newAtts.setValue(Zooea1Attributes.PROP_ph,atts.getValue(atts.PROP_ph));
@@ -698,9 +715,9 @@ public class FemaleAdult extends AbstractBenthicStage {
             lp.doCorrectorStep();
             pos = lp.getIJK();
         time = time+dt;
-        updateAge(dt);
         updateWeight(dt);
         updateNum(dt);
+        updateAge(dt);
         updatePosition(pos);
         interpolateEnvVars(pos);
         //check for exiting grid
@@ -722,9 +739,14 @@ public class FemaleAdult extends AbstractBenthicStage {
     public double[] calcUV(double dt) {
         double[] uv = {0.0,0.0};
         if (horizRWP>0) {
+//            double r = Math.sqrt(horizRWP/Math.abs(dt));
+//            uv[0] += r*rng.computeNormalVariate(); //stochastic swimming rate
+//            uv[1] += r*rng.computeNormalVariate(); //stochastic swimming rate
+            double[] horizGradient = i3d.calcHorizGradient(uv, "temp", 0);
             double r = Math.sqrt(horizRWP/Math.abs(dt));
-            uv[0] += r*rng.computeNormalVariate(); //stochastic swimming rate
-            uv[1] += r*rng.computeNormalVariate(); //stochastic swimming rate
+            double s = Math.sqrt(walkSpeed/Math.abs(dt));
+            uv[0] += s*(horizGradient[0]/Math.sqrt(Math.pow(horizGradient[0],2)+Math.pow(horizGradient[1],2))) + r*rng.computeNormalVariate(); //stochastic swimming rate
+            uv[1] += s*(horizGradient[1]/Math.sqrt(Math.pow(horizGradient[0],2)+Math.pow(horizGradient[1],2))) + r*rng.computeNormalVariate(); //stochastic swimming rate
             if (debugOps) logger.info("uv: "+r+"; "+uv[0]+", "+uv[1]+"\n");
         }
         uv[0] = Math.signum(dt)*uv[0];
@@ -750,13 +772,24 @@ public class FemaleAdult extends AbstractBenthicStage {
      */
     private void updateWeight(double dt) {
         //todo - Add in cost of reproduction!
-        fcnGrowth.setParameterValue("sex", 1.0);
-        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, 0});
-        if(growthRate>0){
-            weight = weight*Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
-        } else{
-            double totRate = Math.max(-1.0,growthRate/weight);
-            starvationMort = -Math.log(-(.0099+totRate))*(dt/DAY_SECS);
+        if (fcnGrowth instanceof CrabBioenergeticsGrowthFunction){
+            fcnGrowth.setParameterValue("sex", 1.0);
+    //        double growthRate = (Double) fcnGrowth.calculate(new double[]{instar, weight, temperature, 0});
+    //        if(growthRate>0){
+    //            weight = weight*Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate)));
+    //        } else{
+    //            double totRate = Math.max(-1.0,growthRate/weight);
+    //            starvationMort = -Math.log(-(.0099+totRate))*(dt/DAY_SECS);
+    //        }
+            double[] growthRate = (double[]) fcnGrowth.calculate(new double[]{instar, weight, temperature, 0});
+            double weightInc = Math.exp(Math.log(1.0+((dt/DAY_SECS)*growthRate[0])));
+            if(weightInc >= percLostWeight){
+                weight = weight*weightInc;
+            } else{
+                starvCounter = starvCounter + dt;
+            }
+        } else {
+            //TODO: add linear growth options
         }
     }
 
@@ -784,8 +817,19 @@ public class FemaleAdult extends AbstractBenthicStage {
         double totRate = mortalityRate + starvationMort;
        
         number = number*Math.exp(-dt*totRate/DAY_SECS);
-        if(number==0){
-            active=false;alive=false;number=number+numTrans;
+//        if(number==0){
+//            active=false;alive=false;number=number+numTrans;
+//        }
+        if(number<0.01){
+            active=false;alive=false;
+            if(numTrans>0){
+                number=number+numTrans;
+            } else{
+                number = 0;
+            }
+        }
+        if((starvCounter)>maxStarvTime){
+            active=false;alive=false;number=0;
         }
     }
 

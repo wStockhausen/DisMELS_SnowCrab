@@ -369,8 +369,6 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
         key = LifeStageAttributesInterface.PROP_parentID;   atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_origID;     atts.setValue(key,newAtts.getValue(key));
         
-        key = LifeStageAttributesInterface.PROP_active;     atts.setValue(key,newAtts.getValue(key));
-        key = LifeStageAttributesInterface.PROP_alive;      atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_startTime;  atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_time;       atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_horizType;  atts.setValue(key,newAtts.getValue(key));
@@ -380,18 +378,21 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
         key = LifeStageAttributesInterface.PROP_vertPos;    atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_bathym;     atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_gridCellID; atts.setValue(key,newAtts.getValue(key));
+        //track?
         
+        key = LifeStageAttributesInterface.PROP_active;     atts.setValue(key,newAtts.getValue(key));
+        key = LifeStageAttributesInterface.PROP_alive;      atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_age;        atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_ageInStage; atts.setValue(key,newAtts.getValue(key));
         key = LifeStageAttributesInterface.PROP_number;     atts.setValue(key,newAtts.getValue(key));
         
         if (newAtts instanceof AbstractBenthicStageAttributes){
-            key = AbstractBenthicStageAttributes.PROP_instar;     atts.setValue(key,newAtts.getValue(key));
-            key = AbstractBenthicStageAttributes.PROP_size;       atts.setValue(key,newAtts.getValue(key));
-            key = AbstractBenthicStageAttributes.PROP_weight;     atts.setValue(key,newAtts.getValue(key));
-            key = AbstractBenthicStageAttributes.PROP_shellcond;  atts.setValue(key,newAtts.getValue(key));
-            key = AbstractBenthicStageAttributes.PROP_shellthick; atts.setValue(key,newAtts.getValue(key));
+            key = AbstractBenthicStageAttributes.PROP_instar;      atts.setValue(key,newAtts.getValue(key));
             key = AbstractBenthicStageAttributes.PROP_ageInInstar; atts.setValue(key,newAtts.getValue(key));
+            key = AbstractBenthicStageAttributes.PROP_size;        atts.setValue(key,newAtts.getValue(key));
+            key = AbstractBenthicStageAttributes.PROP_weight;      atts.setValue(key,newAtts.getValue(key));
+            key = AbstractBenthicStageAttributes.PROP_shellcond;   atts.setValue(key,newAtts.getValue(key));
+            key = AbstractBenthicStageAttributes.PROP_shellthick;  atts.setValue(key,newAtts.getValue(key));
         }
         
         id = atts.getValue(LifeStageAttributesInterface.PROP_id, id);
@@ -405,19 +406,27 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
     protected void updateAttributes() {
         //note that the following do not need to be updated
         //  id, parentID, origID, startTime, horizType, vertType
-        atts.setValue(AbstractBenthicStageAttributes.PROP_active,active);
-        atts.setValue(AbstractBenthicStageAttributes.PROP_alive,alive);
+        //id
+        //parentID
+        //origID
+        //startTime
         atts.setValue(AbstractBenthicStageAttributes.PROP_time,time);
+        //horizType
+        //vertType
         atts.setValue(AbstractBenthicStageAttributes.PROP_horizPos1,lon);
         atts.setValue(AbstractBenthicStageAttributes.PROP_horizPos2,lat);
         atts.setValue(AbstractBenthicStageAttributes.PROP_vertPos,depth);
         atts.setValue(AbstractBenthicStageAttributes.PROP_bathym,bathym);
         atts.setValue(AbstractBenthicStageAttributes.PROP_gridCellID,gridCellID);
+        //track ??
+        atts.setValue(AbstractBenthicStageAttributes.PROP_active,active);
+        atts.setValue(AbstractBenthicStageAttributes.PROP_alive,alive);
         atts.setValue(AbstractBenthicStageAttributes.PROP_age,age);
         atts.setValue(AbstractBenthicStageAttributes.PROP_ageInStage,ageInStage);
-        atts.setValue(AbstractBenthicStageAttributes.PROP_ageInInstar,ageInInstar);
         atts.setValue(AbstractBenthicStageAttributes.PROP_number,number);
+        
         atts.setValue(AbstractBenthicStageAttributes.PROP_instar,instar);
+        atts.setValue(AbstractBenthicStageAttributes.PROP_ageInInstar,ageInInstar);
         atts.setValue(AbstractBenthicStageAttributes.PROP_size,size);
         atts.setValue(AbstractBenthicStageAttributes.PROP_weight,weight);
         atts.setValue(AbstractBenthicStageAttributes.PROP_shellcond,shellcond);
@@ -433,20 +442,27 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
      *  id, parentID, origID, hType, vType
      */
     protected void updateVariables() {
-        active     = atts.getValue(AbstractBenthicStageAttributes.PROP_active,active);
-        alive      = atts.getValue(AbstractBenthicStageAttributes.PROP_alive,alive);
+        //id
+        //parentID
+        //origID
         startTime  = atts.getValue(AbstractBenthicStageAttributes.PROP_startTime,startTime);
         time       = atts.getValue(AbstractBenthicStageAttributes.PROP_time,time);
+        //horizType
+        //vertType
         lon        = atts.getValue(AbstractBenthicStageAttributes.PROP_horizPos1,lon);
         lat        = atts.getValue(AbstractBenthicStageAttributes.PROP_horizPos2,lat);
         depth      = atts.getValue(AbstractBenthicStageAttributes.PROP_vertPos,depth);
         bathym     = atts.getValue(AbstractBenthicStageAttributes.PROP_bathym,bathym);
         gridCellID = atts.getValue(AbstractBenthicStageAttributes.PROP_gridCellID,gridCellID);
+        //track
+        active     = atts.getValue(AbstractBenthicStageAttributes.PROP_active,active);
+        alive      = atts.getValue(AbstractBenthicStageAttributes.PROP_alive,alive);
         age        = atts.getValue(AbstractBenthicStageAttributes.PROP_age,age);
         ageInStage = atts.getValue(AbstractBenthicStageAttributes.PROP_ageInStage,ageInStage);
-        ageInInstar = atts.getValue(AbstractBenthicStageAttributes.PROP_ageInInstar,ageInInstar);
         number     = atts.getValue(AbstractBenthicStageAttributes.PROP_number,number);
+        
         instar      = atts.getValue(AbstractBenthicStageAttributes.PROP_instar,instar);
+        ageInInstar = atts.getValue(AbstractBenthicStageAttributes.PROP_ageInInstar,ageInInstar);
         size        = atts.getValue(AbstractBenthicStageAttributes.PROP_size,size);
         weight      = atts.getValue(AbstractBenthicStageAttributes.PROP_weight,weight);
         shellcond   = atts.getValue(AbstractBenthicStageAttributes.PROP_shellcond,shellcond);

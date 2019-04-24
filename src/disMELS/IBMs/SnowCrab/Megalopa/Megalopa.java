@@ -761,7 +761,8 @@ public class Megalopa extends AbstractPelagicStage {
             }
         }
         number = number*Math.exp(-dt*totRate/DAY_SECS);
-        if(number==0){
+//        if(number==0){
+        if(number<0.01){ //TODO: replace this with parameter
             active=false;alive=false;number=number+numTrans;
         }
     }

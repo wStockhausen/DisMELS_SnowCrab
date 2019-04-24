@@ -4,6 +4,7 @@
 
 package disMELS.IBMs.SnowCrab.Zooea1;
 
+import SnowCrabFunctions.IntermoltLarvaFunction;
 import com.vividsolutions.jts.geom.Coordinate;
 import disMELS.IBMs.SnowCrab.AbstractPelagicStage;
 import disMELS.IBMs.SnowCrab.EggMassExtruded.ExtrudedEggMassAttributes;
@@ -17,6 +18,9 @@ import wts.models.DisMELS.IBMFunctions.Growth.LinearGrowthFunction;
 import wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
+import wts.models.DisMELS.IBMFunctions.Movement.DielVerticalMigration_FixedDepthRanges;
+import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunction;
+import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.PowerLawSwimmingSpeedFunction;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.models.utilities.DateTimeFunctions;
@@ -372,11 +376,21 @@ public class Zooea1 extends AbstractPelagicStage {
      * Sets the IBM functions from the parameters object
      */
     private void setIBMFunctions(){
-        fcnGrowth  = params.getSelectedIBMFunctionForCategory(Zooea1Parameters.FCAT_Growth);
-        fcnMort    = params.getSelectedIBMFunctionForCategory(Zooea1Parameters.FCAT_Mortality);
+        fcnGrowth   = params.getSelectedIBMFunctionForCategory(Zooea1Parameters.FCAT_Growth);
+        if (!(fcnGrowth instanceof ExponentialGrowthFunction||fcnGrowth instanceof LinearGrowthFunction||fcnGrowth instanceof ConstantFunction))
+            throw new java.lang.UnsupportedOperationException("Growth function "+fcnGrowth.getFunctionName()+" is not supported for Zooea1.");
+        fcnMort     = params.getSelectedIBMFunctionForCategory(Zooea1Parameters.FCAT_Mortality);
+        if (!(fcnMort instanceof ConstantMortalityRate||fcnMort instanceof TemperatureDependentMortalityRate_Houde1989))
+            throw new java.lang.UnsupportedOperationException("Mortality function "+fcnMort.getFunctionName()+" is not supported for Zooea1.");
         fcnMoltTime = params.getSelectedIBMFunctionForCategory(Zooea1Parameters.FCAT_MoltTime);
-        fcnVM      = params.getSelectedIBMFunctionForCategory(Zooea1Parameters.FCAT_VerticalMovement);
-        fcnVV      = params.getSelectedIBMFunctionForCategory(Zooea1Parameters.FCAT_VerticalVelocity);
+        if (!(fcnMoltTime instanceof IntermoltLarvaFunction))
+            throw new java.lang.UnsupportedOperationException("Molt time function "+fcnMoltTime.getFunctionName()+" is not supported for Zooea1.");
+        fcnVM       = params.getSelectedIBMFunctionForCategory(Zooea1Parameters.FCAT_VerticalMovement);
+        if (!(fcnVM instanceof DielVerticalMigration_FixedDepthRanges))
+            throw new java.lang.UnsupportedOperationException("Vertical movement function "+fcnVM.getFunctionName()+" is not supported for Zooea1.");
+        fcnVV       = params.getSelectedIBMFunctionForCategory(Zooea1Parameters.FCAT_VerticalVelocity);
+        if (!(fcnVV instanceof PowerLawSwimmingSpeedFunction|| fcnVV instanceof ConstantMovementRateFunction))
+            throw new java.lang.UnsupportedOperationException("Vertical velocity function "+fcnVV.getFunctionName()+" is not supported for Zooea1.");
     }
     
     /*
@@ -395,7 +409,7 @@ public class Zooea1 extends AbstractPelagicStage {
                 params.getValue(Zooea1Parameters.PARAM_maxStageDuration,maxStageDuration);
         randomizeTransitions = 
                 params.getValue(Zooea1Parameters.PARAM_randomizeTransitions,true);
-                minWeight = 
+        minWeight = 
                 params.getValue(Zooea1Parameters.PARAM_minWeight,minWeight);
     }
     
@@ -750,7 +764,8 @@ public class Zooea1 extends AbstractPelagicStage {
             }
         }
         number = number*Math.exp(-dt*totRate/DAY_SECS);
-        if(number==0){
+//        if(number==0){
+        if(number<0.01){ //TODO: replace this with parameter
             active=false;alive=false;number=number+numTrans;
         }
     }

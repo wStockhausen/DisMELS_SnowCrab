@@ -40,6 +40,10 @@ public class MaleAdultParameters extends AbstractLHSParameters {
     public static final String PARAM_isSuperIndividual     = "is a super-individual?";
     public static final String PARAM_horizRWP              = "horizontal random walk parameter [m^2]/[s]";
     public static final String PARAM_maxStageDuration      = "max stage duration [d]";
+    public static final String PARAM_percLostWeight        = "percentage weight that can be lost";
+    public static final String PARAM_maxStarvTime          = "the maximum time for negative growth before a crab starves [s]";
+    public static final String PARAM_aLengthWeight         = "intercept of length-weight relationship";
+    public static final String PARAM_bLengthWeight         = "slope of length-weight relationship";
     
     /** the number of IBMFunction categories defined in the class */
     public static final int numFunctionCats   = 2;
@@ -77,6 +81,8 @@ public class MaleAdultParameters extends AbstractLHSParameters {
         key = PARAM_isSuperIndividual; mapParams.put(key,new IBMParameterBoolean(key,key,false));
         key = PARAM_horizRWP;          mapParams.put(key,new IBMParameterDouble(key,key,0.0));
         key = PARAM_maxStageDuration;  mapParams.put(key,new IBMParameterDouble(key,key,365.0));
+        key = PARAM_percLostWeight;    mapParams.put(key, new IBMParameterDouble(key, key, 0.9385));
+        key = PARAM_maxStarvTime;      mapParams.put(key, new IBMParameterDouble(key, key, 518400.0));
     }
 
     @Override
