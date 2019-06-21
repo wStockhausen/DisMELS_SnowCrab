@@ -9,7 +9,7 @@ import java.beans.*;
 
 /**
  *
- * @author william.stockhausen
+ * @author WilliamStockhausen
  */
 public class MegalopaParametersBeanInfo extends SimpleBeanInfo {
 

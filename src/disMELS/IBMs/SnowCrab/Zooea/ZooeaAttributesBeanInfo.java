@@ -1,21 +1,20 @@
 /*
- * FemaleImmatureAttributesBeanInfo.java
+ * ZooeaAttributesBeanInfo.java
  */
+package disMELS.IBMs.SnowCrab.Zooea;
 
-package disMELS.IBMs.SnowCrab.FemaleImmature;
-
+import disMELS.IBMs.SnowCrab.AbstractPelagicStageAttributesCustomizer;
 import java.beans.*;
-import disMELS.IBMs.SnowCrab.AbstractBenthicStageAttributesCustomizer;
 
 /**
- * BeanInfo for snow crab FemaleImmatureAttributes class.
+ * BeanInfo for the ZooeaAttributes class.
  */
-public class FemaleImmatureAttributesBeanInfo extends SimpleBeanInfo {
+public class ZooeaAttributesBeanInfo extends SimpleBeanInfo {
 
     // Bean descriptor//GEN-FIRST:BeanDescriptor
     /*lazy BeanDescriptor*/
     private static BeanDescriptor getBdescriptor(){
-        BeanDescriptor beanDescriptor = new BeanDescriptor  ( disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes.class , AbstractBenthicStageAttributesCustomizer.class ); // NOI18N//GEN-HEADEREND:BeanDescriptor
+        BeanDescriptor beanDescriptor = new BeanDescriptor  ( disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes.class , AbstractPelagicStageAttributesCustomizer.class ); // NOI18N//GEN-HEADEREND:BeanDescriptor
 
         // Here you can add code for customizing the BeanDescriptor.
 
@@ -43,21 +42,21 @@ public class FemaleImmatureAttributesBeanInfo extends SimpleBeanInfo {
         PropertyDescriptor[] properties = new PropertyDescriptor[15];
     
         try {
-            properties[PROPERTY_active] = new PropertyDescriptor ( "active", disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes.class, "isActive", "setActive" ); // NOI18N
-            properties[PROPERTY_alive] = new PropertyDescriptor ( "alive", disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes.class, "isAlive", "setAlive" ); // NOI18N
-            properties[PROPERTY_arrayList] = new PropertyDescriptor ( "arrayList", disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes.class, "getArrayList", null ); // NOI18N
-            properties[PROPERTY_attributes] = new PropertyDescriptor ( "attributes", disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes.class, "getAttributes", null ); // NOI18N
-            properties[PROPERTY_classes] = new PropertyDescriptor ( "classes", disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes.class, "getClasses", null ); // NOI18N
-            properties[PROPERTY_CSV] = new PropertyDescriptor ( "CSV", disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes.class, "getCSV", null ); // NOI18N
-            properties[PROPERTY_CSVHeader] = new PropertyDescriptor ( "CSVHeader", disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes.class, "getCSVHeader", null ); // NOI18N
-            properties[PROPERTY_CSVHeaderShortNames] = new PropertyDescriptor ( "CSVHeaderShortNames", disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes.class, "getCSVHeaderShortNames", null ); // NOI18N
-            properties[PROPERTY_geometry] = new PropertyDescriptor ( "geometry", disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes.class, "getGeometry", "setGeometry" ); // NOI18N
-            properties[PROPERTY_ID] = new PropertyDescriptor ( "ID", disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes.class, "getID", null ); // NOI18N
-            properties[PROPERTY_keys] = new PropertyDescriptor ( "keys", disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes.class, "getKeys", null ); // NOI18N
-            properties[PROPERTY_shortNames] = new PropertyDescriptor ( "shortNames", disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes.class, "getShortNames", null ); // NOI18N
-            properties[PROPERTY_startTime] = new PropertyDescriptor ( "startTime", disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes.class, "getStartTime", "setStartTime" ); // NOI18N
-            properties[PROPERTY_typeName] = new PropertyDescriptor ( "typeName", disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes.class, "getTypeName", null ); // NOI18N
-            properties[PROPERTY_values] = new PropertyDescriptor ( "values", disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes.class, null, "setValues" ); // NOI18N
+            properties[PROPERTY_active] = new PropertyDescriptor ( "active", disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes.class, "isActive", "setActive" ); // NOI18N
+            properties[PROPERTY_alive] = new PropertyDescriptor ( "alive", disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes.class, "isAlive", "setAlive" ); // NOI18N
+            properties[PROPERTY_arrayList] = new PropertyDescriptor ( "arrayList", disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes.class, "getArrayList", null ); // NOI18N
+            properties[PROPERTY_attributes] = new PropertyDescriptor ( "attributes", disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes.class, "getAttributes", null ); // NOI18N
+            properties[PROPERTY_classes] = new PropertyDescriptor ( "classes", disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes.class, "getClasses", null ); // NOI18N
+            properties[PROPERTY_CSV] = new PropertyDescriptor ( "CSV", disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes.class, "getCSV", null ); // NOI18N
+            properties[PROPERTY_CSVHeader] = new PropertyDescriptor ( "CSVHeader", disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes.class, "getCSVHeader", null ); // NOI18N
+            properties[PROPERTY_CSVHeaderShortNames] = new PropertyDescriptor ( "CSVHeaderShortNames", disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes.class, "getCSVHeaderShortNames", null ); // NOI18N
+            properties[PROPERTY_geometry] = new PropertyDescriptor ( "geometry", disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes.class, "getGeometry", "setGeometry" ); // NOI18N
+            properties[PROPERTY_ID] = new PropertyDescriptor ( "ID", disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes.class, "getID", null ); // NOI18N
+            properties[PROPERTY_keys] = new PropertyDescriptor ( "keys", disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes.class, "getKeys", null ); // NOI18N
+            properties[PROPERTY_shortNames] = new PropertyDescriptor ( "shortNames", disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes.class, "getShortNames", null ); // NOI18N
+            properties[PROPERTY_startTime] = new PropertyDescriptor ( "startTime", disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes.class, "getStartTime", "setStartTime" ); // NOI18N
+            properties[PROPERTY_typeName] = new PropertyDescriptor ( "typeName", disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes.class, "getTypeName", null ); // NOI18N
+            properties[PROPERTY_values] = new PropertyDescriptor ( "values", disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes.class, null, "setValues" ); // NOI18N
         }
         catch(IntrospectionException e) {
             e.printStackTrace();
@@ -75,7 +74,7 @@ public class FemaleImmatureAttributesBeanInfo extends SimpleBeanInfo {
         EventSetDescriptor[] eventSets = new EventSetDescriptor[1];
     
         try {
-            eventSets[EVENT_propertyChangeListener] = new EventSetDescriptor ( disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes.class, "propertyChangeListener", java.beans.PropertyChangeListener.class, new String[] {"propertyChange"}, "addPropertyChangeListener", "removePropertyChangeListener" ); // NOI18N
+            eventSets[EVENT_propertyChangeListener] = new EventSetDescriptor ( disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes.class, "propertyChangeListener", java.beans.PropertyChangeListener.class, new String[] {"propertyChange"}, "addPropertyChangeListener", "removePropertyChangeListener" ); // NOI18N
         }
         catch(IntrospectionException e) {
             e.printStackTrace();
@@ -111,9 +110,9 @@ public class FemaleImmatureAttributesBeanInfo extends SimpleBeanInfo {
         MethodDescriptor[] methods = new MethodDescriptor[19];
     
         try {
-            methods[METHOD_clone0] = new MethodDescriptor(disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes.class.getMethod("clone", new Class[] {})); // NOI18N
+            methods[METHOD_clone0] = new MethodDescriptor(disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes.class.getMethod("clone", new Class[] {})); // NOI18N
             methods[METHOD_clone0].setDisplayName ( "" );
-            methods[METHOD_createInstance1] = new MethodDescriptor(disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes.class.getMethod("createInstance", new Class[] {java.lang.String[].class})); // NOI18N
+            methods[METHOD_createInstance1] = new MethodDescriptor(disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes.class.getMethod("createInstance", new Class[] {java.lang.String[].class})); // NOI18N
             methods[METHOD_createInstance1].setDisplayName ( "" );
             methods[METHOD_getValue2] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes.class.getMethod("getValue", new Class[] {java.lang.String.class, java.lang.Boolean.class})); // NOI18N
             methods[METHOD_getValue2].setDisplayName ( "" );
@@ -135,7 +134,7 @@ public class FemaleImmatureAttributesBeanInfo extends SimpleBeanInfo {
             methods[METHOD_getValue10].setDisplayName ( "" );
             methods[METHOD_getValue11] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes.class.getMethod("getValue", new Class[] {java.lang.String.class})); // NOI18N
             methods[METHOD_getValue11].setDisplayName ( "" );
-            methods[METHOD_getValueAsString12] = new MethodDescriptor(disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes.class.getMethod("getValueAsString", new Class[] {java.lang.String.class})); // NOI18N
+            methods[METHOD_getValueAsString12] = new MethodDescriptor(disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes.class.getMethod("getValueAsString", new Class[] {java.lang.String.class})); // NOI18N
             methods[METHOD_getValueAsString12].setDisplayName ( "" );
             methods[METHOD_setValue13] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes.class.getMethod("setValue", new Class[] {java.lang.String.class, java.lang.Object.class})); // NOI18N
             methods[METHOD_setValue13].setDisplayName ( "" );
@@ -147,7 +146,7 @@ public class FemaleImmatureAttributesBeanInfo extends SimpleBeanInfo {
             methods[METHOD_setValue16].setDisplayName ( "" );
             methods[METHOD_setValue17] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSAttributes.class.getMethod("setValue", new Class[] {java.lang.String.class, long.class})); // NOI18N
             methods[METHOD_setValue17].setDisplayName ( "" );
-            methods[METHOD_setValueFromString18] = new MethodDescriptor(disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes.class.getMethod("setValueFromString", new Class[] {java.lang.String.class, java.lang.String.class})); // NOI18N
+            methods[METHOD_setValueFromString18] = new MethodDescriptor(disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes.class.getMethod("setValueFromString", new Class[] {java.lang.String.class, java.lang.String.class})); // NOI18N
             methods[METHOD_setValueFromString18].setDisplayName ( "" );
         }
         catch( Exception e) {}//GEN-HEADEREND:Methods

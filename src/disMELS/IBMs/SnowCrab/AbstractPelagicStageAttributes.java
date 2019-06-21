@@ -19,8 +19,8 @@ public abstract class AbstractPelagicStageAttributes implements LifeStageAttribu
     // attributes in addition to those from LifeStageAttributesInterface
     /** the number of new attributes defined by this class */
     public static final int PROP_NumNewAtts = 5;
-    /** the property key for the weight of the individual */
-    public static final String PROP_weight      = "weight (g)";
+    /** the property key for the individual's molt indicator */
+    public static final String PROP_moltindicator = "molt indicator";
     /** the property key for the shell thickness for the individual */
     public static final String PROP_shellthick  = "shell thickness";
     /** the property key for the in situ temperature at the individual's location */
@@ -35,7 +35,7 @@ public abstract class AbstractPelagicStageAttributes implements LifeStageAttribu
     
     protected static final Set<String> keys = new LinkedHashSet<>(32);
     
-    /** map to attributes values */
+    /** map to IBMAttributes defined in this class */
     protected static final Map<String,IBMAttribute> mapAttributes = new HashMap<>(32);
     
     /* LHS type name assigned to instance*/
@@ -84,11 +84,11 @@ public abstract class AbstractPelagicStageAttributes implements LifeStageAttribu
             key = PROP_ageInStage; keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"ageInStage"));
             key = PROP_number;     keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"number"));
             
-            key = PROP_weight;     keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"weight"));
-            key = PROP_shellthick; keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"shellthickness"));
-            key = PROP_temperature;keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"temperature"));
-            key = PROP_salinity;   keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"salinity"));
-            key = PROP_ph;         keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"pH"));
+            key = PROP_moltindicator; keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"molt indicator"));
+            key = PROP_shellthick;    keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"shellthickness"));
+            key = PROP_temperature;   keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"temperature"));
+            key = PROP_salinity;      keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"salinity"));
+            key = PROP_ph;            keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"pH"));
         }
         //assign instance-level attributes values for this class
         mapValues = new HashMap<>(2*numAttributes);
@@ -111,11 +111,11 @@ public abstract class AbstractPelagicStageAttributes implements LifeStageAttribu
         mapValues.put(PROP_ageInStage,new Double(0));
         mapValues.put(PROP_number,    new Double(1));
         
-        mapValues.put(PROP_weight,     new Double(0));
-        mapValues.put(PROP_shellthick, new Double(-1));
-        mapValues.put(PROP_temperature,new Double(-1));
-        mapValues.put(PROP_salinity,   new Double(-1));
-        mapValues.put(PROP_ph,         new Double(0));
+        mapValues.put(PROP_moltindicator,new Double(0));
+        mapValues.put(PROP_shellthick,   new Double(-1));
+        mapValues.put(PROP_temperature,  new Double(-1));
+        mapValues.put(PROP_salinity,     new Double(-1));
+        mapValues.put(PROP_ph,           new Double(0));
     }
 
     @Override
@@ -176,8 +176,7 @@ public abstract class AbstractPelagicStageAttributes implements LifeStageAttribu
      *  ageInStage
      *  number
      * 
-     *  weight
-     *  shell condition
+     *  molt indicator
      *  shell thickness
      *  temperature
      *  salinity

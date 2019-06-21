@@ -11,7 +11,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.openide.util.lookup.ServiceProvider;
-import wts.models.DisMELS.IBMFunctions.Growth.vonBertalanffyGrowthFunction;
+import wts.models.DisMELS.IBMFunctions.Growth.LinearGrowthFunction;
 import wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction;
 import wts.models.DisMELS.IBMFunctions.Miscellaneous.LogisticFunction;
 import wts.models.DisMELS.IBMFunctions.Miscellaneous.PowerLawFunction;
@@ -23,8 +23,8 @@ import wts.models.DisMELS.framework.IBMFunctions.IBMParameterDouble;
 import wts.models.DisMELS.framework.LifeStageParametersInterface;
 import SnowCrabFunctions.CrabBioenergeticsGrowthFunction;
 import SnowCrabFunctions.MoltIncrementFunction;
-import SnowCrabFunctions.IntermoltPeriodFunction;
 import SnowCrabFunctions.ExCostFunction;
+import SnowCrabFunctions.IntermoltIntegratorFunction;
 
 /**
  * DisMELS class representing attributes for adolescent female snow crab. 
@@ -115,13 +115,20 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
         IBMFunctionInterface ifi;
         
         cat = FCAT_Growth;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(2); 
+        mapOfPotentialFunctions = new LinkedHashMap<>(6); 
         mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new CrabBioenergeticsGrowthFunction(); 
         mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new ConstantFunction();  //generic function, so change defaults
+            ifi.setFunctionName("Constant growth rate"); 
+            ifi.setDescription("Constant growth rate [mm/day]"); 
+            ifi.setParameterDescription(ConstantFunction.PARAM_constant,"Constant growth rate [mm/day]");
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new LinearGrowthFunction();
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_Mortality;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(4); 
+        mapOfPotentialFunctions = new LinkedHashMap<>(6); 
         mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new ConstantFunction();  //generic function, so change defaults
             ifi.setFunctionName("Constant mortality rate"); 
@@ -134,6 +141,8 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
             ifi.setParameterDescription(PowerLawFunction.PARAM_stdVal,"mortality rate at standard size (z0) [1/day]");
             ifi.setParameterDescription(PowerLawFunction.PARAM_stdX,"standard size z0 [cm]");
             ifi.setParameterDescription(PowerLawFunction.PARAM_exponent,"exponent (<0 for decreasing function of size)");
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new LinearGrowthFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_Maturity;  
@@ -179,7 +188,7 @@ public class FemaleAdolescentParameters extends AbstractLHSParameters {
        cat = FCAT_MoltTiming;
        mapOfPotentialFunctions = new LinkedHashMap<>(2); 
        mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
-       ifi = new IntermoltPeriodFunction();
+       ifi = new IntermoltIntegratorFunction();
                mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
                
        cat = FCAT_ExCost;

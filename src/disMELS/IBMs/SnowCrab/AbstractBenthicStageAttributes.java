@@ -21,12 +21,14 @@ public abstract class AbstractBenthicStageAttributes implements LifeStageAttribu
     
     // attributes in addition to those from LisfeStageAttributesInterface
     /** the number of new attributes defined by this class */
-    public static final int PROP_NumNewAtts = 9;
+    public static final int PROP_NumNewAtts = 10;
     /** the property key for the instar of the individual */
     public static final String PROP_instar      = "instar";
-        /** the property key for the age in instar of the individual */
+    /** the property key for the age in instar of the individual */
     public static final String PROP_ageInInstar = "ageInInstar";
-        /** the property key for the size (carapace width) of the individual */
+    /** the property key for the molt indicator of the individual */
+    public static final String PROP_moltindicator = "moltindicator";
+    /** the property key for the size (carapace width) of the individual */
     public static final String PROP_size        = "size (mm CW)";
     /** the property key for the size (carapace width) of the individual */
     public static final String PROP_weight      = "weight (g)";
@@ -94,15 +96,16 @@ public abstract class AbstractBenthicStageAttributes implements LifeStageAttribu
             key = PROP_ageInStage; keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"ageInStage"));
             key = PROP_number;     keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"number"));
             //the above are generic to DisMELS IBMs. the below are specfic to snow crab.
-            key = PROP_instar;     keys.add(key); mapAttributes.put(key,new IBMAttributeInteger( key,"instar"));
-            key = PROP_ageInInstar;keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"ageInInstar"));
-            key = PROP_size;       keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"size"));
-            key = PROP_weight;     keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"weight"));
-            key = PROP_shellcond;  keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"shellcondition"));
-            key = PROP_shellthick; keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"shellthickness"));
-            key = PROP_temperature;keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"temperature"));
-            key = PROP_salinity;   keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"salinity"));
-            key = PROP_ph;         keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"pH"));
+            key = PROP_instar;       keys.add(key); mapAttributes.put(key,new IBMAttributeInteger( key,"instar"));
+            key = PROP_ageInInstar;  keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"ageInInstar"));
+            key = PROP_moltindicator;keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"moltIndicator"));
+            key = PROP_size;         keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"size"));
+            key = PROP_weight;       keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"weight"));
+            key = PROP_shellcond;    keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"shellcondition"));
+            key = PROP_shellthick;   keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"shellthickness"));
+            key = PROP_temperature;  keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"temperature"));
+            key = PROP_salinity;     keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"salinity"));
+            key = PROP_ph;           keys.add(key); mapAttributes.put(key,new IBMAttributeDouble(  key,"pH"));
         }
         //assign instance-level attributes values for this class
         mapValues = new HashMap<>(2*numAttributes);
@@ -125,15 +128,16 @@ public abstract class AbstractBenthicStageAttributes implements LifeStageAttribu
         mapValues.put(PROP_ageInStage, new Double(0));
         mapValues.put(PROP_number,     new Double(1));
         
-        mapValues.put(PROP_instar,     new Integer(0));
-        mapValues.put(PROP_ageInInstar,new Double(0));
-        mapValues.put(PROP_size,       new Double(0));
-        mapValues.put(PROP_weight,     new Double(0));
-        mapValues.put(PROP_shellcond,  new Double(-1));
-        mapValues.put(PROP_shellthick, new Double(-1));
-        mapValues.put(PROP_temperature,new Double(-1));
-        mapValues.put(PROP_salinity,   new Double(-1));
-        mapValues.put(PROP_ph,         new Double(0));
+        mapValues.put(PROP_instar,       new Integer(0));
+        mapValues.put(PROP_ageInInstar,  new Double(0));
+        mapValues.put(PROP_moltindicator,new Double(0));
+        mapValues.put(PROP_size,         new Double(0));
+        mapValues.put(PROP_weight,       new Double(0));
+        mapValues.put(PROP_shellcond,    new Double(-1));
+        mapValues.put(PROP_shellthick,   new Double(-1));
+        mapValues.put(PROP_temperature,  new Double(-1));
+        mapValues.put(PROP_salinity,     new Double(-1));
+        mapValues.put(PROP_ph,           new Double(0));
     }
 
     @Override
@@ -193,8 +197,10 @@ public abstract class AbstractBenthicStageAttributes implements LifeStageAttribu
      *  age
      *  ageInStage
      *  number
+     * 
      *  instar
      *  ageInInstar
+     *  moltIndicator
      *  size
      *  weight
      *  shell condition

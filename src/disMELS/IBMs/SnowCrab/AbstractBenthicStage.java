@@ -105,12 +105,15 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
     protected double  age=0;
     /** age in life stage, in days */
     protected double  ageInStage=0;
-    /** age in instar, in days */
-    protected double ageInInstar=0;
     /** number of individuals represented */
     protected double  number=0;
+    
     /** instar */
     protected int instar = 1;
+    /** age in instar, in days */
+    protected double ageInInstar=0;
+    /** molt indicator */
+    protected double moltIndicator=0;
     /** size (mm carapace width) */
     protected double size = 0;
     /** weight (g) */
@@ -146,7 +149,7 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
      * 
      * @param subAtts - the attributes object for the subclass
      */
-    protected void setAttributesFromSubClass(AbstractBenthicStageAttributes subAtts){
+    protected final void setAttributesFromSubClass(AbstractBenthicStageAttributes subAtts){
         atts = subAtts;
     }
     
@@ -156,7 +159,7 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
      * 
      * @param subParams - the parameters object from the subclass 
      */
-    protected void setParametersFromSubClass(LifeStageParametersInterface subParams){
+    protected final void setParametersFromSubClass(LifeStageParametersInterface subParams){
         params = subParams;
     }
     
@@ -171,7 +174,7 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
     }
     
     /**
-     * Gets the LagrangianParticle instance associted with this object.
+     * Gets the LagrangianParticle instance associated with this object.
      * 
      * @return 
      */
@@ -358,8 +361,11 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
      * 
      * If newAtts inherits from AbstractBenthicStageAttributes, then additional attributes are copied.
      * 
-     *  As a side effect, updateVariables() is called to update instance variables.
-     *  Instance field "id" is also updated.
+     *  NOTE: This changes the this object's current Instance field "id" to the one from newAtts.
+     * 
+     * This DOES NOT call updateVariables() to update the variables with values from the attributes object.
+     * Implementing subclasses should call super.updateVariables() to do so.
+     * 
      * @param newAtts - instance of LifeStageAttributesInterface
      */
     @Override
@@ -387,16 +393,16 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
         key = LifeStageAttributesInterface.PROP_number;     atts.setValue(key,newAtts.getValue(key));
         
         if (newAtts instanceof AbstractBenthicStageAttributes){
-            key = AbstractBenthicStageAttributes.PROP_instar;      atts.setValue(key,newAtts.getValue(key));
-            key = AbstractBenthicStageAttributes.PROP_ageInInstar; atts.setValue(key,newAtts.getValue(key));
-            key = AbstractBenthicStageAttributes.PROP_size;        atts.setValue(key,newAtts.getValue(key));
-            key = AbstractBenthicStageAttributes.PROP_weight;      atts.setValue(key,newAtts.getValue(key));
-            key = AbstractBenthicStageAttributes.PROP_shellcond;   atts.setValue(key,newAtts.getValue(key));
-            key = AbstractBenthicStageAttributes.PROP_shellthick;  atts.setValue(key,newAtts.getValue(key));
+            key = AbstractBenthicStageAttributes.PROP_instar;        atts.setValue(key,newAtts.getValue(key));
+            key = AbstractBenthicStageAttributes.PROP_ageInInstar;   atts.setValue(key,newAtts.getValue(key));
+            key = AbstractBenthicStageAttributes.PROP_moltindicator; atts.setValue(key,newAtts.getValue(key));
+            key = AbstractBenthicStageAttributes.PROP_size;          atts.setValue(key,newAtts.getValue(key));
+            key = AbstractBenthicStageAttributes.PROP_weight;        atts.setValue(key,newAtts.getValue(key));
+            key = AbstractBenthicStageAttributes.PROP_shellcond;     atts.setValue(key,newAtts.getValue(key));
+            key = AbstractBenthicStageAttributes.PROP_shellthick;    atts.setValue(key,newAtts.getValue(key));
         }
         
         id = atts.getValue(LifeStageAttributesInterface.PROP_id, id);
-        updateVariables();
     }
     
     /**
@@ -427,6 +433,7 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
         
         atts.setValue(AbstractBenthicStageAttributes.PROP_instar,instar);
         atts.setValue(AbstractBenthicStageAttributes.PROP_ageInInstar,ageInInstar);
+        atts.setValue(AbstractBenthicStageAttributes.PROP_moltindicator,moltIndicator);
         atts.setValue(AbstractBenthicStageAttributes.PROP_size,size);
         atts.setValue(AbstractBenthicStageAttributes.PROP_weight,weight);
         atts.setValue(AbstractBenthicStageAttributes.PROP_shellcond,shellcond);
@@ -461,15 +468,16 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
         ageInStage = atts.getValue(AbstractBenthicStageAttributes.PROP_ageInStage,ageInStage);
         number     = atts.getValue(AbstractBenthicStageAttributes.PROP_number,number);
         
-        instar      = atts.getValue(AbstractBenthicStageAttributes.PROP_instar,instar);
-        ageInInstar = atts.getValue(AbstractBenthicStageAttributes.PROP_ageInInstar,ageInInstar);
-        size        = atts.getValue(AbstractBenthicStageAttributes.PROP_size,size);
-        weight      = atts.getValue(AbstractBenthicStageAttributes.PROP_weight,weight);
-        shellcond   = atts.getValue(AbstractBenthicStageAttributes.PROP_shellcond,shellcond);
-        shellthick  = atts.getValue(AbstractBenthicStageAttributes.PROP_shellthick,shellthick);
-        salinity    = atts.getValue(AbstractBenthicStageAttributes.PROP_salinity,salinity);
-        temperature = atts.getValue(AbstractBenthicStageAttributes.PROP_temperature,temperature);
-        ph          = atts.getValue(AbstractBenthicStageAttributes.PROP_ph,ph);
+        instar        = atts.getValue(AbstractBenthicStageAttributes.PROP_instar,instar);
+        ageInInstar   = atts.getValue(AbstractBenthicStageAttributes.PROP_ageInInstar,ageInInstar);
+        moltIndicator = atts.getValue(AbstractBenthicStageAttributes.PROP_moltindicator,moltIndicator);
+        size          = atts.getValue(AbstractBenthicStageAttributes.PROP_size,size);
+        weight        = atts.getValue(AbstractBenthicStageAttributes.PROP_weight,weight);
+        shellcond     = atts.getValue(AbstractBenthicStageAttributes.PROP_shellcond,shellcond);
+        shellthick    = atts.getValue(AbstractBenthicStageAttributes.PROP_shellthick,shellthick);
+        salinity      = atts.getValue(AbstractBenthicStageAttributes.PROP_salinity,salinity);
+        temperature   = atts.getValue(AbstractBenthicStageAttributes.PROP_temperature,temperature);
+        ph            = atts.getValue(AbstractBenthicStageAttributes.PROP_ph,ph);
     }
     
 }

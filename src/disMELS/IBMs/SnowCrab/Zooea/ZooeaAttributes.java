@@ -1,8 +1,8 @@
 /*
- * Zooea2Attributes.java
+ * ZooeaAttributes.java
  */
 
-package disMELS.IBMs.SnowCrab.Zooea2;
+package disMELS.IBMs.SnowCrab.Zooea;
 
 import disMELS.IBMs.SnowCrab.AbstractPelagicStageAttributes;
 import java.util.*;
@@ -11,37 +11,37 @@ import org.openide.util.lookup.ServiceProvider;
 import wts.models.DisMELS.framework.IBMAttributes.IBMAttribute;
 
 /**
- * DisMELS class representing attributes for the second snow crab zooeal stage.
+ * DisMELS class representing attributes for the first snow crab zooeal stage.
  */
 @ServiceProvider(service=wts.models.DisMELS.framework.LifeStageAttributesInterface.class)
-public class Zooea2Attributes extends AbstractPelagicStageAttributes {
+public class ZooeaAttributes extends disMELS.IBMs.SnowCrab.AbstractPelagicStageAttributes {
     
-    /** Number of new attributes defined by this class */
-    public static final int numNewAttributes = 0;
+    /** Number of NEW attributes defined by this class */
+    public static final int numAttributes = 0;
 //    //define keys to new attributes here as public static final String's, e.g.:
 //    public static final String PROP_size   = "size [mm]";
         
-    /** set of keys identifying new attributes */
-    protected static final Set<String> newKeys = new LinkedHashSet<>((int)(2*numNewAttributes));
-    /** set of keys identifying all attributes */
-    protected static final Set<String> allKeys = new LinkedHashSet<>((int)(2*(AbstractPelagicStageAttributes.numAttributes+numNewAttributes)));
-    /** map containing all attributes */
-    protected static final Map<String,IBMAttribute> mapAllAttributes = new HashMap<>((int)(2*(AbstractPelagicStageAttributes.numAttributes+numNewAttributes)));
+    /** set of keys identifying NEW attributes */
+    protected static final Set<String> newKeys = new LinkedHashSet<>((int)(2*numAttributes));
+    /** set of keys identifying ALL attributes (from this class AND all superclasses) */
+    protected static final Set<String> keys = new LinkedHashSet<>((int)(2*(AbstractPelagicStageAttributes.numAttributes+numAttributes)));
+    /** map containing ALL attributes  (from this class AND all superclasses) */
+    protected static final Map<String,IBMAttribute> mapAttributes = new HashMap<>((int)(2*(AbstractPelagicStageAttributes.numAttributes+numAttributes)));
     /** String[] containing all attribute keys EXCEPT typeName */
-    protected static final String[] aKeys      = new String[AbstractPelagicStageAttributes.numAttributes+numNewAttributes-1];//does not include typeName
+    protected static final String[] aKeys      = new String[AbstractPelagicStageAttributes.numAttributes+numAttributes-1];//does not include typeName
     /** Class[] containing the class associated with each attribute */
-    protected static final Class[]  classes    = new Class[AbstractPelagicStageAttributes.numAttributes+numNewAttributes];
+    protected static final Class[]  classes    = new Class[AbstractPelagicStageAttributes.numAttributes+numAttributes];
     /** String[] containing short names for all attributes (for writing results) */
-    protected static final String[] shortNames = new String[AbstractPelagicStageAttributes.numAttributes+numNewAttributes];
+    protected static final String[] shortNames = new String[AbstractPelagicStageAttributes.numAttributes+numAttributes];
    
     /** class logger */
-    private static final Logger logger = Logger.getLogger(Zooea2Attributes.class.getName());
+    private static final Logger logger = Logger.getLogger(ZooeaAttributes.class.getName());
     
     /**
      * This constructor is provided only to facilitate the ServiceProvider functionality.
      * DO NOT USE IT!!
      */
-    public Zooea2Attributes(){
+    public ZooeaAttributes(){
         super("NULL");
         finishInstantiation();
     }
@@ -49,11 +49,36 @@ public class Zooea2Attributes extends AbstractPelagicStageAttributes {
     /**
      * Creates a new attributes instance with type name 'typeName'.
      */
-    public Zooea2Attributes(String typeName) {
+    public ZooeaAttributes(String typeName) {
         super(typeName);
         finishInstantiation();
     }
     
+    private void finishInstantiation(){
+        if (newKeys.isEmpty()){
+            //set static field information (only if it hasn't been set before)
+            //map all attributes
+            mapAttributes.putAll(super.mapAttributes);//add from superclass
+            //create new keys and map new attributes here. 
+//            //No new keys for this class, but would look like:
+//            String key;
+//            key = PROP_size; newKeys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"size"));
+            //create keys by combining keys from superclass and new keys from this class
+            keys.addAll(super.keys);//add from superclass
+            keys.addAll(newKeys);//add from this class
+            Iterator<String> it = keys.iterator();
+            int j = 0; it.next();//skip typeName
+            while (it.hasNext()) aKeys[j++] = it.next();
+        }
+        //set instance information
+        Map<String,Object> tmpMapValues = new HashMap<>((int)(2*(numAttributes+AbstractPelagicStageAttributes.numAttributes)));
+        tmpMapValues.putAll(mapValues);//copy from super
+        //add new attributes
+//        //no new attributes for this class, but would look like:
+//        tmpMapValues.put(PROP_size,       new Double(0));
+        mapValues = tmpMapValues;//assign to super
+    }
+
     /**
      * Returns a deep copy of the instance.  Values are copied.  
      * Any listeners on 'this' are not(?) copied, so these need to be hooked up.
@@ -61,8 +86,8 @@ public class Zooea2Attributes extends AbstractPelagicStageAttributes {
      */
     @Override
     public Object clone() {
-        Zooea2Attributes clone = new Zooea2Attributes(typeName);
-        for (String key: allKeys) clone.setValue(key,this.getValue(key));
+        ZooeaAttributes clone = new ZooeaAttributes(typeName);
+        for (String key: keys) clone.setValue(key,this.getValue(key));
         return clone;
     }
 
@@ -74,48 +99,23 @@ public class Zooea2Attributes extends AbstractPelagicStageAttributes {
      * @return - the new instance
      */
     @Override
-    public Zooea2Attributes createInstance(final String[] strv) {
-        Zooea2Attributes atts = new Zooea2Attributes(strv[0]);//this sets atts.typeName
+    public ZooeaAttributes createInstance(final String[] strv) {
+        ZooeaAttributes atts = new ZooeaAttributes(strv[0]);//this sets atts.typeName
         atts.setValues(strv);
         return atts;
     }
     
-    private void finishInstantiation(){
-        if (newKeys.isEmpty()){
-            //set static field information
-            //map all attributes
-            mapAllAttributes.putAll(super.mapAttributes);//add from superclass
-            //create new keys and map new attributes here. 
-//            //No new keys for this class, but would look like:
-//            String key;
-//            key = PROP_size;       newKeys.add(key); mapAllAttributes.put(key,new IBMAttributeDouble(key,"size"));
-            //create allKeys by combining keys from superclass and new keys from this class
-            allKeys.addAll(super.keys);//add from superclass
-            allKeys.addAll(newKeys);//add from this class
-            Iterator<String> it = allKeys.iterator();
-            int j = 0; it.next();//skip typeName
-            while (it.hasNext()) aKeys[j++] = it.next();
-        }
-        //set instance information
-        Map<String,Object> tmpMapValues = new HashMap<>((int)(2*(numNewAttributes+numAttributes)));
-        tmpMapValues.putAll(mapValues);//copy from super
-        //add new attributes
-//        //no new attributes for this class, but would look like:
-//        tmpMapValues.put(PROP_size,       new Double(0));
-        mapValues = tmpMapValues;//assign to super
-    }
-
-    /**
-     * Returns the attribute values as an ArrayList (including typeName).
-     * 
-     * @return 
-     */
-    @Override
-    public ArrayList getArrayList() {
-        ArrayList a = super.getArrayList();
-        for (String key: newKeys) a.add(getValue(key));
-        return a;
-    }
+//    /**
+//     * Returns the attribute values as an ArrayList (including typeName).
+//     * 
+//     * @return 
+//     */
+//    @Override
+//    public ArrayList getArrayList() {
+//        ArrayList a = super.getArrayList();
+//        for (String key: newKeys) a.add(getValue(key));
+//        return a;
+//    }
 
     /**
      * Returns the attributes values (not including typeName) as an Object[].
@@ -124,9 +124,9 @@ public class Zooea2Attributes extends AbstractPelagicStageAttributes {
      */
     @Override
     public Object[] getAttributes() {
-        Object[] atts = new Object[numNewAttributes+numAttributes-1];
+        Object[] atts = new Object[numAttributes+AbstractPelagicStageAttributes.numAttributes-1];
         int j = 0;
-        Iterator<String> it = allKeys.iterator();
+        Iterator<String> it = keys.iterator();
         it.next();//skip PROP_typeName
         while (it.hasNext()) atts[j++] = getValue(it.next()); 
         return atts;
@@ -170,13 +170,13 @@ public class Zooea2Attributes extends AbstractPelagicStageAttributes {
     public String getCSVHeaderShortNames() {
         String str = super.getCSVHeaderShortNames();
         Iterator<String> it = newKeys.iterator();
-        while (it.hasNext()) str = str+cc+mapAllAttributes.get(it.next()).shortName;
+        while (it.hasNext()) str = str+cc+mapAttributes.get(it.next()).shortName;
         return str;
     }
 
     /**
      * Returns Class types for all attributes (including typeName) as a Class[]
-     * in the order the allKeys are defined.
+ in the order the keys are defined.
      * 
      * @return 
      */
@@ -184,8 +184,8 @@ public class Zooea2Attributes extends AbstractPelagicStageAttributes {
     public Class[] getClasses() {
         if (classes[0]==null){
             int j = 0;
-            for (String key: allKeys){
-                classes[j++] = mapAllAttributes.get(key).getValueClass();
+            for (String key: keys){
+                classes[j++] = mapAttributes.get(key).getValueClass();
             }
         }
         return classes;
@@ -204,7 +204,7 @@ public class Zooea2Attributes extends AbstractPelagicStageAttributes {
 
     /**
      * Returns short names for all attributes (including typeName) as a String[]
-     * in the order the allKeys are defined.
+ in the order the keys are defined.
      * 
      * @return 
      */
@@ -212,8 +212,8 @@ public class Zooea2Attributes extends AbstractPelagicStageAttributes {
     public String[] getShortNames() {
         if (shortNames[0]==null){
             int j = 0;
-            for (String key: allKeys){
-                shortNames[j++] = mapAllAttributes.get(key).shortName;
+            for (String key: keys){
+                shortNames[j++] = mapAttributes.get(key).shortName;
             }
         }
         return shortNames;
@@ -227,16 +227,16 @@ public class Zooea2Attributes extends AbstractPelagicStageAttributes {
     public void setValues(final String[] strv) {
         super.setValues(strv);//set the standard attribute values
         //set the values of the new attributes
-        int j = numAttributes;
+        int j = AbstractPelagicStageAttributes.numAttributes;
         try {
             for (String key: newKeys) setValueFromString(key,strv[j++]);
         } catch (java.lang.IndexOutOfBoundsException ex) {
             //@TODO: should throw an exception here that identifies the problem
-            String[] aKeys = new String[Zooea2Attributes.allKeys.size()];
-            aKeys = Zooea2Attributes.allKeys.toArray(aKeys);
+            String[] aKeys = new String[ZooeaAttributes.keys.size()];
+            aKeys = ZooeaAttributes.keys.toArray(aKeys);
                 String str = "Missing attribute value for "+aKeys[j-1]+".\n"+
                              "Prior values are ";
-                for (int i=0;i<(j);i++) str = str+strv[i]+" ";
+                for (int i=0;i<j;i++) str = str+strv[i]+" ";
                 javax.swing.JOptionPane.showMessageDialog(
                         null,
                         str,
@@ -244,8 +244,8 @@ public class Zooea2Attributes extends AbstractPelagicStageAttributes {
                         javax.swing.JOptionPane.ERROR_MESSAGE);
                 throw ex;
         } catch (java.lang.NumberFormatException ex) {
-            String[] aKeys = new String[Zooea2Attributes.allKeys.size()];
-            aKeys = Zooea2Attributes.allKeys.toArray(aKeys);
+            String[] aKeys = new String[ZooeaAttributes.keys.size()];
+            aKeys = ZooeaAttributes.keys.toArray(aKeys);
             String str = "Bad attribute value for "+aKeys[j-2]+".\n"+
                          "Value was '"+strv[j-1]+"'.\n"+
                          "Entry was '";
@@ -277,7 +277,7 @@ public class Zooea2Attributes extends AbstractPelagicStageAttributes {
     @Override
     public String getValueAsString(String key){
         Object val = getValue(key);
-        IBMAttribute att = mapAllAttributes.get(key);
+        IBMAttribute att = mapAttributes.get(key);
         att.setValue(val);
         String str = att.getValueAsString();
         return str;
@@ -286,7 +286,7 @@ public class Zooea2Attributes extends AbstractPelagicStageAttributes {
     @Override
     public void setValueFromString(String key, String value) throws NumberFormatException {
         if (!key.equals(PROP_typeName)){
-            IBMAttribute att = mapAllAttributes.get(key);
+            IBMAttribute att = mapAttributes.get(key);
             att.parseValue(value);
             setValue(key,att.getValue());
         }

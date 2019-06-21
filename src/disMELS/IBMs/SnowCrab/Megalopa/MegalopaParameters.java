@@ -9,21 +9,17 @@
 
 package disMELS.IBMs.SnowCrab.Megalopa;
 
-import SnowCrabFunctions.IntermoltLarvaFunction;
+import SnowCrabFunctions.IntermoltIntegratorFunction;
 import java.beans.PropertyChangeSupport;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.openide.util.lookup.ServiceProvider;
-import wts.models.DisMELS.IBMFunctions.Growth.ExponentialGrowthFunction;
-import wts.models.DisMELS.IBMFunctions.Growth.LinearGrowthFunction;
-import wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
 import wts.models.DisMELS.IBMFunctions.Movement.DielVerticalMigration_FixedDepthRanges;
 import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunction;
-import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.PowerLawSwimmingSpeedFunction;
 import wts.models.DisMELS.framework.AbstractLHSParameters;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.models.DisMELS.framework.IBMFunctions.IBMParameter;
@@ -32,25 +28,19 @@ import wts.models.DisMELS.framework.IBMFunctions.IBMParameterDouble;
 import wts.models.DisMELS.framework.LifeStageParametersInterface;
 
 /**
- * DisMELS class representing parameters for arrowtooth flounder settlers
- * for the GOA IERP Modeling project.
+ * DisMELS class representing parameters for snow crab megalopae.
  * 
  * This class uses the IBMParameters/IBMFunctions approach to specifying stage-specific parameters.
  * 
- *  Potential growth functions (FCAT_Growth)
- *      ExponentialGrowthFunction()
- *      LinearGrowthFunction()
- *      ConstantFunction()
- *  Potential mortality functions (FCAT_Mortality)
+ *  Potential intermolt duration functions          (FCAT_IntermoltDuration)
+ *      IntermoltIntegratorFunction()
+ *  Potential mortality functions                   (FCAT_Mortality)
  *      ConstantMortalityRate()
  *      TemperatureDependentMortalityRate_Houde1989()
- *  Potential vertical movement functions (FCAT_VerticalMovement)
+ *  Potential vertical movement functions           (FCAT_VerticalMovement)
  *      DielVerticalMigration_FixedDepthRanges()
- *  Potential vertical velocity functions (FCAT_VerticalVelocity)
- *      PowerLawSwimmingSpeedFunction()
+ *  Potential vertical velocity functions           (FCAT_VerticalVelocity)
  *      ConstantMovementRateFunction()
- *  Potential molt timing functions (FCAT_MoltTime)
- *      IntermoltLarvaFunction()
  * 
  * @author William Stockhausen
  */
@@ -60,30 +50,27 @@ public class MegalopaParameters extends AbstractLHSParameters {
     public static final long serialVersionUID = 1L;
     
     /** the number of IBMParameter objects defined in the class */
-    public static final int numParams = 9;
+    public static final int numParams = 6;
     public static final String PARAM_isSuperIndividual      = "is a super-individual?";
     public static final String PARAM_horizRWP               = "horizontal random walk parameter [m^2]/[s]";
-    public static final String PARAM_minStageDuration       = "min stage duration [d]";
     public static final String PARAM_maxStageDuration       = "max stage duration [d]";
     public static final String PARAM_minSettlementDepth     = "min settlement depth (m)";
     public static final String PARAM_maxSettlementDepth     = "max settlement depth (m)";
+    public static final String PARAM_sexRatio               = "fraction male abundance at 1st benthic instar";
     public static final String PARAM_randomizeTransitions   = "randomize transitions?";
-    public static final String PARAM_initialWeight          = "initial weight in stage (g)";
-    public static final String PARAM_minWeight              = "minimum weight before transition (g)";
     
     
     /** the number of IBMFunction categories defined in the class */
-    public static final int numFunctionCats = 5;
-    public static final String FCAT_Growth           = "growth";
-    public static final String FCAT_Mortality        = "mortality";
-    public static final String FCAT_VerticalMovement = "vertical movement";
-    public static final String FCAT_VerticalVelocity = "vertical velocity";
-    public static final String FCAT_MoltTime = "intermolt period";
+    public static final int numFunctionCats = 4;
+    public static final String FCAT_IntermoltDuration = "intermolt duration";
+    public static final String FCAT_Mortality         = "mortality";
+    public static final String FCAT_VerticalMovement  = "vertical movement";
+    public static final String FCAT_VerticalVelocity  = "vertical velocity";
     
     private static final Logger logger = Logger.getLogger(MegalopaParameters.class.getName());
     
     /**
-     * Creates a new instance of EggStageParameters.
+     * Creates a new instance of MeagalopaParameters.
      */
     public MegalopaParameters() {
         super("",numParams,numFunctionCats);
@@ -93,7 +80,7 @@ public class MegalopaParameters extends AbstractLHSParameters {
     }
     
     /**
-     * Creates a new instance of EggStageParameters
+     * Creates a new instance of MegalopaParameters
      */
     public MegalopaParameters(String typeName) {
         super(typeName,numParams,numFunctionCats);
@@ -109,13 +96,11 @@ public class MegalopaParameters extends AbstractLHSParameters {
     protected final void createMapToParameters() {
         String key;
         key = PARAM_isSuperIndividual;    mapParams.put(key,new IBMParameterBoolean(key,key,false));
-        key = PARAM_horizRWP;             mapParams.put(key,new IBMParameterDouble(key,key,0.0));
-        key = PARAM_minWeight;            mapParams.put(key,new IBMParameterDouble(key,key,.01));
-        key = PARAM_initialWeight;        mapParams.put(key,new IBMParameterDouble(key,key,0.0006));
-        key = PARAM_minStageDuration;     mapParams.put(key,new IBMParameterDouble(key,key,0.0));
+        key = PARAM_horizRWP;             mapParams.put(key,new IBMParameterDouble(key,key,  0.0));
         key = PARAM_maxStageDuration;     mapParams.put(key,new IBMParameterDouble(key,key,365.0));
-        key = PARAM_minSettlementDepth;   mapParams.put(key,new IBMParameterDouble(key,key,0.0));
-        key = PARAM_maxSettlementDepth;   mapParams.put(key,new IBMParameterDouble(key,key,50.0));
+        key = PARAM_minSettlementDepth;   mapParams.put(key,new IBMParameterDouble(key,key,  0.0));
+        key = PARAM_maxSettlementDepth;   mapParams.put(key,new IBMParameterDouble(key,key, 50.0));
+        key = PARAM_sexRatio;             mapParams.put(key,new IBMParameterDouble(key,key,  0.5));
         key = PARAM_randomizeTransitions; mapParams.put(key,new IBMParameterBoolean(key,key,false));
     }
 
@@ -126,17 +111,10 @@ public class MegalopaParameters extends AbstractLHSParameters {
         Map<String,IBMFunctionInterface> mapOfPotentialFunctions; 
         IBMFunctionInterface ifi;
         
-        cat = FCAT_Growth;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(8); 
+        cat = FCAT_IntermoltDuration;  
+        mapOfPotentialFunctions = new LinkedHashMap<>(2); 
         mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
-        ifi = new ExponentialGrowthFunction();
-            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
-        ifi = new LinearGrowthFunction();
-            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
-        ifi = new ConstantFunction();  //generic function, so change defaults
-            ifi.setFunctionName("Constant growth rate"); 
-            ifi.setDescription("Constant growth rate [mm/day]"); 
-            ifi.setParameterDescription(ConstantFunction.PARAM_constant,"Constant growth rate [mm/day]");
+        ifi = new IntermoltIntegratorFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_Mortality;  
@@ -156,16 +134,8 @@ public class MegalopaParameters extends AbstractLHSParameters {
         cat = FCAT_VerticalVelocity;  
         mapOfPotentialFunctions = new LinkedHashMap<>(4); 
         mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
-        ifi = new PowerLawSwimmingSpeedFunction();
-            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
-        ifi = new ConstantMovementRateFunction(); 
-            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
-            
-        cat = FCAT_MoltTime;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(2); 
-        mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
-        ifi = new IntermoltLarvaFunction();
-            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+         ifi = new ConstantMovementRateFunction(); 
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);           
     }
     
     /**
@@ -202,7 +172,7 @@ public class MegalopaParameters extends AbstractLHSParameters {
     }
 
     /**
-     *  Creates an instance of SimplePelagicLHSParameters.
+     *  Creates an instance of MegalopaParameters.
      *
      *@param strv - array of values (as Strings) used to create the new instance. 
      *              This should be typeName followed by parameter value (as Strings)

@@ -4,14 +4,18 @@
 
 package disMELS.IBMs.SnowCrab;
 
+import SnowCrabFunctions.IntermoltIntegratorFunction;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.wtstockhausen.utils.RandomNumberGenerator;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
+import java.util.List;
 import wts.models.DisMELS.framework.GlobalInfo;
+import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.models.DisMELS.framework.LHS_Factory;
 import wts.models.DisMELS.framework.LifeStageAttributesInterface;
 import wts.models.DisMELS.framework.LifeStageInterface;
+import static wts.models.DisMELS.framework.LifeStageInterface.DAY_SECS;
 import wts.models.DisMELS.framework.LifeStageParametersInterface;
 import wts.roms.gis.AlbersNAD83;
 import wts.roms.model.Interpolator3D;
@@ -82,6 +86,20 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     /** id for this instance*/
     protected long id = 0;
     
+    /** fields that reflect parameter values */
+    /** flag indicating instance is a super-individual */
+    protected boolean isSuperIndividual;
+    /** horizontal random walk parameter */
+    protected double horizRWP;
+    /** minimum preferred bottom depth */
+    protected double minDepth;
+    /** maximum preferred bottom depth */
+    protected double maxDepth;
+    /** maximum stage duration (followed by death) */
+    protected double maxStageDuration;
+    /** flag to use stochastic transitions */
+    protected boolean randomizeTransitions;
+    
     //fields that reflect attribute values
     /** flag indicating whether individual has been "activated" */
     protected boolean active=false;
@@ -107,14 +125,9 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     protected double  ageInStage=0;
     /** number of individuals represented */
     protected double  number=0;
-    /** instar */
-    protected int instar = 1;
-    /** size (mm) */
-    protected double size = 0;
-    /** weight (g) */
-    protected double weight = 0;
-    /** shell condition */
-    protected double shellcond = 0;
+    
+    /** molt indicator */
+    protected double moltIndicator = 0;
     /** shell thickness */
     protected double shellthick = 0;
     /** in situ temperature (deg C) */
@@ -123,6 +136,23 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     protected double salinity = 0;
     /** in situ pH */
     protected double ph = 0; 
+    
+    //other fields
+    /** number of individuals transitioning to next stage */
+    protected double numTrans;  
+    /** total depth (m) at individual's position */
+    protected double totalDepth;
+    
+    //IBM Functions
+    /** IBM function selected for intermolt time */
+    protected IBMFunctionInterface fcnIntermoltDuration = null; 
+    /** IBM function selected for mortality */
+    protected IBMFunctionInterface fcnMort = null; 
+    /** IBM function selected for vertical movement */
+    protected IBMFunctionInterface fcnVM = null; 
+    /** IBM function selected for vertical velocity */
+    protected IBMFunctionInterface fcnVV = null; 
+    
     
     /**
      * Partially instantiates an instance of a class inheriting from AbstractPelagicStage
@@ -143,7 +173,7 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
      * 
      * @param subAtts - the attributes object for the subclass
      */
-    protected void setAttributesFromSubClass(AbstractPelagicStageAttributes subAtts){
+    protected final void setAttributesFromSubClass(AbstractPelagicStageAttributes subAtts){
         atts = subAtts;
     }
     
@@ -153,7 +183,7 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
      * 
      * @param subParams - the parameters object from the subclass 
      */
-    protected void setParametersFromSubClass(LifeStageParametersInterface subParams){
+    protected final void setParametersFromSubClass(LifeStageParametersInterface subParams){
         params = subParams;
     }
     
@@ -277,7 +307,7 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     }
 
     /**
-     * Returns the reportfor the implementing class as a CSV formatted string.
+     * Returns the report for the implementing class as a CSV formatted string.
      *
      * @return - the attributes and track as a csv-formatted String
      */
@@ -383,8 +413,8 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
         key = LifeStageAttributesInterface.PROP_number;     atts.setValue(key,newAtts.getValue(key));
         
         if (newAtts instanceof AbstractPelagicStageAttributes){
-            key = AbstractPelagicStageAttributes.PROP_weight;     atts.setValue(key,newAtts.getValue(key));
-            key = AbstractPelagicStageAttributes.PROP_shellthick; atts.setValue(key,newAtts.getValue(key));
+            key = AbstractPelagicStageAttributes.PROP_moltindicator; atts.setValue(key,newAtts.getValue(key));
+            key = AbstractPelagicStageAttributes.PROP_shellthick;    atts.setValue(key,newAtts.getValue(key));
         }
         
         id = atts.getValue(LifeStageAttributesInterface.PROP_id, id);
@@ -417,7 +447,7 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
         atts.setValue(AbstractPelagicStageAttributes.PROP_ageInStage,ageInStage);
         atts.setValue(AbstractPelagicStageAttributes.PROP_number,number);
         
-        atts.setValue(AbstractPelagicStageAttributes.PROP_weight,weight);
+        atts.setValue(AbstractPelagicStageAttributes.PROP_moltindicator,moltIndicator);
         atts.setValue(AbstractPelagicStageAttributes.PROP_shellthick,shellthick);
         atts.setValue(AbstractPelagicStageAttributes.PROP_salinity,salinity);
         atts.setValue(AbstractPelagicStageAttributes.PROP_temperature,temperature);
@@ -436,17 +466,100 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
         lat        = atts.getValue(AbstractPelagicStageAttributes.PROP_horizPos2,lat);
         depth      = atts.getValue(AbstractPelagicStageAttributes.PROP_vertPos,depth);
         gridCellID = atts.getValue(AbstractPelagicStageAttributes.PROP_gridCellID,gridCellID);
-        active     = atts.getValue(AbstractPelagicStageAttributes.PROP_active,active);
-        
+        active     = atts.getValue(AbstractPelagicStageAttributes.PROP_active,active);        
         alive      = atts.getValue(AbstractPelagicStageAttributes.PROP_alive,alive);
         age        = atts.getValue(AbstractPelagicStageAttributes.PROP_age,age);
         ageInStage = atts.getValue(AbstractPelagicStageAttributes.PROP_ageInStage,ageInStage);
         number     = atts.getValue(AbstractPelagicStageAttributes.PROP_number,number);
         
-        weight      = atts.getValue(AbstractPelagicStageAttributes.PROP_weight,weight);
-        salinity    = atts.getValue(AbstractPelagicStageAttributes.PROP_salinity,salinity);
-        temperature = atts.getValue(AbstractPelagicStageAttributes.PROP_temperature,temperature);
-        ph          = atts.getValue(AbstractPelagicStageAttributes.PROP_ph,ph);
+        moltIndicator = atts.getValue(AbstractPelagicStageAttributes.PROP_moltindicator,moltIndicator);
+        shellthick    = atts.getValue(AbstractPelagicStageAttributes.PROP_shellthick,shellthick);
+        salinity      = atts.getValue(AbstractPelagicStageAttributes.PROP_salinity,salinity);
+        temperature   = atts.getValue(AbstractPelagicStageAttributes.PROP_temperature,temperature);
+        ph            = atts.getValue(AbstractPelagicStageAttributes.PROP_ph,ph);
     }
     
+    /**
+     *
+     * @param dt - time step in seconds
+     */
+    protected void updateAge(double dt) {
+        age        = age+dt/DAY_SECS;
+        ageInStage = ageInStage+dt/DAY_SECS;
+        if (ageInStage>maxStageDuration) {
+            alive = false;
+            active = false;
+        }
+    }
+
+    /**
+     *
+     * @param dt - time step in seconds
+     */
+    protected void updateMoltIndicator(double dt){
+        if (fcnIntermoltDuration instanceof IntermoltIntegratorFunction) {
+            moltIndicator += dt/DAY_SECS*((Double) fcnIntermoltDuration.calculate(temperature));
+        }
+    }
+
+    protected void updatePosition(double[] pos) {
+        totalDepth = i3d.interpolateBathymetricDepth(pos);
+        depth      = -i3d.calcZfromK(pos[0],pos[1],pos[2]);
+        lat        = i3d.interpolateLat(pos);
+        lon        = i3d.interpolateLon(pos);
+        gridCellID = ""+Math.round(pos[0])+"_"+Math.round(pos[1]);
+        updateTrack();
+    }
+    
+    protected void updateEnvVars(double[] pos) {
+        temperature = i3d.interpolateTemperature(pos);
+        salinity    = i3d.interpolateSalinity(pos);
+    }
+
+    @Override
+    public boolean isSuperIndividual() {
+        return isSuperIndividual;
+    }
+    
+    @Override
+    public double getStartTime() {
+        return startTime;
+    }
+
+    @Override
+    public void setStartTime(double newTime) {
+        startTime = newTime;
+        time      = startTime;
+        atts.setValue(LifeStageAttributesInterface.PROP_startTime,startTime);
+        atts.setValue(LifeStageAttributesInterface.PROP_time,time);
+    }
+
+    @Override
+    public boolean isActive() {
+        return active;
+    }
+
+    @Override
+    public void setActive(boolean b) {
+        active = b;
+        atts.setActive(b);
+    }
+
+    @Override
+    public boolean isAlive() {
+        return alive;
+    }
+
+    @Override
+    public void setAlive(boolean b) {
+        alive = b;
+        atts.setAlive(b);
+    }
+
+    @Override
+    public List<LifeStageInterface> getSpawnedIndividuals() {
+        output.clear();
+        return output;
+    }
+
 }

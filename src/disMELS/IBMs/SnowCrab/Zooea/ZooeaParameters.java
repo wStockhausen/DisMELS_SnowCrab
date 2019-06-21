@@ -1,27 +1,23 @@
 /*
- * Zooea1Parameters.java
+ * ZooeaParameters.java
  *
  * Created on September 26, 2017.
  *
  */
 
-package disMELS.IBMs.SnowCrab.Zooea1;
+package disMELS.IBMs.SnowCrab.Zooea;
 
-import SnowCrabFunctions.IntermoltLarvaFunction;
+import SnowCrabFunctions.IntermoltIntegratorFunction;
 import java.beans.PropertyChangeSupport;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.openide.util.lookup.ServiceProvider;
-import wts.models.DisMELS.IBMFunctions.Growth.ExponentialGrowthFunction;
-import wts.models.DisMELS.IBMFunctions.Growth.LinearGrowthFunction;
-import wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
 import wts.models.DisMELS.IBMFunctions.Movement.DielVerticalMigration_FixedDepthRanges;
 import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunction;
-import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.PowerLawSwimmingSpeedFunction;
 import wts.models.DisMELS.framework.AbstractLHSParameters;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.models.DisMELS.framework.IBMFunctions.IBMParameter;
@@ -34,53 +30,44 @@ import wts.models.DisMELS.framework.LifeStageParametersInterface;
  * 
  * This class uses the IBMParameters/IBMFunctions approach to specifying stage-specific parameters.
  * 
- *  Potential growth functions (FCAT_Growth)
- *      ExponentialGrowthFunction()
- *      LinearGrowthFunction()
- *      ConstantFunction()
- *  Potential mortality functions (FCAT_Mortality)
+ *  Potential intermolt duration functions         (FCAT_IntermoltDuration)
+ *      IntermoltIntegratorFunction()
+ *  Potential mortality functions                  (FCAT_Mortality)
  *      ConstantMortalityRate()
  *      TemperatureDependentMortalityRate_Houde1989()
- *  Potential vertical movement functions (FCAT_VerticalMovement)
+ *  Potential vertical movement functions          (FCAT_VerticalMovement)
  *      DielVerticalMigration_FixedDepthRanges()
- *  Potential vertical velocity functions (FCAT_VerticalVelocity)
- *      PowerLawSwimmingSpeedFunction()
+ *  Potential vertical velocity functions          (FCAT_VerticalVelocity)
  *      ConstantMovementRateFunction()
- *  Potential molt timing functions (FCAT_MoltTime)
- *      IntermoltLarvaFunction()
  * 
  * @author William Stockhausen
  */
 @ServiceProvider(service=LifeStageParametersInterface.class)
-public class Zooea1Parameters extends AbstractLHSParameters {
+public class ZooeaParameters extends AbstractLHSParameters {
     
     public static final long serialVersionUID = 1L;
     
     /** the number of IBMParameter objects defined in the class */
-    public static final int numParams = 7;
+    public static final int numParams = 4;
     public static final String PARAM_isSuperIndividual      = "is a super-individual?";
     public static final String PARAM_horizRWP               = "horizontal random walk parameter [m^2]/[s]";
-    public static final String PARAM_minStageDuration       = "min stage duration [d]";
     public static final String PARAM_maxStageDuration       = "max stage duration [d]";
-    public static final String PARAM_minWeight              = "min weight before metamorphosis (g)";
     public static final String PARAM_randomizeTransitions   = "randomize transitions?";
-    public static final String PARAM_initialWeight          = "initial weight in stage (g)";
     
     
     /** the number of IBMFunction categories defined in the class */
-    public static final int numFunctionCats = 5;
-    public static final String FCAT_Growth           = "growth";
-    public static final String FCAT_Mortality        = "mortality";
-    public static final String FCAT_VerticalMovement = "vertical movement";
-    public static final String FCAT_VerticalVelocity = "vertical velocity";
-    public static final String FCAT_MoltTime         = "molt timing";
+    public static final int numFunctionCats = 4;
+    public static final String FCAT_IntermoltDuration = "intermolt duration";
+    public static final String FCAT_Mortality         = "mortality";
+    public static final String FCAT_VerticalMovement  = "vertical movement";
+    public static final String FCAT_VerticalVelocity  = "vertical velocity";
     
-    private static final Logger logger = Logger.getLogger(Zooea1Parameters.class.getName());
+    private static final Logger logger = Logger.getLogger(ZooeaParameters.class.getName());
     
     /**
      * Creates a new instance of EggStageParameters.
      */
-    public Zooea1Parameters() {
+    public ZooeaParameters() {
         super("",numParams,numFunctionCats);
         createMapToParameters();
         createMapToPotentialFunctions();
@@ -90,7 +77,7 @@ public class Zooea1Parameters extends AbstractLHSParameters {
     /**
      * Creates a new instance of EggStageParameters
      */
-    public Zooea1Parameters(String typeName) {
+    public ZooeaParameters(String typeName) {
         super(typeName,numParams,numFunctionCats);
         createMapToParameters();
         createMapToPotentialFunctions();
@@ -105,11 +92,8 @@ public class Zooea1Parameters extends AbstractLHSParameters {
         String key;
         key = PARAM_isSuperIndividual;    mapParams.put(key,new IBMParameterBoolean(key,key,false));
         key = PARAM_horizRWP;             mapParams.put(key,new IBMParameterDouble(key,key,0.0));
-        key = PARAM_minStageDuration;     mapParams.put(key,new IBMParameterDouble(key,key,0.0));
         key = PARAM_maxStageDuration;     mapParams.put(key,new IBMParameterDouble(key,key,365.0));
-        key = PARAM_minWeight;            mapParams.put(key,new IBMParameterDouble(key,key,0.0002));
         key = PARAM_randomizeTransitions; mapParams.put(key,new IBMParameterBoolean(key,key,false));
-        key = PARAM_initialWeight;        mapParams.put(key,new IBMParameterDouble(key,key,0.00008));
     }
 
     @Override
@@ -119,17 +103,10 @@ public class Zooea1Parameters extends AbstractLHSParameters {
         Map<String,IBMFunctionInterface> mapOfPotentialFunctions; 
         IBMFunctionInterface ifi;
         
-        cat = FCAT_Growth;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(8); 
+        cat = FCAT_IntermoltDuration;  
+        mapOfPotentialFunctions = new LinkedHashMap<>(2); 
         mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
-        ifi = new ExponentialGrowthFunction();
-            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
-        ifi = new LinearGrowthFunction();
-            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
-        ifi = new ConstantFunction();  //generic function, so change defaults
-            ifi.setFunctionName("Constant growth rate"); 
-            ifi.setDescription("Constant growth rate [mm/day]"); 
-            ifi.setParameterDescription(ConstantFunction.PARAM_constant,"Constant growth rate [mm/day]");
+        ifi = new IntermoltIntegratorFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_Mortality;  
@@ -147,18 +124,10 @@ public class Zooea1Parameters extends AbstractLHSParameters {
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_VerticalVelocity;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(4); 
-        mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
-        ifi = new PowerLawSwimmingSpeedFunction();
-            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
-        ifi = new ConstantMovementRateFunction(); 
-            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
-            
-        cat = FCAT_MoltTime;
         mapOfPotentialFunctions = new LinkedHashMap<>(2); 
         mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
-        ifi = new IntermoltLarvaFunction();
-        mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new ConstantMovementRateFunction(); 
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
     }
     
     
@@ -169,9 +138,9 @@ public class Zooea1Parameters extends AbstractLHSParameters {
      */
     @Override
     public Object clone() {
-        Zooea1Parameters clone = null;
+        ZooeaParameters clone = null;
         try {
-            clone = (Zooea1Parameters) super.clone();
+            clone = (ZooeaParameters) super.clone();
             for (String pKey: mapParams.keySet()) {
                 clone.setValue(pKey,this.getValue(pKey));
             }
@@ -196,16 +165,16 @@ public class Zooea1Parameters extends AbstractLHSParameters {
     }
 
     /**
-     *  Creates an instance of SimplePelagicLHSParameters.
+     *  Creates an instance of ZooeaParameters.
      *
      *@param strv - array of values (as Strings) used to create the new instance. 
      *              This should be typeName followed by parameter value (as Strings)
      *              in the same order as the keys.
      */
     @Override
-    public Zooea1Parameters createInstance(final String[] strv) {
+    public ZooeaParameters createInstance(final String[] strv) {
         int c = 0;
-        Zooea1Parameters params = new Zooea1Parameters(strv[c++]);
+        ZooeaParameters params = new ZooeaParameters(strv[c++]);
         for (String key: mapParams.keySet()) params.setValueFromString(key,strv[c++]);
         return params;
     }
@@ -218,7 +187,8 @@ public class Zooea1Parameters extends AbstractLHSParameters {
 
     /**
      * Returns a CSV string representation of the parameter values.
-     * This method should be overriden by subclasses that add additional parameters, 
+     * 
+     * This method should be overridden by subclasses that add additional parameters, 
      * possibly calling super.getCSV() to get an initial csv string to which 
      * additional field values could be appended.
      * 
@@ -234,6 +204,7 @@ public class Zooea1Parameters extends AbstractLHSParameters {
     /**
      * Returns the comma-delimited string corresponding to the parameters
      * to be used as a header for a csv file.  
+     * 
      * This should be overriden by subclasses that add additional parameters, 
      * possibly calling super.getCSVHeader() to get an initial header string 
      * to which additional field names could be appended.

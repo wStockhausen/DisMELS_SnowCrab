@@ -1,47 +1,48 @@
 /*
- * Zooea1Attributes.java
+ * ImmatureCrabAttributes.java
  */
 
-package disMELS.IBMs.SnowCrab.Zooea1;
 
-import disMELS.IBMs.SnowCrab.AbstractPelagicStageAttributes;
+package disMELS.IBMs.SnowCrab.ImmatureCrab;
+
 import java.util.*;
 import java.util.logging.Logger;
 import org.openide.util.lookup.ServiceProvider;
+import disMELS.IBMs.SnowCrab.AbstractBenthicStageAttributes;
 import wts.models.DisMELS.framework.IBMAttributes.IBMAttribute;
 
 /**
- * DisMELS class representing attributes for the first snow crab zooeal stage.
+ * DisMELS class representing attributes for immature male snow crab.
  */
 @ServiceProvider(service=wts.models.DisMELS.framework.LifeStageAttributesInterface.class)
-public class Zooea1Attributes extends AbstractPelagicStageAttributes {
+public class ImmatureCrabAttributes extends AbstractBenthicStageAttributes {
     
     /** Number of new attributes defined by this class */
     public static final int numNewAttributes = 0;
 //    //define keys to new attributes here as public static final String's, e.g.:
 //    public static final String PROP_size   = "size [mm]";
-        
+    
     /** set of keys identifying new attributes */
     protected static final Set<String> newKeys = new LinkedHashSet<>((int)(2*numNewAttributes));
     /** set of keys identifying all attributes */
-    protected static final Set<String> allKeys = new LinkedHashSet<>((int)(2*(AbstractPelagicStageAttributes.numAttributes+numNewAttributes)));
+    protected static final Set<String> allKeys = new LinkedHashSet<>((int)(2*(AbstractBenthicStageAttributes.numAttributes+numNewAttributes)));
     /** map containing all attributes */
-    protected static final Map<String,IBMAttribute> mapAllAttributes = new HashMap<>((int)(2*(AbstractPelagicStageAttributes.numAttributes+numNewAttributes)));
+    protected static final Map<String,IBMAttribute> mapAllAttributes = new HashMap<>((int)(2*(AbstractBenthicStageAttributes.numAttributes+numNewAttributes)));
     /** String[] containing all attribute keys EXCEPT typeName */
-    protected static final String[] aKeys      = new String[AbstractPelagicStageAttributes.numAttributes+numNewAttributes-1];//does not include typeName
+    protected static final String[] aKeys      = new String[AbstractBenthicStageAttributes.numAttributes+numNewAttributes-1];//does not include typeName
     /** Class[] containing the class associated with each attribute */
-    protected static final Class[]  classes    = new Class[AbstractPelagicStageAttributes.numAttributes+numNewAttributes];
+    protected static final Class[]  classes    = new Class[AbstractBenthicStageAttributes.numAttributes+numNewAttributes];
     /** String[] containing short names for all attributes (for writing results) */
-    protected static final String[] shortNames = new String[AbstractPelagicStageAttributes.numAttributes+numNewAttributes];
+    protected static final String[] shortNames = new String[AbstractBenthicStageAttributes.numAttributes+numNewAttributes];
    
     /** class logger */
-    private static final Logger logger = Logger.getLogger(Zooea1Attributes.class.getName());
+    private static final Logger logger = Logger.getLogger(ImmatureCrabAttributes.class.getName());
     
     /**
      * This constructor is provided only to facilitate the ServiceProvider functionality.
      * DO NOT USE IT!!
      */
-    public Zooea1Attributes(){
+    public ImmatureCrabAttributes(){
         super("NULL");
         finishInstantiation();
     }
@@ -49,7 +50,7 @@ public class Zooea1Attributes extends AbstractPelagicStageAttributes {
     /**
      * Creates a new attributes instance with type name 'typeName'.
      */
-    public Zooea1Attributes(String typeName) {
+    public ImmatureCrabAttributes(String typeName) {
         super(typeName);
         finishInstantiation();
     }
@@ -61,7 +62,7 @@ public class Zooea1Attributes extends AbstractPelagicStageAttributes {
      */
     @Override
     public Object clone() {
-        Zooea1Attributes clone = new Zooea1Attributes(typeName);
+        ImmatureCrabAttributes clone = new ImmatureCrabAttributes(typeName);
         for (String key: allKeys) clone.setValue(key,this.getValue(key));
         return clone;
     }
@@ -74,8 +75,8 @@ public class Zooea1Attributes extends AbstractPelagicStageAttributes {
      * @return - the new instance
      */
     @Override
-    public Zooea1Attributes createInstance(final String[] strv) {
-        Zooea1Attributes atts = new Zooea1Attributes(strv[0]);//this sets atts.typeName
+    public ImmatureCrabAttributes createInstance(final String[] strv) {
+        ImmatureCrabAttributes atts = new ImmatureCrabAttributes(strv[0]);//this sets atts.typeName
         atts.setValues(strv);
         return atts;
     }
@@ -97,7 +98,7 @@ public class Zooea1Attributes extends AbstractPelagicStageAttributes {
             while (it.hasNext()) aKeys[j++] = it.next();
         }
         //set instance information
-        Map<String,Object> tmpMapValues = new HashMap<>((int)(2*(numNewAttributes+numAttributes)));
+        Map<String,Object> tmpMapValues = new HashMap<>((int)(2*(super.numAttributes+numNewAttributes)));
         tmpMapValues.putAll(mapValues);//copy from super
         //add new attributes
 //        //no new attributes for this class, but would look like:
@@ -124,7 +125,7 @@ public class Zooea1Attributes extends AbstractPelagicStageAttributes {
      */
     @Override
     public Object[] getAttributes() {
-        Object[] atts = new Object[numNewAttributes+numAttributes-1];
+        Object[] atts = new Object[super.numAttributes+numNewAttributes-1];
         int j = 0;
         Iterator<String> it = allKeys.iterator();
         it.next();//skip PROP_typeName
@@ -227,13 +228,13 @@ public class Zooea1Attributes extends AbstractPelagicStageAttributes {
     public void setValues(final String[] strv) {
         super.setValues(strv);//set the standard attribute values
         //set the values of the new attributes
-        int j = numAttributes;
+        int j = super.numAttributes;
         try {
             for (String key: newKeys) setValueFromString(key,strv[j++]);
         } catch (java.lang.IndexOutOfBoundsException ex) {
             //@TODO: should throw an exception here that identifies the problem
-            String[] aKeys = new String[Zooea1Attributes.allKeys.size()];
-            aKeys = Zooea1Attributes.allKeys.toArray(aKeys);
+            String[] aKeys = new String[ImmatureCrabAttributes.allKeys.size()];
+            aKeys = ImmatureCrabAttributes.allKeys.toArray(aKeys);
                 String str = "Missing attribute value for "+aKeys[j-1]+".\n"+
                              "Prior values are ";
                 for (int i=0;i<(j);i++) str = str+strv[i]+" ";
@@ -244,8 +245,8 @@ public class Zooea1Attributes extends AbstractPelagicStageAttributes {
                         javax.swing.JOptionPane.ERROR_MESSAGE);
                 throw ex;
         } catch (java.lang.NumberFormatException ex) {
-            String[] aKeys = new String[Zooea1Attributes.allKeys.size()];
-            aKeys = Zooea1Attributes.allKeys.toArray(aKeys);
+            String[] aKeys = new String[ImmatureCrabAttributes.allKeys.size()];
+            aKeys = ImmatureCrabAttributes.allKeys.toArray(aKeys);
             String str = "Bad attribute value for "+aKeys[j-2]+".\n"+
                          "Value was '"+strv[j-1]+"'.\n"+
                          "Entry was '";

@@ -23,10 +23,10 @@ public class MegalopaAttributes extends AbstractPelagicStageAttributes {
         
     /** set of keys identifying new attributes */
     protected static final Set<String> newKeys = new LinkedHashSet<>((int)(2*numNewAttributes));
-    /** set of keys identifying all attributes */
-    protected static final Set<String> allKeys = new LinkedHashSet<>((int)(2*(AbstractPelagicStageAttributes.numAttributes+numNewAttributes)));
-    /** map containing all attributes */
-    protected static final Map<String,IBMAttribute> mapAllAttributes = new HashMap<>((int)(2*(AbstractPelagicStageAttributes.numAttributes+numNewAttributes)));
+    /** set of keys identifying ALL attributes (from this class AND all superclasses) */
+    protected static final Set<String> keys = new LinkedHashSet<>((int)(2*(AbstractPelagicStageAttributes.numAttributes+numNewAttributes)));
+    /** map containing ALL attributes  (from this class AND all superclasses) */
+    protected static final Map<String,IBMAttribute> mapAttributes = new HashMap<>((int)(2*(AbstractPelagicStageAttributes.numAttributes+numNewAttributes)));
     /** String[] containing all attribute keys EXCEPT typeName */
     protected static final String[] aKeys      = new String[AbstractPelagicStageAttributes.numAttributes+numNewAttributes-1];//does not include typeName
     /** Class[] containing the class associated with each attribute */
@@ -54,6 +54,31 @@ public class MegalopaAttributes extends AbstractPelagicStageAttributes {
         finishInstantiation();
     }
     
+    private void finishInstantiation(){
+        if (newKeys.isEmpty()){
+            //set static field information (only if it hasn't been set before)
+            //map all attributes
+            mapAttributes.putAll(super.mapAttributes);//add from superclass
+            //create new keys and map new attributes here. 
+//            //No new keys for this class, but would look like:
+//            String key;
+//            key = PROP_size; newKeys.add(key); mapAttributes.put(key,new IBMAttributeDouble(key,"size"));
+            //create keys by combining keys from superclass and new keys from this class
+            keys.addAll(super.keys);//add from superclass
+            keys.addAll(newKeys);//add from this class
+            Iterator<String> it = keys.iterator();
+            int j = 0; it.next();//skip typeName
+            while (it.hasNext()) aKeys[j++] = it.next();
+        }
+        //set instance information
+        Map<String,Object> tmpMapValues = new HashMap<>((int)(2*(numNewAttributes+numAttributes)));
+        tmpMapValues.putAll(mapValues);//copy from super
+        //add new attributes
+//        //no new attributes for this class, but would look like:
+//        tmpMapValues.put(PROP_size,       new Double(0));
+        mapValues = tmpMapValues;//assign to super
+    }
+
     /**
      * Returns a deep copy of the instance.  Values are copied.  
      * Any listeners on 'this' are not(?) copied, so these need to be hooked up.
@@ -62,7 +87,7 @@ public class MegalopaAttributes extends AbstractPelagicStageAttributes {
     @Override
     public Object clone() {
         MegalopaAttributes clone = new MegalopaAttributes(typeName);
-        for (String key: allKeys) clone.setValue(key,this.getValue(key));
+        for (String key: keys) clone.setValue(key,this.getValue(key));
         return clone;
     }
 
@@ -80,43 +105,18 @@ public class MegalopaAttributes extends AbstractPelagicStageAttributes {
         return atts;
     }
     
-    private void finishInstantiation(){
-        if (newKeys.isEmpty()){
-            //set static field information
-            //map all attributes
-            mapAllAttributes.putAll(super.mapAttributes);//add from superclass
-            //create new keys and map new attributes here. 
-//            //No new keys for this class, but would look like:
-//            String key;
-//            key = PROP_size;       newKeys.add(key); mapAllAttributes.put(key,new IBMAttributeDouble(key,"size"));
-            //create allKeys by combining keys from superclass and new keys from this class
-            allKeys.addAll(super.keys);//add from superclass
-            allKeys.addAll(newKeys);//add from this class
-            Iterator<String> it = allKeys.iterator();
-            int j = 0; it.next();//skip typeName
-            while (it.hasNext()) aKeys[j++] = it.next();
-        }
-        //set instance information
-        Map<String,Object> tmpMapValues = new HashMap<>((int)(2*(numNewAttributes+numAttributes)));
-        tmpMapValues.putAll(mapValues);//copy from super
-        //add new attributes
-//        //no new attributes for this class, but would look like:
-//        tmpMapValues.put(PROP_size,       new Double(0));
-        mapValues = tmpMapValues;//assign to super
-    }
-
-    /**
-     * Returns the attribute values as an ArrayList (including typeName).
-     * 
-     * @return 
-     */
-    @Override
-    public ArrayList getArrayList() {
-        ArrayList a = super.getArrayList();
-        for (String key: newKeys) a.add(getValue(key));
-        return a;
-    }
-
+//    /**
+//     * Returns the attribute values as an ArrayList (including typeName).
+//     * 
+//     * @return 
+//     */
+//    @Override
+//    public ArrayList getArrayList() {
+//        ArrayList a = super.getArrayList();
+//        for (String key: newKeys) a.add(getValue(key));
+//        return a;
+//    }
+//
     /**
      * Returns the attributes values (not including typeName) as an Object[].
      * 
@@ -126,7 +126,7 @@ public class MegalopaAttributes extends AbstractPelagicStageAttributes {
     public Object[] getAttributes() {
         Object[] atts = new Object[numNewAttributes+numAttributes-1];
         int j = 0;
-        Iterator<String> it = allKeys.iterator();
+        Iterator<String> it = keys.iterator();
         it.next();//skip PROP_typeName
         while (it.hasNext()) atts[j++] = getValue(it.next()); 
         return atts;
@@ -170,13 +170,13 @@ public class MegalopaAttributes extends AbstractPelagicStageAttributes {
     public String getCSVHeaderShortNames() {
         String str = super.getCSVHeaderShortNames();
         Iterator<String> it = newKeys.iterator();
-        while (it.hasNext()) str = str+cc+mapAllAttributes.get(it.next()).shortName;
+        while (it.hasNext()) str = str+cc+mapAttributes.get(it.next()).shortName;
         return str;
     }
 
     /**
      * Returns Class types for all attributes (including typeName) as a Class[]
-     * in the order the allKeys are defined.
+ in the order the keys are defined.
      * 
      * @return 
      */
@@ -184,8 +184,8 @@ public class MegalopaAttributes extends AbstractPelagicStageAttributes {
     public Class[] getClasses() {
         if (classes[0]==null){
             int j = 0;
-            for (String key: allKeys){
-                classes[j++] = mapAllAttributes.get(key).getValueClass();
+            for (String key: keys){
+                classes[j++] = mapAttributes.get(key).getValueClass();
             }
         }
         return classes;
@@ -204,7 +204,7 @@ public class MegalopaAttributes extends AbstractPelagicStageAttributes {
 
     /**
      * Returns short names for all attributes (including typeName) as a String[]
-     * in the order the allKeys are defined.
+ in the order the keys are defined.
      * 
      * @return 
      */
@@ -212,8 +212,8 @@ public class MegalopaAttributes extends AbstractPelagicStageAttributes {
     public String[] getShortNames() {
         if (shortNames[0]==null){
             int j = 0;
-            for (String key: allKeys){
-                shortNames[j++] = mapAllAttributes.get(key).shortName;
+            for (String key: keys){
+                shortNames[j++] = mapAttributes.get(key).shortName;
             }
         }
         return shortNames;
@@ -232,8 +232,8 @@ public class MegalopaAttributes extends AbstractPelagicStageAttributes {
             for (String key: newKeys) setValueFromString(key,strv[j++]);
         } catch (java.lang.IndexOutOfBoundsException ex) {
             //@TODO: should throw an exception here that identifies the problem
-            String[] aKeys = new String[MegalopaAttributes.allKeys.size()];
-            aKeys = MegalopaAttributes.allKeys.toArray(aKeys);
+            String[] aKeys = new String[MegalopaAttributes.keys.size()];
+            aKeys = MegalopaAttributes.keys.toArray(aKeys);
                 String str = "Missing attribute value for "+aKeys[j-1]+".\n"+
                              "Prior values are ";
                 for (int i=0;i<(j);i++) str = str+strv[i]+" ";
@@ -244,8 +244,8 @@ public class MegalopaAttributes extends AbstractPelagicStageAttributes {
                         javax.swing.JOptionPane.ERROR_MESSAGE);
                 throw ex;
         } catch (java.lang.NumberFormatException ex) {
-            String[] aKeys = new String[MegalopaAttributes.allKeys.size()];
-            aKeys = MegalopaAttributes.allKeys.toArray(aKeys);
+            String[] aKeys = new String[MegalopaAttributes.keys.size()];
+            aKeys = MegalopaAttributes.keys.toArray(aKeys);
             String str = "Bad attribute value for "+aKeys[j-2]+".\n"+
                          "Value was '"+strv[j-1]+"'.\n"+
                          "Entry was '";
@@ -277,7 +277,7 @@ public class MegalopaAttributes extends AbstractPelagicStageAttributes {
     @Override
     public String getValueAsString(String key){
         Object val = getValue(key);
-        IBMAttribute att = mapAllAttributes.get(key);
+        IBMAttribute att = mapAttributes.get(key);
         att.setValue(val);
         String str = att.getValueAsString();
         return str;
@@ -286,7 +286,7 @@ public class MegalopaAttributes extends AbstractPelagicStageAttributes {
     @Override
     public void setValueFromString(String key, String value) throws NumberFormatException {
         if (!key.equals(PROP_typeName)){
-            IBMAttribute att = mapAllAttributes.get(key);
+            IBMAttribute att = mapAttributes.get(key);
             att.parseValue(value);
             setValue(key,att.getValue());
         }

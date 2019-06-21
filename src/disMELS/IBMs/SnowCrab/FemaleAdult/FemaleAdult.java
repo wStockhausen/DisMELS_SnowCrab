@@ -14,9 +14,9 @@ import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
 import disMELS.IBMs.SnowCrab.AbstractBenthicStage;
 import disMELS.IBMs.SnowCrab.FemaleAdolescent.FemaleAdolescentAttributes;
-import disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes;
-import disMELS.IBMs.SnowCrab.Zooea1.Zooea1;
-import disMELS.IBMs.SnowCrab.Zooea1.Zooea1Attributes;
+import disMELS.IBMs.SnowCrab.Zooea.Zooea;
+import disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes;
+import wts.models.DisMELS.IBMFunctions.Growth.LinearGrowthFunction;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import static wts.models.DisMELS.framework.LifeStageInterface.DAY_SECS;
@@ -46,7 +46,7 @@ public class FemaleAdult extends AbstractBenthicStage {
     /* Classes for next LHS */
     public static final String[] nextLHSClasses = new String[]{FemaleAdult.class.getName()};
     /* Classes for spawned LHS */
-    public static final String[] spawnedLHSClasses = new String[]{Zooea1.class.getName()};
+    public static final String[] spawnedLHSClasses = new String[]{Zooea.class.getName()};
     
         //Instance fields
             //  Fields hiding ones from superclass
@@ -517,8 +517,8 @@ public class FemaleAdult extends AbstractBenthicStage {
                  */
                 nLHS = LHS_Factory.createSpawnedLHS(typeName);
                 newAttsI = nLHS.getAttributes();
-                if (newAttsI instanceof Zooea1Attributes) {
-                    Zooea1Attributes newAtts = (Zooea1Attributes) newAttsI;
+                if (newAttsI instanceof ZooeaAttributes) {
+                    ZooeaAttributes newAtts = (ZooeaAttributes) newAttsI;
                     //newAtts.setValue(LifeStageAttributesInterface.PROP_id,         -1);<-don't need to update this
                     newAtts.setValue(LifeStageAttributesInterface.PROP_parentID,   atts.getValue(LifeStageAttributesInterface.PROP_id));
                     newAtts.setValue(LifeStageAttributesInterface.PROP_origID,     atts.getValue(LifeStageAttributesInterface.PROP_id));
@@ -536,10 +536,10 @@ public class FemaleAdult extends AbstractBenthicStage {
                     newAtts.setValue(LifeStageAttributesInterface.PROP_age,        0.0);
                     newAtts.setValue(LifeStageAttributesInterface.PROP_ageInStage, 0.0);
                     newAtts.setValue(LifeStageAttributesInterface.PROP_number,     1.0);//TODO:change this to fecundity/numSpawnPerIndiv
-                    newAtts.setValue(Zooea1Attributes.PROP_weight,     0.00008);
-                    newAtts.setValue(Zooea1Attributes.PROP_salinity,   atts.getValue(atts.PROP_salinity));
-                    newAtts.setValue(Zooea1Attributes.PROP_temperature,atts.getValue(atts.PROP_temperature));
-                    newAtts.setValue(Zooea1Attributes.PROP_ph,atts.getValue(atts.PROP_ph));
+                    newAtts.setValue(ZooeaAttributes.PROP_moltindicator, 0.0);
+                    newAtts.setValue(ZooeaAttributes.PROP_salinity,      atts.getValue(atts.PROP_salinity));
+                    newAtts.setValue(ZooeaAttributes.PROP_temperature,   atts.getValue(atts.PROP_temperature));
+                    newAtts.setValue(ZooeaAttributes.PROP_ph,            atts.getValue(atts.PROP_ph));
                     //copy LagrangianParticle information
                     nLHS.setLagrangianParticle(lp);
                     //start track at last position of oldLHS track
@@ -788,8 +788,10 @@ public class FemaleAdult extends AbstractBenthicStage {
             } else{
                 starvCounter = starvCounter + dt;
             }
+        } else if (fcnGrowth instanceof LinearGrowthFunction){
+            weight= (Double) fcnGrowth.calculate(new double[]{dt/DAY_SECS, weight});
         } else {
-            //TODO: add linear growth options
+            //throw an error
         }
     }
 

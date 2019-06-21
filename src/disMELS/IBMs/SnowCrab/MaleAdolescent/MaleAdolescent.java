@@ -11,7 +11,7 @@ import java.util.logging.Logger;
 import org.openide.util.lookup.ServiceProvider;
 import disMELS.IBMs.SnowCrab.AbstractBenthicStage;
 import disMELS.IBMs.SnowCrab.MaleAdult.MaleAdult;
-import disMELS.IBMs.SnowCrab.MaleImmature.MaleImmatureAttributes;
+import disMELS.IBMs.SnowCrab.ImmatureCrab.ImmatureCrabAttributes;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
 import wts.models.DisMELS.framework.*;
@@ -251,8 +251,8 @@ public class MaleAdolescent extends AbstractBenthicStage {
         if (newAtts instanceof MaleAdolescentAttributes) {
             MaleAdolescentAttributes spAtts = (MaleAdolescentAttributes) newAtts;
             for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
-        } else if(newAtts instanceof MaleImmatureAttributes) {
-            MaleImmatureAttributes spAtts = (MaleImmatureAttributes) newAtts;
+        } else if(newAtts instanceof ImmatureCrabAttributes) {
+            ImmatureCrabAttributes spAtts = (ImmatureCrabAttributes) newAtts;
             for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));  } else {
             //TODO: should throw an error here
             logger.info("AdultStage.setAttributes(): no match for attributes type");

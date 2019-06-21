@@ -13,7 +13,7 @@ import org.openide.util.lookup.ServiceProvider;
 import wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
-import disMELS.IBMs.SnowCrab.Zooea1.Zooea1;
+import disMELS.IBMs.SnowCrab.Zooea.Zooea;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.roms.model.LagrangianParticle;
@@ -39,7 +39,7 @@ public class ExtrudedEggMass extends AbstractEggMassStage {
     public static final String pointFTClass = wts.models.DisMELS.framework.LHSPointFeatureType.class.getName();
     /* Classes for next LHS */
     public static final String[] nextLHSClasses = new String[]{ExtrudedEggMass.class.getName(),
-                                                               Zooea1.class.getName()};
+                                                               Zooea.class.getName()};
     /* Classes for spawned LHS */
     public static final String[] spawnedLHSClasses = new String[]{};
     

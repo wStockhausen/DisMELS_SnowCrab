@@ -12,8 +12,8 @@ import org.openide.util.lookup.ServiceProvider;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
 import disMELS.IBMs.SnowCrab.AbstractBenthicStage;
-import disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmatureAttributes;
 import disMELS.IBMs.SnowCrab.FemaleAdult.FemaleAdult;
+import disMELS.IBMs.SnowCrab.ImmatureCrab.ImmatureCrabAttributes;
 import wts.models.DisMELS.framework.*;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import static wts.models.DisMELS.framework.LifeStageInterface.DAY_SECS;
@@ -257,8 +257,8 @@ public class FemaleAdolescent extends AbstractBenthicStage {
         if (newAtts instanceof FemaleAdolescentAttributes) {
             FemaleAdolescentAttributes spAtts = (FemaleAdolescentAttributes) newAtts;
             for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
-        }  else if(newAtts instanceof FemaleImmatureAttributes) {
-            FemaleImmatureAttributes spAtts = (FemaleImmatureAttributes) newAtts;
+        }  else if(newAtts instanceof ImmatureCrabAttributes) {
+            ImmatureCrabAttributes spAtts = (ImmatureCrabAttributes) newAtts;
             for (String key: atts.getKeys()) atts.setValue(key,spAtts.getValue(key));
         }else {
             //TODO: should throw an error here

@@ -53,7 +53,7 @@ public class AbstractPelagicStageAttributesCustomizer extends AttributesCustomiz
         jtfNumber = new javax.swing.JTextField();
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
-        jtfWeight = new javax.swing.JTextField();
+        jtfMoltIndicator = new javax.swing.JTextField();
         jLabel10 = new javax.swing.JLabel();
         jtfShellThick = new javax.swing.JTextField();
 
@@ -223,12 +223,12 @@ public class AbstractPelagicStageAttributesCustomizer extends AttributesCustomiz
 
         jLabel6.setText("number");
 
-        jLabel7.setText("weight (g)");
+        jLabel7.setText("molt indicator");
 
-        jtfWeight.setText("0.0");
-        jtfWeight.addActionListener(new java.awt.event.ActionListener() {
+        jtfMoltIndicator.setText("0.0");
+        jtfMoltIndicator.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jtfWeightActionPerformed(evt);
+                jtfMoltIndicatorActionPerformed(evt);
             }
         });
 
@@ -264,8 +264,8 @@ public class AbstractPelagicStageAttributesCustomizer extends AttributesCustomiz
                             .add(jLabel10)))
                     .add(jPanel6Layout.createSequentialGroup()
                         .add(86, 86, 86)
-                        .add(jtfWeight, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 80, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
-                        .add(11, 11, 11)
+                        .add(jtfMoltIndicator, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 80, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                        .add(18, 18, 18)
                         .add(jtfShellThick, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, 80, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)))
                 .addContainerGap(org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
@@ -287,7 +287,7 @@ public class AbstractPelagicStageAttributesCustomizer extends AttributesCustomiz
                     .add(jLabel10))
                 .addPreferredGap(org.jdesktop.layout.LayoutStyle.RELATED)
                 .add(jPanel6Layout.createParallelGroup(org.jdesktop.layout.GroupLayout.BASELINE)
-                    .add(jtfWeight, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
+                    .add(jtfMoltIndicator, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE)
                     .add(jtfShellThick, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE, org.jdesktop.layout.GroupLayout.DEFAULT_SIZE, org.jdesktop.layout.GroupLayout.PREFERRED_SIZE))
                 .addContainerGap())
         );
@@ -393,10 +393,10 @@ public class AbstractPelagicStageAttributesCustomizer extends AttributesCustomiz
         }
     }//GEN-LAST:event_jcbVertTypeActionPerformed
 
-    private void jtfWeightActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfWeightActionPerformed
-        Double n = new Double(jtfWeight.getText());
-        attributes.setValue(AbstractPelagicStageAttributes.PROP_weight,n);
-    }//GEN-LAST:event_jtfWeightActionPerformed
+    private void jtfMoltIndicatorActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfMoltIndicatorActionPerformed
+        Double n = new Double(jtfMoltIndicator.getText());
+        attributes.setValue(AbstractPelagicStageAttributes.PROP_moltindicator,n);
+    }//GEN-LAST:event_jtfMoltIndicatorActionPerformed
 
     private void jtfShellThickActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jtfShellThickActionPerformed
         Double n = new Double(jtfShellThick.getText());
@@ -431,7 +431,7 @@ public class AbstractPelagicStageAttributesCustomizer extends AttributesCustomiz
             jtfAge.setText(attributes.getValue(AbstractPelagicStageAttributes.PROP_age,d).toString());
             jtfAgeInStage.setText(attributes.getValue(AbstractPelagicStageAttributes.PROP_ageInStage,d).toString());
             jtfNumber.setText(attributes.getValue(AbstractPelagicStageAttributes.PROP_number,d).toString());
-            jtfWeight.setText(attributes.getValue(AbstractPelagicStageAttributes.PROP_weight,d).toString());
+            jtfMoltIndicator.setText(attributes.getValue(AbstractPelagicStageAttributes.PROP_moltindicator,d).toString());
             jtfShellThick.setText(attributes.getValue(AbstractPelagicStageAttributes.PROP_shellthick,d).toString());
         }
     }
@@ -465,10 +465,10 @@ public class AbstractPelagicStageAttributesCustomizer extends AttributesCustomiz
     private javax.swing.JPanel jpVert;
     private javax.swing.JTextField jtfAge;
     private javax.swing.JTextField jtfAgeInStage;
+    private javax.swing.JTextField jtfMoltIndicator;
     private javax.swing.JTextField jtfNumber;
     private javax.swing.JTextField jtfShellThick;
     private javax.swing.JTextField jtfTime;
-    private javax.swing.JTextField jtfWeight;
     private javax.swing.JTextField jtfX;
     private javax.swing.JTextField jtfY;
     private javax.swing.JTextField jtfZ;

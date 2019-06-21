@@ -13,17 +13,12 @@ import java.util.Map;
 import java.util.Set;
 import java.util.logging.Logger;
 import org.openide.util.lookup.ServiceProvider;
-import wts.models.DisMELS.IBMFunctions.Growth.vonBertalanffyGrowthFunction;
-import wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction;
-import wts.models.DisMELS.IBMFunctions.Miscellaneous.LogisticFunction;
-import wts.models.DisMELS.IBMFunctions.Miscellaneous.PowerLawFunction;
 import wts.models.DisMELS.IBMFunctions.Growth.ExponentialGrowthFunction;
 import wts.models.DisMELS.IBMFunctions.Growth.LinearGrowthFunction;
 import wts.models.DisMELS.IBMFunctions.Growth.vonBertalanffyGrowthFunction;
 import wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
-import wts.models.DisMELS.IBMFunctions.Movement.DielVerticalMigration_FixedDepthRanges;
 import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunction;
 import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.PowerLawSwimmingSpeedFunction;
 import wts.models.DisMELS.framework.AbstractLHSParameters;
@@ -34,7 +29,7 @@ import wts.models.DisMELS.framework.IBMFunctions.IBMParameterDouble;
 import wts.models.DisMELS.framework.LifeStageParametersInterface;
 import SnowCrabFunctions.CrabBioenergeticsGrowthFunction;
 import SnowCrabFunctions.ExCostFunction;
-import SnowCrabFunctions.IntermoltPeriodFunction;
+import SnowCrabFunctions.IntermoltIntegratorFunction;
 import SnowCrabFunctions.MoltIncrementFunction;
 import SnowCrabFunctions.MaturityOgiveFunction;
 
@@ -166,7 +161,7 @@ public class MaleAdolescentParameters extends AbstractLHSParameters {
        cat = FCAT_MoltTiming;
        mapOfPotentialFunctions = new LinkedHashMap<>(2); 
        mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
-       ifi = new IntermoltPeriodFunction();
+       ifi = new IntermoltIntegratorFunction();
                mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
                
        cat = FCAT_ExCost;

@@ -3,20 +3,20 @@
  * To change this template file, choose Tools | Templates
  * and open the template in the editor.
  */
-package disMELS.IBMs.SnowCrab.Zooea1;
+package disMELS.IBMs.SnowCrab.Zooea;
 
 import java.beans.*;
 
 /**
  *
- * @author william.stockhausen
+ * @author WilliamStockhausen
  */
-public class Zooea1ParametersBeanInfo extends SimpleBeanInfo {
+public class ZooeaParametersBeanInfo extends SimpleBeanInfo {
 
     // Bean descriptor//GEN-FIRST:BeanDescriptor
     /*lazy BeanDescriptor*/
     private static BeanDescriptor getBdescriptor(){
-        BeanDescriptor beanDescriptor = new BeanDescriptor  ( disMELS.IBMs.SnowCrab.Zooea1.Zooea1Parameters.class , null ); // NOI18N//GEN-HEADEREND:BeanDescriptor
+        BeanDescriptor beanDescriptor = new BeanDescriptor  ( disMELS.IBMs.SnowCrab.Zooea.ZooeaParameters.class , null ); // NOI18N//GEN-HEADEREND:BeanDescriptor
         // Here you can add code for customizing the BeanDescriptor.
 
         return beanDescriptor;     }//GEN-LAST:BeanDescriptor
@@ -36,12 +36,12 @@ public class Zooea1ParametersBeanInfo extends SimpleBeanInfo {
         PropertyDescriptor[] properties = new PropertyDescriptor[6];
     
         try {
-            properties[PROPERTY_CSV] = new PropertyDescriptor ( "CSV", disMELS.IBMs.SnowCrab.Zooea1.Zooea1Parameters.class, "getCSV", null ); // NOI18N
-            properties[PROPERTY_CSVHeader] = new PropertyDescriptor ( "CSVHeader", disMELS.IBMs.SnowCrab.Zooea1.Zooea1Parameters.class, "getCSVHeader", null ); // NOI18N
-            properties[PROPERTY_IBMFunctionCategories] = new PropertyDescriptor ( "IBMFunctionCategories", disMELS.IBMs.SnowCrab.Zooea1.Zooea1Parameters.class, "getIBMFunctionCategories", null ); // NOI18N
-            properties[PROPERTY_IBMParameterKeys] = new PropertyDescriptor ( "IBMParameterKeys", disMELS.IBMs.SnowCrab.Zooea1.Zooea1Parameters.class, "getIBMParameterKeys", null ); // NOI18N
-            properties[PROPERTY_keys] = new PropertyDescriptor ( "keys", disMELS.IBMs.SnowCrab.Zooea1.Zooea1Parameters.class, "getKeys", null ); // NOI18N
-            properties[PROPERTY_typeName] = new PropertyDescriptor ( "typeName", disMELS.IBMs.SnowCrab.Zooea1.Zooea1Parameters.class, "getTypeName", "setTypeName" ); // NOI18N
+            properties[PROPERTY_CSV] = new PropertyDescriptor ( "CSV", disMELS.IBMs.SnowCrab.Zooea.ZooeaParameters.class, "getCSV", null ); // NOI18N
+            properties[PROPERTY_CSVHeader] = new PropertyDescriptor ( "CSVHeader", disMELS.IBMs.SnowCrab.Zooea.ZooeaParameters.class, "getCSVHeader", null ); // NOI18N
+            properties[PROPERTY_IBMFunctionCategories] = new PropertyDescriptor ( "IBMFunctionCategories", disMELS.IBMs.SnowCrab.Zooea.ZooeaParameters.class, "getIBMFunctionCategories", null ); // NOI18N
+            properties[PROPERTY_IBMParameterKeys] = new PropertyDescriptor ( "IBMParameterKeys", disMELS.IBMs.SnowCrab.Zooea.ZooeaParameters.class, "getIBMParameterKeys", null ); // NOI18N
+            properties[PROPERTY_keys] = new PropertyDescriptor ( "keys", disMELS.IBMs.SnowCrab.Zooea.ZooeaParameters.class, "getKeys", null ); // NOI18N
+            properties[PROPERTY_typeName] = new PropertyDescriptor ( "typeName", disMELS.IBMs.SnowCrab.Zooea.ZooeaParameters.class, "getTypeName", "setTypeName" ); // NOI18N
         }
         catch(IntrospectionException e) {
             e.printStackTrace();
@@ -59,7 +59,7 @@ public class Zooea1ParametersBeanInfo extends SimpleBeanInfo {
         EventSetDescriptor[] eventSets = new EventSetDescriptor[1];
     
         try {
-            eventSets[EVENT_propertyChangeListener] = new EventSetDescriptor ( disMELS.IBMs.SnowCrab.Zooea1.Zooea1Parameters.class, "propertyChangeListener", java.beans.PropertyChangeListener.class, new String[] {"propertyChange"}, "addPropertyChangeListener", "removePropertyChangeListener" ); // NOI18N
+            eventSets[EVENT_propertyChangeListener] = new EventSetDescriptor ( disMELS.IBMs.SnowCrab.Zooea.ZooeaParameters.class, "propertyChangeListener", java.beans.PropertyChangeListener.class, new String[] {"propertyChange"}, "addPropertyChangeListener", "removePropertyChangeListener" ); // NOI18N
         }
         catch(IntrospectionException e) {
             e.printStackTrace();
@@ -99,9 +99,9 @@ public class Zooea1ParametersBeanInfo extends SimpleBeanInfo {
         MethodDescriptor[] methods = new MethodDescriptor[23];
     
         try {
-            methods[METHOD_clone0] = new MethodDescriptor(disMELS.IBMs.SnowCrab.Zooea1.Zooea1Parameters.class.getMethod("clone", new Class[] {})); // NOI18N
+            methods[METHOD_clone0] = new MethodDescriptor(disMELS.IBMs.SnowCrab.Zooea.ZooeaParameters.class.getMethod("clone", new Class[] {})); // NOI18N
             methods[METHOD_clone0].setDisplayName ( "" );
-            methods[METHOD_createInstance1] = new MethodDescriptor(disMELS.IBMs.SnowCrab.Zooea1.Zooea1Parameters.class.getMethod("createInstance", new Class[] {java.lang.String[].class})); // NOI18N
+            methods[METHOD_createInstance1] = new MethodDescriptor(disMELS.IBMs.SnowCrab.Zooea.ZooeaParameters.class.getMethod("createInstance", new Class[] {java.lang.String[].class})); // NOI18N
             methods[METHOD_createInstance1].setDisplayName ( "" );
             methods[METHOD_getIBMFunction2] = new MethodDescriptor(wts.models.DisMELS.framework.AbstractLHSParameters.class.getMethod("getIBMFunction", new Class[] {java.lang.String.class, java.lang.String.class})); // NOI18N
             methods[METHOD_getIBMFunction2].setDisplayName ( "" );

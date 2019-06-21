@@ -4,21 +4,22 @@
 
 package disMELS.IBMs.SnowCrab.Megalopa;
 
+import SnowCrabFunctions.IntermoltIntegratorFunction;
 import com.vividsolutions.jts.geom.Coordinate;
+import disMELS.IBMs.SnowCrab.AbstractBenthicStageAttributes;
 import disMELS.IBMs.SnowCrab.AbstractPelagicStage;
-import disMELS.IBMs.SnowCrab.FemaleImmature.FemaleImmature;
-import disMELS.IBMs.SnowCrab.MaleImmature.MaleImmature;
+import disMELS.IBMs.SnowCrab.ImmatureCrab.ImmatureFemale;
+import disMELS.IBMs.SnowCrab.ImmatureCrab.ImmatureMale;
+import disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import org.openide.util.lookup.ServiceProvider;
-import wts.models.DisMELS.IBMFunctions.Growth.ExponentialGrowthFunction;
-import wts.models.DisMELS.IBMFunctions.Growth.LinearGrowthFunction;
-import wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
+import wts.models.DisMELS.IBMFunctions.Movement.DielVerticalMigration_FixedDepthRanges;
+import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunction;
 import wts.models.DisMELS.framework.*;
-import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.models.utilities.DateTimeFunctions;
 import wts.roms.model.LagrangianParticle;
 
@@ -43,8 +44,8 @@ public class Megalopa extends AbstractPelagicStage {
 //            wts.models.DisMELS.IBMs.Arrowtooth.EggStage.EggStagePointFT.class.getName();
     /* Classes for next LHS */
     public static final String[] nextLHSClasses = new String[]{Megalopa.class.getName(),
-                                                               FemaleImmature.class.getName(),
-                                                               MaleImmature.class.getName()};
+                                                               ImmatureFemale.class.getName(),
+                                                               ImmatureMale.class.getName()};
     /* Classes for spawned LHS */
     public static final String[] spawnedLHSClasses = new String[]{};
     
@@ -55,51 +56,19 @@ public class Megalopa extends AbstractPelagicStage {
     /* life stage parameters object */
     protected MegalopaParameters params = null;
     
-    //  Fields new to class
+    //Fields new to class
         //fields that reflect parameter values
-    /** flag indicating instance is a super-individual */
-    protected boolean isSuperIndividual;
-    /** horizontal random walk parameter */
-    protected double horizRWP;
-    /** minimum preferred bottom depth */
-    protected double minDepth;
-    /** maximum preferred bottom depth */
-    protected double maxDepth;
-    /** minimum stage duration before metamorphosis to next stage */
-    protected double minStageDuration;
-    /** maximum stage duration (followed by death) */
-    protected double maxStageDuration;
-    /** minimum settlement depth */
+     /** minimum settlement depth */
     protected double minSettlementDepth;
     /** maximum settlement depth */
     protected double maxSettlementDepth;
-    /** initial size (mm) */
-    protected double minWeight;
-    /** initial weight (g) */
-    protected double initialWeight;
-    /** flag to use stochastic transitions */
-    protected boolean randomizeTransitions;
-    
+   
         //fields that reflect (new) attribute values
-    //none
+    //--none
     
-            //other fields
-    /** number of individuals transitioning to next stage */
-    private double numTrans;  
-    /** total depth (m) at individual's position */
-    private double totalDepth;
-    
-    /** IBM function selected for development */
-    private IBMFunctionInterface fcnGrowth = null; 
-    /** IBM function selected for mortality */
-    private IBMFunctionInterface fcnMort = null; 
-    
-    private IBMFunctionInterface fcnMoltTime = null;
-    /** IBM function selected for vertical movement */
-    private IBMFunctionInterface fcnVM = null; 
-    /** IBM function selected for vertical velocity */
-    private IBMFunctionInterface fcnVV = null; 
-    
+        //other fields
+    //--none
+        
     /** logger for class */
     private static final Logger logger = Logger.getLogger(Megalopa.class.getName());
     
@@ -133,7 +102,7 @@ public class Megalopa extends AbstractPelagicStage {
         atts.setValue(LifeStageAttributesInterface.PROP_origID,id);
         setAttributesFromSubClass(atts);  //set object in the superclass
         params = (MegalopaParameters) LHS_Factory.createParameters(typeName);
-        setParameters(params);
+        setParameters(params);//calls setParametersFromSubClass(...)
     }
 
     /**
@@ -196,7 +165,7 @@ public class Megalopa extends AbstractPelagicStage {
                 lhs.atts.setValue(LifeStageAttributesInterface.PROP_origID,newID);
             }
         }
-        lhs.initialize();//initialize instance variables
+        if (lhs!=null) lhs.initialize();//initialize instance variables
         return lhs;
     }
 
@@ -255,13 +224,18 @@ public class Megalopa extends AbstractPelagicStage {
      *  Side effects:
      *      updateVariables() is called to update instance variables.
      *      Instance field "id" is also updated.
-     * @param newAtts - should be instance of EggStageAttributes or LarvaStageAttributes
+     *      Instance field "moltindicator" is set to 0.
+     * @param newAtts - should be instance of ZooeaAttributes
      */
     @Override
     public void setAttributes(LifeStageAttributesInterface newAtts) {
         //copy attributes, regardless of life stage associated w/ newAtts
         for (String key: newAtts.getKeys()) atts.setValue(key,newAtts.getValue(key));
         //fill in missing attributes depending on class of newAtts
+        if (newAtts instanceof ZooeaAttributes) {
+            //set moltIndicator to 0
+            atts.setValue(MegalopaAttributes.PROP_moltindicator, 0.0);
+        }
         id = atts.getValue(LifeStageAttributesInterface.PROP_id, id);
         updateVariables();
     }
@@ -368,16 +342,23 @@ public class Megalopa extends AbstractPelagicStage {
             //TODO: throw some error
         }
     }
-    
+        
     /**
      * Sets the IBM functions from the parameters object
      */
     private void setIBMFunctions(){
-        fcnGrowth  = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_Growth);
-        fcnMort    = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_Mortality);
-        fcnMoltTime = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_MoltTime);
-        fcnVM      = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_VerticalMovement);
-        fcnVV      = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_VerticalVelocity);
+        fcnIntermoltDuration = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_IntermoltDuration);
+        if (!(fcnIntermoltDuration instanceof IntermoltIntegratorFunction))
+            throw new java.lang.UnsupportedOperationException("Intermolt duration function "+fcnIntermoltDuration.getFunctionName()+" is not supported for Megalopa.");
+        fcnMort     = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_Mortality);
+        if (!(fcnMort instanceof ConstantMortalityRate||fcnMort instanceof TemperatureDependentMortalityRate_Houde1989))
+            throw new java.lang.UnsupportedOperationException("Mortality function "+fcnMort.getFunctionName()+" is not supported for Megalopa.");
+        fcnVM       = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_VerticalMovement);
+        if (!(fcnVM instanceof DielVerticalMigration_FixedDepthRanges))
+            throw new java.lang.UnsupportedOperationException("Vertical movement function "+fcnVM.getFunctionName()+" is not supported for Megalopa.");
+        fcnVV       = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_VerticalVelocity);
+        if (!(fcnVV instanceof ConstantMovementRateFunction))
+            throw new java.lang.UnsupportedOperationException("Vertical velocity function "+fcnVV.getFunctionName()+" is not supported for Megalopa.");
     }
     
     /*
@@ -388,12 +369,6 @@ public class Megalopa extends AbstractPelagicStage {
                 params.getValue(MegalopaParameters.PARAM_isSuperIndividual,isSuperIndividual);
         horizRWP = 
                 params.getValue(MegalopaParameters.PARAM_horizRWP,horizRWP);
-        minWeight = 
-                params.getValue(MegalopaParameters.PARAM_minWeight,minWeight);
-        initialWeight = 
-                params.getValue(MegalopaParameters.PARAM_initialWeight,initialWeight);
-        minStageDuration = 
-                params.getValue(MegalopaParameters.PARAM_minStageDuration,minStageDuration);
         maxStageDuration = 
                 params.getValue(MegalopaParameters.PARAM_maxStageDuration,maxStageDuration);
         minSettlementDepth = 
@@ -436,21 +411,17 @@ public class Megalopa extends AbstractPelagicStage {
         double dtp = 0.25*(dt/DAY_SECS);//use 1/4 timestep (converted from sec to d)
         output.clear();
         List<LifeStageInterface> nLHSs=null;
-        if (((ageInStage+dtp)>=minStageDuration)&&(weight>=minWeight)) {
-            if ((numTrans>0)){
-                if(depth<=minSettlementDepth){
-                    active = false;
-                    alive = false;
-                } else{
-            nLHSs = createNextLHSs();
-            if (nLHSs!=null) output.addAll(nLHSs);
-                }
-        }
+        if (moltIndicator>=1.0) {
+            if ((minSettlementDepth<=totalDepth)&&(totalDepth<=maxSettlementDepth)&&
+                    (depth>(totalDepth-5))) {
+                nLHSs = createMetamorphosedIndividuals();
+                if (nLHSs!=null) output.addAll(nLHSs);
+            }
         }
         return output;
     }
 
-    private List<LifeStageInterface> createNextLHSs() {
+    private List<LifeStageInterface> createMetamorphosedIndividuals() {
         List<LifeStageInterface> nLHSs = null;
         try {
             //create LHS with "next" stage
@@ -485,6 +456,19 @@ public class Megalopa extends AbstractPelagicStage {
             }
         } catch (IllegalAccessException | InstantiationException ex) {
             ex.printStackTrace();
+        }
+        if (nLHSs!=null){
+            //apply sex ratio 
+            double xr = (Double)params.getValue(MegalopaParameters.PARAM_sexRatio);
+            for (LifeStageInterface nLHS : nLHSs){
+                if (nLHS instanceof ImmatureFemale){
+                    double n = (Double) nLHS.getAttributes().getValue(AbstractBenthicStageAttributes.PROP_number);
+                    nLHS.getAttributes().setValue(AbstractBenthicStageAttributes.PROP_number,(1.0-xr)*n);
+                } else if (nLHS instanceof ImmatureMale){
+                    double n = (Double) nLHS.getAttributes().getValue(AbstractBenthicStageAttributes.PROP_number);
+                    nLHS.getAttributes().setValue(AbstractBenthicStageAttributes.PROP_number,xr*n);
+                }
+            }
         }
         return nLHSs;
     }
@@ -562,7 +546,7 @@ public class Megalopa extends AbstractPelagicStage {
                 logger.info("depth = "+depth);
                 logger.info("-------Finished setting initial position------------");
             }
-            interpolateEnvVars(pos);
+            updateEnvVars(pos);
             updateAttributes(); 
         }
     }
@@ -591,12 +575,12 @@ public class Megalopa extends AbstractPelagicStage {
             if (debugOps) logger.info("Depth after corrector step = "+(-i3d.calcZfromK(pos[0],pos[1],pos[2])));
         time = time+dt;
         numTrans = 0.0;
-        updateAge(dt);
-        updateWeight(dt);
+        updateAge(dt);          //calling superclass method
+        updateMoltIndicator(dt);//calling superclass method
         updateNum(dt);
         updatePosition(pos);
     
-        interpolateEnvVars(pos);
+        updateEnvVars(pos);
         //check for exiting grid
         if (i3d.isAtGridEdge(pos,tolGridEdge)){
             alive=false;
@@ -617,14 +601,6 @@ public class Megalopa extends AbstractPelagicStage {
         //compute vertical velocity
         double w = 0;
         //calculate the vertical movement rate
-        if (fcnVV instanceof wts.models.DisMELS.IBMFunctions.SwimmingBehavior.PowerLawSwimmingSpeedFunction) {
-            /**
-            * @param vars - the inputs variables as a double[]{dt,z}.
-            *      dt - [0] - integration time step
-            *      z  - [1] - size of individual
-            */
-            w = (Double) fcnVV.calculate(new double[]{dt,size});
-        } else
         if (fcnVV instanceof wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunction) {
             /**
             * @param vars - double[]{dt}.
@@ -686,50 +662,6 @@ public class Megalopa extends AbstractPelagicStage {
      *
      * @param dt - time step in seconds
      */
-    private void updateAge(double dt) {
-        age        = age+dt/DAY_SECS;
-        ageInStage = ageInStage+dt/DAY_SECS;
-        if (ageInStage>maxStageDuration) {
-            alive = false;
-            active = false;
-        }
-    }
-
-    /**
-     *
-     * @param dt - time step in seconds
-     */
-    private void updateWeight(double dt) {
-        if (fcnGrowth instanceof ExponentialGrowthFunction){
-            /**
-             * @param vars - the inputs variables, dt (in days) and z0, as a double[].
-             * @return     - the function value (z[dt]) as a Double 
-             */
-            weight = (Double)fcnGrowth.calculate(new double[]{dt/DAY_SECS,weight});
-        } else
-        if (fcnGrowth instanceof LinearGrowthFunction){
-            /**
-             * @param vars - the inputs variables, z0 and dt, as a double[].
-             * @return     - the function value (z[dt]) as a Double 
-             */
-            Double D = (Double) fcnMoltTime.calculate(temperature); 
-            Double growthRate = (Double) (minWeight-initialWeight)/D;
-            fcnGrowth.setParameterValue("rate", growthRate);
-            weight = (Double)fcnGrowth.calculate(new double[]{dt/DAY_SECS,weight});
-        } else
-        if (fcnGrowth instanceof ConstantFunction){
-            double rate = (Double)fcnGrowth.calculate(null);
-            weight += rate*dt/DAY_SECS;
-        }
-        if(weight>minWeight){
-            numTrans += 1;
-        }
-    }
-
-    /**
-     *
-     * @param dt - time step in seconds
-     */
     private void updateNum(double dt) {
         double mortalityRate = 0.0D;//in unis of [days]^-1
         if (fcnMort instanceof ConstantMortalityRate){
@@ -747,15 +679,15 @@ public class Megalopa extends AbstractPelagicStage {
             mortalityRate = (Double)fcnMort.calculate(temperature);//using temperature as covariate for mortality
         }
         double totRate = mortalityRate;
-        if ((ageInStage>=minStageDuration)) {
-              if((numTrans<number)&&(numTrans>0.0)){
-            double transRate = numTrans/number;
-            double instTransRate = -Math.log(1-transRate);
-            totRate += instTransRate;
-            //apply mortality rate to previous number transitioning and
-            //add in new transitioners
-            numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
-                    (instTransRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
+        if (moltIndicator>=1.0) {
+            if((numTrans<number)&&(numTrans>0.0)){
+                double transRate = numTrans/number;
+                double instTransRate = -Math.log(1-transRate);
+                totRate += instTransRate;
+                //apply mortality rate to previous number transitioning and
+                //add in new transitioners
+                numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
+                        (instTransRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
             } else if(numTrans==number){
                 number = number - numTrans;
             }
@@ -767,55 +699,6 @@ public class Megalopa extends AbstractPelagicStage {
         }
     }
     
-    private void updatePosition(double[] pos) {
-        totalDepth = i3d.interpolateBathymetricDepth(pos);
-        depth      = -i3d.calcZfromK(pos[0],pos[1],pos[2]);
-        lat        = i3d.interpolateLat(pos);
-        lon        = i3d.interpolateLon(pos);
-        gridCellID = ""+Math.round(pos[0])+"_"+Math.round(pos[1]);
-        updateTrack();
-    }
-    
-    private void interpolateEnvVars(double[] pos) {
-        temperature = i3d.interpolateTemperature(pos);
-        salinity    = i3d.interpolateSalinity(pos);
-    }
-
-    @Override
-    public double getStartTime() {
-        return startTime;
-    }
-
-    @Override
-    public void setStartTime(double newTime) {
-        startTime = newTime;
-        time      = startTime;
-        atts.setValue(LifeStageAttributesInterface.PROP_startTime,startTime);
-        atts.setValue(LifeStageAttributesInterface.PROP_time,time);
-    }
-
-    @Override
-    public boolean isActive() {
-        return active;
-    }
-
-    @Override
-    public void setActive(boolean b) {
-        active = b;
-        atts.setActive(b);
-    }
-
-    @Override
-    public boolean isAlive() {
-        return alive;
-    }
-
-    @Override
-    public void setAlive(boolean b) {
-        alive = b;
-        atts.setAlive(b);
-    }
-
     @Override
     public String getAttributesClassName() {
         return attributesClass;
@@ -842,17 +725,6 @@ public class Megalopa extends AbstractPelagicStage {
     }
 
     @Override
-    public List<LifeStageInterface> getSpawnedIndividuals() {
-        output.clear();
-        return output;
-    }
-
-    @Override
-    public boolean isSuperIndividual() {
-        return isSuperIndividual;
-    }
-    
-    @Override
     public String getReport() {
         updateAttributes();//make sure attributes are up to date
         atts.setValue(LifeStageAttributesInterface.PROP_track, getTrackAsString(COORDINATE_TYPE_GEOGRAPHIC));//
@@ -869,14 +741,10 @@ public class Megalopa extends AbstractPelagicStage {
      */
     @Override
     protected void updateAttributes() {
-        //update superclass attributes
+        //update superclass (AbstractPelagicStage) attributes
         super.updateAttributes();
-        //update new attributes
-        atts.setValue(MegalopaAttributes.PROP_weight,weight);
-        atts.setValue(MegalopaAttributes.PROP_number,number);
-        atts.setValue(MegalopaAttributes.PROP_salinity,salinity);
-        atts.setValue(MegalopaAttributes.PROP_temperature,temperature);
-        atts.setValue(MegalopaAttributes.PROP_ph,ph);
+        //update attributes new to class
+        //--NONE!
     }
 
     /**
@@ -886,11 +754,7 @@ public class Megalopa extends AbstractPelagicStage {
     protected void updateVariables() {
         //update superclass variables
         super.updateVariables();
-        //update new variables
-       weight      = atts.getValue(MegalopaAttributes.PROP_weight, weight);
-       salinity    = atts.getValue(MegalopaAttributes.PROP_salinity,salinity);
-       temperature = atts.getValue(MegalopaAttributes.PROP_temperature,temperature);
-       number      = atts.getValue(MegalopaAttributes.PROP_number, number);
-       ph        = atts.getValue(MegalopaAttributes.PROP_ph,ph);
+        //update variables new to class
+        //--NONE
     }
 }

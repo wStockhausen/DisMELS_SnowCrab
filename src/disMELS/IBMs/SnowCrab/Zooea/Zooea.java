@@ -1,116 +1,83 @@
 /*
- * Zooea2.java
+ * Zooea.java
  */
 
-package disMELS.IBMs.SnowCrab.Zooea2;
+package disMELS.IBMs.SnowCrab.Zooea;
 
+import SnowCrabFunctions.IntermoltIntegratorFunction;
 import com.vividsolutions.jts.geom.Coordinate;
 import disMELS.IBMs.SnowCrab.AbstractPelagicStage;
+import disMELS.IBMs.SnowCrab.EggMassExtruded.ExtrudedEggMassAttributes;
 import disMELS.IBMs.SnowCrab.Megalopa.Megalopa;
-import disMELS.IBMs.SnowCrab.Zooea1.Zooea1Attributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
 import org.openide.util.lookup.ServiceProvider;
-import wts.models.DisMELS.IBMFunctions.Growth.ExponentialGrowthFunction;
-import wts.models.DisMELS.IBMFunctions.Growth.LinearGrowthFunction;
-import wts.models.DisMELS.IBMFunctions.Miscellaneous.ConstantFunction;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
+import wts.models.DisMELS.IBMFunctions.Movement.DielVerticalMigration_FixedDepthRanges;
+import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunction;
 import wts.models.DisMELS.framework.*;
-import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.models.utilities.DateTimeFunctions;
 import wts.roms.model.LagrangianParticle;
 
 /**
- * Life stage representing the second snow crab zooeal stage.
+ * This class represents the snow crab zooea stages.
  */
 @ServiceProvider(service=LifeStageInterface.class)
-public class Zooea2 extends AbstractPelagicStage {
+public class Zooea extends AbstractPelagicStage {
     
         //Static fields    
             //  Static fields new to this class
     /* flag to do debug operations */
     public static boolean debugOps = false;
     /* Class for attributes */
-    public static final String attributesClass = Zooea2Attributes.class.getName();
+    public static final String attributesClass = ZooeaAttributes.class.getName();
     /* Class for parameters */
-    public static final String parametersClass = Zooea2Parameters.class.getName();
+    public static final String parametersClass = ZooeaParameters.class.getName();
     /* Class for feature type for point positions */
     public static final String pointFTClass = wts.models.DisMELS.framework.LHSPointFeatureType.class.getName();
 //            wts.models.DisMELS.IBMs.Arrowtooth.EggStage.EggStagePointFT.class.getName();
     /* Classes for next LHS */
-    public static final String[] nextLHSClasses = new String[]{Zooea2.class.getName(),
+    public static final String[] nextLHSClasses = new String[]{Zooea.class.getName(),
                                                                Megalopa.class.getName()};
     /* Classes for spawned LHS */
     public static final String[] spawnedLHSClasses = new String[]{};
     
     //Instance fields
             //  Fields hiding ones from superclass
-    /* life stage atrbutes object */
-    protected Zooea2Attributes atts = null;
+    /* life stage attributes object */
+    protected ZooeaAttributes atts = null;
     /* life stage parameters object */
-    protected Zooea2Parameters params = null;
+    protected ZooeaParameters params = null;
     
     //  Fields new to class
         //fields that reflect parameter values
-    /** flag indicating instance is a super-individual */
-    protected boolean isSuperIndividual;
-    /** horizontal random walk parameter */
-    protected double horizRWP;
-    /** minimum preferred bottom depth */
-    protected double minDepth;
-    /** maximum preferred bottom depth */
-    protected double maxDepth;
-    /** minimum stage duration before metamorphosis to next stage */
-    protected double minStageDuration;
-    /** maximum stage duration (followed by death) */
-    protected double maxStageDuration;
-    /** minimum weight before metamorphosis to next stage */
-    protected double minWeight;
-    protected double initialWeight;
-    /** flag to use stochastic transitions */
-    protected boolean randomizeTransitions;
+    //--none
     
         //fields that reflect (new) attribute values
-    //none
+    //--none
     
-            //other fields
-    /** number of individuals transitioning to next stage */
-    private double numTrans;  
-    /** total depth (m) at individual's position */
-    private double totalDepth;
-    
-    /** IBM function selected for development */
-    private IBMFunctionInterface fcnGrowth = null; 
-    /** IBM function selected for mortality */
-    private IBMFunctionInterface fcnMort = null; 
-    
-    private IBMFunctionInterface fcnMoltTime = null;
-    /** IBM function selected for vertical movement */
-    private IBMFunctionInterface fcnVM = null; 
-    /** IBM function selected for vertical velocity */
-    private IBMFunctionInterface fcnVV = null; 
     
     /** flag to print debugging info */
     public static boolean debug = false;
     /** logger for class */
-    private static final Logger logger = Logger.getLogger(Zooea2.class.getName());
+    private static final Logger logger = Logger.getLogger(Zooea.class.getName());
     
     /**
-     * Creates a new instance of Zooea2.  
+     * Creates a new instance of Zooea.  
      *  This constructor should be used ONLY to obtain
      *  the class names of the associated classes.
      * DO NOT DELETE THIS CONSTRUCTOR!!
      */
-    public Zooea2() {
+    public Zooea() {
         super("");
         super.atts = atts;
         super.params = params;
     }
     
     /**
-     * Creates a new instance of Zooea2 with the given typeName.
+     * Creates a new instance of Zooea with the given typeName.
      * A new id number is calculated in the superclass and assigned to
      * the new instance's id, parentID, and origID. 
      * 
@@ -118,21 +85,21 @@ public class Zooea2 extends AbstractPelagicStage {
      * then initialize() should be called to initialize all instance variables.
      * DO NOT DELETE THIS CONSTRUCTOR!!
      */
-    public Zooea2(String typeName) 
+    public Zooea(String typeName) 
                 throws InstantiationException, IllegalAccessException {
         super(typeName);
-        atts = new Zooea2Attributes(typeName);
+        atts = new ZooeaAttributes(typeName);
         atts.setValue(LifeStageAttributesInterface.PROP_id,id);
         atts.setValue(LifeStageAttributesInterface.PROP_parentID,id);
         atts.setValue(LifeStageAttributesInterface.PROP_origID,id);
         setAttributesFromSubClass(atts);  //set object in the superclass
-        params = (Zooea2Parameters) LHS_Factory.createParameters(typeName);
+        params = (ZooeaParameters) LHS_Factory.createParameters(typeName);
         setParameters(params);
     }
 
     /**
-     * Creates a new instance of Zooea2 with type name and
-     * attribute values given by input String array.
+     * Creates a new instance of Zooea with type name and
+ attribute values given by input String array.
      * 
      * Side effects:
      *  1. Calls createInstance(LifeStageAttributesInterface), with associated effects,
@@ -144,16 +111,16 @@ public class Zooea2 extends AbstractPelagicStage {
      * @throws java.lang.IllegalAccessException
      */
     @Override
-    public Zooea2 createInstance(String[] strv) 
+    public Zooea createInstance(String[] strv) 
                         throws InstantiationException, IllegalAccessException {
         LifeStageAttributesInterface theAtts = LHS_Factory.createAttributes(strv);
-        Zooea2 lhs = createInstance(theAtts);
+        Zooea lhs = createInstance(theAtts);
         return lhs;
     }
 
     /**
-     * Creates a new instance of this LHS with attributes (including type name) 
-     * corresponding to the input attributes instance.
+     * Creates a new instance of Zooea with attributes (including type name) 
+ corresponding to the input attributes instance.
      * 
      * Side effects:
      *  1. If theAtts id attribute is "-1", then a new (unique) id value is created 
@@ -169,11 +136,11 @@ public class Zooea2 extends AbstractPelagicStage {
      * @throws java.lang.IllegalAccessException
      */
     @Override
-    public Zooea2 createInstance(LifeStageAttributesInterface theAtts)
+    public Zooea createInstance(LifeStageAttributesInterface theAtts)
                         throws InstantiationException, IllegalAccessException {
-        Zooea2 lhs = null;
-        if (theAtts instanceof Zooea2Attributes) {
-            lhs = new Zooea2(theAtts.getTypeName());
+        Zooea lhs = null;
+        if (theAtts instanceof ZooeaAttributes) {
+            lhs = new Zooea(theAtts.getTypeName());
             long newID = lhs.id;//save id of new instance
             lhs.setAttributes(theAtts);
             if (lhs.atts.getID()==-1) {
@@ -190,7 +157,7 @@ public class Zooea2 extends AbstractPelagicStage {
                 lhs.atts.setValue(LifeStageAttributesInterface.PROP_origID,newID);
             }
         }
-        lhs.initialize();//initialize instance variables
+        if (lhs!=null) lhs.initialize();//initialize instance variables
         return lhs;
     }
 
@@ -198,23 +165,25 @@ public class Zooea2 extends AbstractPelagicStage {
      *  Returns the associated attributes.  
      */
     @Override
-    public Zooea2Attributes getAttributes() {
+    public ZooeaAttributes getAttributes() {
         return atts;
     }
 
     /**
      * Sets the values of the associated attributes object to those in the input
-     * String[]. This does NOT change the typeNameof the LHS instance (or the 
-     * associated LHSAttributes instance) on which the method is called.
-     * Attribute values are set using SimpleBenthicLHSAttributes.setValues(String[]).
-     * Side effects:
-     *  1. If th new id attribute is not "-1", then its value for id replaces the 
-     *      current value for the lhs.
-     *  2. If the new parentID attribute is "-1", then it is set to the value for id.
-     *  3. If the new origID attribute is "-1", then it is set to the value for id.
-     *  4. initialize() is called to initialize variables and convert position
-     *   attributes.
-     * /
+     * String[]. 
+     * 
+     * This does NOT change the typeNameof the LHS instance (or the 
+ associated LHSAttributes instance) on which the method is called.
+ Attribute values are set using ZooeaAttributes.setValues(String[]).
+ 
+ Side effects:
+  1. If th new id attribute is not "-1", then its value for id replaces the 
+      current value for the lhs.
+  2. If the new parentID attribute is "-1", then it is set to the value for id.
+  3. If the new origID attribute is "-1", then it is set to the value for id.
+  4. initialize() is called to initialize variables and convert position attributes.
+     * 
      * @param strv - attribute values as String[]
      */
     @Override
@@ -242,32 +211,43 @@ public class Zooea2 extends AbstractPelagicStage {
 
     /**
      * Sets the attributes for the instance by copying values from the input.
+     * 
      * This does NOT change the typeName of the LHS instance (or the associated 
      * LHSAttributes instance) on which the method is called.
      * Note that ALL attributes are copied, so id, parentID, and origID are copied
      * as well. 
+     * 
      *  Side effects:
-     *      updateVariables() is called to update instance variables.
-     *      Instance field "id" is also updated.
-     * @param newAtts - should be instance of EggStageAttributes or Zooea2Attributes
+     *      1. updateVariables() is called to update instance variables.
+     *      2. Instance field "id" is also updated.
+     *      3. Instance field "moltindicator" is set to 0 if molt occurred
+     * 
+     * @param newAtts - should be instance of ExtrudedEggMassAttributes or ZooeaAttributes
      */
     @Override
     public void setAttributes(LifeStageAttributesInterface newAtts) {
         //copy attributes, regardless of life stage associated w/ newAtts
         for (String key: newAtts.getKeys()) atts.setValue(key,newAtts.getValue(key));
         //fill in missing attributes depending on class of newAtts
-        if (newAtts instanceof Zooea1Attributes) {
-            //get initial values for size and weight
-            String akey; String pkey;
-                      akey = Zooea2Attributes.PROP_weight;  atts.setValue(akey, initialWeight);
+        if (newAtts instanceof ExtrudedEggMassAttributes) {
+            //set moltIndicator to 0
+            atts.setValue(ZooeaAttributes.PROP_moltindicator, 0.0);
+        } else
+        if (newAtts instanceof ZooeaAttributes) {
+            //set moltIndicator to 0 ifmolt occurred 
+            String key = ZooeaAttributes.PROP_moltindicator;
+            double mi = ((ZooeaAttributes) newAtts).getValue(key,1.0);
+            if (mi>=1.0) atts.setValue(key, 0.0);
         }
         id = atts.getValue(LifeStageAttributesInterface.PROP_id, id);
         updateVariables();
     }
     
     /**
-     *  Sets the associated attributes object. Use this after creating an LHS instance
-     * as an "output" from another LHS that is functioning as an ordinary individual.
+     *  Sets the associated attributes object. 
+     * 
+     * Use this after creating an LHS instance as an "output" from 
+     * another LHS that is functioning as an ordinary individual.
      */
     @Override
     public void setInfoFromIndividual(LifeStageInterface oldLHS){
@@ -299,8 +279,10 @@ public class Zooea2 extends AbstractPelagicStage {
     }
     
     /**
-     *  Sets the associated attributes object. Use this after creating an LHS instance
-     * as an "output" from another LHS that is functioning as a super individual.
+     *  Sets the associated attributes object. 
+     * 
+     * Use this after creating an LHS instance as an "output" from another LHS 
+     * that is functioning as a super individual.
      */
     @Override
     public void setInfoFromSuperIndividual(LifeStageInterface oldLHS, double numTrans) {
@@ -348,7 +330,7 @@ public class Zooea2 extends AbstractPelagicStage {
      *  Returns the associated parameters.  
      */
     @Override
-    public Zooea2Parameters getParameters() {
+    public ZooeaParameters getParameters() {
         return params;
     }
 
@@ -358,8 +340,8 @@ public class Zooea2 extends AbstractPelagicStage {
      */
     @Override
     public void setParameters(LifeStageParametersInterface newParams) {
-        if (newParams instanceof Zooea2Parameters) {
-            params = (Zooea2Parameters) newParams;
+        if (newParams instanceof ZooeaParameters) {
+            params = (ZooeaParameters) newParams;
             setParametersFromSubClass(params);
             setParameterValues();
             setIBMFunctions();
@@ -372,30 +354,32 @@ public class Zooea2 extends AbstractPelagicStage {
      * Sets the IBM functions from the parameters object
      */
     private void setIBMFunctions(){
-        fcnGrowth  = params.getSelectedIBMFunctionForCategory(Zooea2Parameters.FCAT_Growth);
-        fcnMort    = params.getSelectedIBMFunctionForCategory(Zooea2Parameters.FCAT_Mortality);
-        fcnVM      = params.getSelectedIBMFunctionForCategory(Zooea2Parameters.FCAT_VerticalMovement);
-        fcnVV      = params.getSelectedIBMFunctionForCategory(Zooea2Parameters.FCAT_VerticalVelocity);
-        fcnMoltTime = params.getSelectedIBMFunctionForCategory(Zooea2Parameters.FCAT_MoltTime);
+        fcnIntermoltDuration = params.getSelectedIBMFunctionForCategory(ZooeaParameters.FCAT_IntermoltDuration);
+        if (!(fcnIntermoltDuration instanceof IntermoltIntegratorFunction))
+            throw new java.lang.UnsupportedOperationException("Intermolt duration function "+fcnIntermoltDuration.getFunctionName()+" is not supported for Zooea1.");
+        fcnMort     = params.getSelectedIBMFunctionForCategory(ZooeaParameters.FCAT_Mortality);
+        if (!(fcnMort instanceof ConstantMortalityRate||fcnMort instanceof TemperatureDependentMortalityRate_Houde1989))
+            throw new java.lang.UnsupportedOperationException("Mortality function "+fcnMort.getFunctionName()+" is not supported for Zooea1.");
+        fcnVM       = params.getSelectedIBMFunctionForCategory(ZooeaParameters.FCAT_VerticalMovement);
+        if (!(fcnVM instanceof DielVerticalMigration_FixedDepthRanges))
+            throw new java.lang.UnsupportedOperationException("Vertical movement function "+fcnVM.getFunctionName()+" is not supported for Zooea1.");
+        fcnVV       = params.getSelectedIBMFunctionForCategory(ZooeaParameters.FCAT_VerticalVelocity);
+        if (!(fcnVV instanceof ConstantMovementRateFunction))
+            throw new java.lang.UnsupportedOperationException("Vertical velocity function "+fcnVV.getFunctionName()+" is not supported for Zooea1.");
     }
+    
     /*
      * Copy the values from the params map to the param variables.
      */
     private void setParameterValues() {
         isSuperIndividual = 
-                params.getValue(Zooea2Parameters.PARAM_isSuperIndividual,isSuperIndividual);
+                params.getValue(ZooeaParameters.PARAM_isSuperIndividual,isSuperIndividual);
         horizRWP = 
-                params.getValue(Zooea2Parameters.PARAM_horizRWP,horizRWP);
-        initialWeight = 
-                params.getValue(Zooea2Parameters.PARAM_initialWeight,initialWeight);
-        minStageDuration = 
-                params.getValue(Zooea2Parameters.PARAM_minStageDuration,minStageDuration);
+                params.getValue(ZooeaParameters.PARAM_horizRWP,horizRWP);
         maxStageDuration = 
-                params.getValue(Zooea2Parameters.PARAM_maxStageDuration,maxStageDuration);
+                params.getValue(ZooeaParameters.PARAM_maxStageDuration,maxStageDuration);
         randomizeTransitions = 
-                params.getValue(Zooea2Parameters.PARAM_randomizeTransitions,true);
-                minWeight = 
-                params.getValue(Zooea2Parameters.PARAM_minWeight,minWeight);
+                params.getValue(ZooeaParameters.PARAM_randomizeTransitions,true);
     }
     
     /**
@@ -405,9 +389,9 @@ public class Zooea2 extends AbstractPelagicStage {
      */
     @Override
     public Object clone() {
-        Zooea2 clone = null;
+        Zooea clone = null;
         try {
-            clone = (Zooea2) super.clone();
+            clone = (Zooea) super.clone();
             clone.setAttributes(atts);//this clones atts
             clone.setParameters(params);//this clones params
             clone.lp      = (LagrangianParticle) lp.clone();
@@ -429,17 +413,22 @@ public class Zooea2 extends AbstractPelagicStage {
     public List<LifeStageInterface> getMetamorphosedIndividuals(double dt) {
         double dtp = 0.25*(dt/DAY_SECS);//use 1/4 timestep (converted from sec to d)
         output.clear();
-        List<LifeStageInterface> nLHSs=null;
-        if (((ageInStage+dtp)>=minStageDuration)&&(weight>=minWeight)) {
-            if ((numTrans>0)){
-                nLHSs = createNextLHSs();
+        List<LifeStageInterface> nLHSs;
+        if (moltIndicator>=1.0) {
+            if ((numTrans>0)||!isSuperIndividual){
+                nLHSs = getMetamorphosedIndividuals();
                 if (nLHSs!=null) output.addAll(nLHSs);
             }
         }
         return output;
     }
 
-    private List<LifeStageInterface> createNextLHSs() {
+    /**
+     * Creates a list of objects representing individuals in the succeeding life stage.
+     * 
+     * @return 
+     */
+    private List<LifeStageInterface> getMetamorphosedIndividuals() {
         List<LifeStageInterface> nLHSs = null;
         try {
             //create LHS with "next" stage
@@ -481,12 +470,10 @@ public class Zooea2 extends AbstractPelagicStage {
     /**
      * Initializes instance variables to attribute values (via updateVariables()), 
      * then determines initial position for the lagrangian particle tracker
-     * and resets the track,
-     * sets horizType and vertType attributes to HORIZ_LL, VERT_H,
+     * and resets the track, sets horizType and vertType attributes to HORIZ_LL, VERT_H,
      * and finally calls updatePosition(), updateEnvVars(), and updateAttributes().
      */
     public void initialize() {
-//        atts.setValue(SimplePelagicLHSAttributes.PARAM_id,id);//TODO: should do this beforehand!!
         updateVariables();//set instance variables to attribute values
         int hType,vType;
         hType=vType=-1;
@@ -551,7 +538,7 @@ public class Zooea2 extends AbstractPelagicStage {
                 logger.info("depth = "+depth);
                 logger.info("-------Finished setting initial position------------");
             }
-            interpolateEnvVars(pos);
+            updateEnvVars(pos);
             updateAttributes(); 
         }
     }
@@ -560,32 +547,31 @@ public class Zooea2 extends AbstractPelagicStage {
     public void step(double dt) throws ArrayIndexOutOfBoundsException {
         double[] pos = lp.getIJK();
         double[] uvw = calcUVW(pos,dt);//this also sets "attached" and may change pos[2] to 0
-        //do lagrangian particle tracking
-        lp.setU(uvw[0],lp.getN());
-        lp.setV(uvw[1],lp.getN());
-        lp.setW(uvw[2],lp.getN());
-        //now do predictor step
-        lp.doPredictorStep();
-        //assume same daytime status, but recalc depth and revise W 
-        pos = lp.getPredictedIJK();
-        depth = -i3d.calcZfromK(pos[0],pos[1],pos[2]);
-        if (debugOps) logger.info("Depth after predictor step = "+depth);
-        //w = calcW(dt,lp.getNP1())+r; //set swimming rate for predicted position
-        lp.setU(uvw[0],lp.getNP1());
-        lp.setV(uvw[1],lp.getNP1());
-        lp.setW(uvw[2],lp.getNP1());
-        //now do corrector step
-        lp.doCorrectorStep();
-        pos = lp.getIJK();
-        if (debugOps) logger.info("Depth after corrector step = "+(-i3d.calcZfromK(pos[0],pos[1],pos[2])));
+            //do lagrangian particle tracking
+            lp.setU(uvw[0],lp.getN());
+            lp.setV(uvw[1],lp.getN());
+            lp.setW(uvw[2],lp.getN());
+            //now do predictor step
+            lp.doPredictorStep();
+            //assume same daytime status, but recalc depth and revise W 
+            pos = lp.getPredictedIJK();
+            depth = -i3d.calcZfromK(pos[0],pos[1],pos[2]);
+            if (debugOps) logger.info("Depth after predictor step = "+depth);
+            //w = calcW(dt,lp.getNP1())+r; //set swimming rate for predicted position
+            lp.setU(uvw[0],lp.getNP1());
+            lp.setV(uvw[1],lp.getNP1());
+            lp.setW(uvw[2],lp.getNP1());
+            //now do corrector step
+            lp.doCorrectorStep();
+            pos = lp.getIJK();
+            if (debugOps) logger.info("Depth after corrector step = "+(-i3d.calcZfromK(pos[0],pos[1],pos[2])));
         time = time+dt;
         updateAge(dt);
-        updateWeight(dt);
+        updateMoltIndicator(dt);
         updateNum(dt);
-
         updatePosition(pos);
     
-        interpolateEnvVars(pos);
+        updateEnvVars(pos);
         //check for exiting grid
         if (i3d.isAtGridEdge(pos,tolGridEdge)){
             alive=false;
@@ -606,15 +592,6 @@ public class Zooea2 extends AbstractPelagicStage {
         //compute vertical velocity
         double w = 0;
         if (fcnVM instanceof wts.models.DisMELS.IBMFunctions.Movement.DielVerticalMigration_FixedDepthRanges) {
-            //calculate the vertical movement rate
-            if (fcnVV instanceof wts.models.DisMELS.IBMFunctions.SwimmingBehavior.PowerLawSwimmingSpeedFunction) {
-                /**
-                * @param vars - the inputs variables as a double[]{dt,z}.
-                *      dt - [0] - integration time step
-                *      z  - [1] - size of individual
-                */
-                w = (Double) fcnVV.calculate(new double[]{dt,size});
-            } else
             if (fcnVV instanceof wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunction) {
                 /**
                 * @param vars - double[]{dt}.
@@ -671,50 +648,6 @@ public class Zooea2 extends AbstractPelagicStage {
      *
      * @param dt - time step in seconds
      */
-    private void updateAge(double dt) {
-        age        = age+dt/DAY_SECS;
-        ageInStage = ageInStage+dt/DAY_SECS;
-        if (ageInStage>maxStageDuration) {
-            alive = false;
-            active = false;
-        }
-    }
-
-    /**
-     *
-     * @param dt - time step in seconds
-     */
-    private void updateWeight(double dt) {
-        if (fcnGrowth instanceof ExponentialGrowthFunction){
-            /**
-             * @param vars - the inputs variables, dt (in days) and z0, as a double[].
-             * @return     - the function value (z[dt]) as a Double 
-             */
-            weight = (Double)fcnGrowth.calculate(new double[]{dt/DAY_SECS,weight});
-        } else
-        if (fcnGrowth instanceof LinearGrowthFunction){
-            /**
-             * @param vars - the inputs variables, z0 and dt, as a double[].
-             * @return     - the function value (z[dt]) as a Double 
-             */
-            Double D = (Double) fcnMoltTime.calculate(temperature); 
-            Double growthRate = (Double) (minWeight-initialWeight)/D;
-            fcnGrowth.setParameterValue("rate", growthRate);
-            weight = (Double)fcnGrowth.calculate(new double[]{dt/DAY_SECS,weight});
-        } else
-        if (fcnGrowth instanceof ConstantFunction){
-            double rate = (Double)fcnGrowth.calculate(null);
-            weight += rate*dt/DAY_SECS;
-        }
-        if(weight>minWeight){
-            numTrans += 1;
-    }
-    }
-
-    /**
-     *
-     * @param dt - time step in seconds
-     */
     private void updateNum(double dt) {
         double mortalityRate = 0.0D;//in unis of [days]^-1
         if (fcnMort instanceof ConstantMortalityRate){
@@ -732,8 +665,8 @@ public class Zooea2 extends AbstractPelagicStage {
             mortalityRate = (Double)fcnMort.calculate(temperature);//using temperature as covariate for mortality
         }
         double totRate = mortalityRate;
-        if ((ageInStage>=minStageDuration)) {
-                      if((numTrans<number)&&(numTrans>0.0)){
+        if (moltIndicator>=1.0) {
+            if((numTrans<number)&&(numTrans>0.0)){
             double transRate = numTrans/number;
             double instTransRate = -Math.log(1-transRate);
             totRate += instTransRate;
@@ -747,60 +680,11 @@ public class Zooea2 extends AbstractPelagicStage {
         }
         number = number*Math.exp(-dt*totRate/DAY_SECS);
 //        if(number==0){
-        if(number<0.01){ //TODO: make this a parameter
+        if(number<0.01){ //TODO: replace this with parameter
             active=false;alive=false;number=number+numTrans;
         }
     }
     
-    private void updatePosition(double[] pos) {
-        totalDepth = i3d.interpolateBathymetricDepth(pos);
-        depth      = -i3d.calcZfromK(pos[0],pos[1],pos[2]);
-        lat        = i3d.interpolateLat(pos);
-        lon        = i3d.interpolateLon(pos);
-        gridCellID = ""+Math.round(pos[0])+"_"+Math.round(pos[1]);
-        updateTrack();
-    }
-    
-    private void interpolateEnvVars(double[] pos) {
-        temperature = i3d.interpolateTemperature(pos);
-        salinity    = i3d.interpolateSalinity(pos);
-    }
-
-    @Override
-    public double getStartTime() {
-        return startTime;
-    }
-
-    @Override
-    public void setStartTime(double newTime) {
-        startTime = newTime;
-        time      = startTime;
-        atts.setValue(LifeStageAttributesInterface.PROP_startTime,startTime);
-        atts.setValue(LifeStageAttributesInterface.PROP_time,time);
-    }
-
-    @Override
-    public boolean isActive() {
-        return active;
-    }
-
-    @Override
-    public void setActive(boolean b) {
-        active = b;
-        atts.setActive(b);
-    }
-
-    @Override
-    public boolean isAlive() {
-        return alive;
-    }
-
-    @Override
-    public void setAlive(boolean b) {
-        alive = b;
-        atts.setAlive(b);
-    }
-
     @Override
     public String getAttributesClassName() {
         return attributesClass;
@@ -827,17 +711,6 @@ public class Zooea2 extends AbstractPelagicStage {
     }
 
     @Override
-    public List<LifeStageInterface> getSpawnedIndividuals() {
-        output.clear();
-        return output;
-    }
-
-    @Override
-    public boolean isSuperIndividual() {
-        return isSuperIndividual;
-    }
-    
-    @Override
     public String getReport() {
         updateAttributes();//make sure attributes are up to date
         atts.setValue(LifeStageAttributesInterface.PROP_track, getTrackAsString(COORDINATE_TYPE_GEOGRAPHIC));//
@@ -856,12 +729,8 @@ public class Zooea2 extends AbstractPelagicStage {
     protected void updateAttributes() {
         //update superclass attributes
         super.updateAttributes();
-        //update new attributes
-        atts.setValue(Zooea1Attributes.PROP_weight,weight);
-        atts.setValue(Zooea1Attributes.PROP_number,number);
-        atts.setValue(Zooea1Attributes.PROP_salinity,salinity);
-        atts.setValue(Zooea1Attributes.PROP_temperature,temperature);
-        atts.setValue(Zooea1Attributes.PROP_ph,ph);
+        //update attributes new to class
+        //--NONE!
     }
 
     /**
@@ -872,10 +741,6 @@ public class Zooea2 extends AbstractPelagicStage {
         //update superclass variables
         super.updateVariables();
         //update new variables
-       weight      = atts.getValue(Zooea1Attributes.PROP_weight, weight);
-       salinity    = atts.getValue(Zooea1Attributes.PROP_salinity,salinity);
-       temperature = atts.getValue(Zooea1Attributes.PROP_temperature,temperature);
-       number      = atts.getValue(Zooea1Attributes.PROP_number, number);
-       ph        = atts.getValue(Zooea1Attributes.PROP_ph,ph);
-}
+        //--NONE!
+    }
 }
