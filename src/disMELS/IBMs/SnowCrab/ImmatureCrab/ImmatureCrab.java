@@ -46,12 +46,8 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
     protected double minDepth;
     /** maximum preferred bottom depth */
     protected double maxDepth;
-    /** minimum stage duration before metamorphosis to next stage */
-    protected double minStageDuration;
     /** maximum stage duration (followed by death) */
     protected double maxStageDuration;
-    /** minimum size before metamorphosis to next stage */
-    protected double minSize;
     /** initial size (mm) */
     protected double initialSize;
     /** initial weight (g) */
@@ -361,6 +357,7 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
         fcnExCost   = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_ExuviaeCost);
         fcnGrowth   = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_Growth);
         fcnMort     = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_Mortality);
+        fcnMovement = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_Movement);
     }
     
     /*
@@ -375,12 +372,8 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
                 params.getValue(ImmatureCrabParameters.PARAM_initialSize,initialSize);
         initialWeight = 
                 params.getValue(ImmatureCrabParameters.PARAM_initialWeight,initialWeight);
-        minStageDuration = 
-                params.getValue(ImmatureCrabParameters.PARAM_minStageDuration,minStageDuration);
         maxStageDuration = 
                 params.getValue(ImmatureCrabParameters.PARAM_maxStageDuration,maxStageDuration);
-        minSize = 
-                params.getValue(ImmatureCrabParameters.PARAM_minSize,minSize);
         randomizeTransitions = 
                 params.getValue(ImmatureCrabParameters.PARAM_randomizeTransitions,randomizeTransitions);
         sCost = 
@@ -429,11 +422,9 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
         double dtp = 0.25*(dt/DAY_SECS);//use 1/4 timestep (converted from sec to d)
         output.clear();
         List<LifeStageInterface> nLHSs=null;
-        if (((ageInStage+dtp)>=minStageDuration)&&(size>=minSize)) {
-            if (numTrans>0){
-                nLHSs = createNextLHSs();
-                if (nLHSs!=null) output.addAll(nLHSs);
-            }
+        if (numTrans>0){
+            nLHSs = createNextLHSs();
+            if (nLHSs!=null) output.addAll(nLHSs);
         }
         return output;
     }
@@ -733,7 +724,7 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
             mortalityRate = (Double)fcnMort.calculate(temperature);//using temperature as covariate for mortality
         }
         double totRate = mortalityRate + starvationMort;
-        if ((ageInStage>=minStageDuration)&&numTrans>0) {
+        if (numTrans>0) {
             if(number!=numTrans){
             double matRate = numTrans/number;
             double instMatRate = -Math.log(1-matRate);

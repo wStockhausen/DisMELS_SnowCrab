@@ -43,12 +43,10 @@ public class ImmatureCrabParameters extends AbstractLHSParameters {
     public static final long serialVersionUID = 1L;
     
     /** the number of IBMParameter objects defined in the class */
-    public static final int numParams = 11;
+    public static final int numParams = 13;
     public static final String PARAM_isSuperIndividual      = "is a super-individual?";
     public static final String PARAM_horizRWP               = "horizontal random walk parameter [m^2]/[s]";
-    public static final String PARAM_minStageDuration       = "min stage duration [d]";
     public static final String PARAM_maxStageDuration       = "max stage duration [d]";
-    public static final String PARAM_minSize                = "min size before metamorphosis (mm)";
     public static final String PARAM_minWeight              = "min weight before metamorphosis (g)";
     public static final String PARAM_randomizeTransitions   = "randomize transitions?";
     public static final String PARAM_initialSize            = "initial size in stage (mm)";
