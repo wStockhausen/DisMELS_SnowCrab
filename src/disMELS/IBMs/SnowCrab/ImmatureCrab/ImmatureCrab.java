@@ -4,6 +4,8 @@
 
 package disMELS.IBMs.SnowCrab.ImmatureCrab;
 
+import SnowCrabFunctions.AnnualMoltFunction;
+import SnowCrabFunctions.IntermoltIntegratorFunction;
 import com.vividsolutions.jts.geom.Coordinate;
 import java.util.ArrayList;
 import java.util.List;
@@ -358,6 +360,14 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
         fcnGrowth   = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_Growth);
         fcnMort     = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_Mortality);
         fcnMovement = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_Movement);
+        if (fcnMoltTime instanceof AnnualMoltFunction){
+            if ((Boolean) fcnMoltTime.getParameter(AnnualMoltFunction.PARAM_random).getValue()){
+                //clone and replace 
+                logger.info("cloning AnnualMoltFunction for id "+id);
+                AnnualMoltFunction clone = (AnnualMoltFunction) fcnMoltTime.clone();
+                fcnMoltTime = clone;
+            }
+        }
     }
     
     /*
@@ -631,10 +641,13 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
     private void updateSize(double dt) {
 //        double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
         double D;
-        if(instar<8){
-            D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
-        } else{
-            D = 365.0;
+        if ((instar<8)&&(fcnMoltTime instanceof IntermoltIntegratorFunction)){
+            moltIndicator += dt/DAY_SECS*((Double) fcnMoltTime.calculate(temperature));
+        } else if (fcnMoltTime instanceof AnnualMoltFunction) {
+            if ((Double)fcnMoltTime.calculate(false)<dayOfYear)
+                moltIndicator = 1.0;
+            else
+                moltIndicator = 0.0;
         }
         exTot = (Double) fcnExCost.calculate(size);
 //        if((ageInInstar+dt/DAY_SECS)>D){
@@ -647,7 +660,7 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
 //                numTrans += number;
 //            }
 //        }
-        if(exEnergy>exTot){
+        if ((exEnergy>exTot)&&(moltIndicator>1.0)){
             Double newsize = (Double) fcnMoltInc.calculate(size);
             Double minWeightGain = aLW*((1-confInt)*Math.pow(newsize,bLW) - ((1+confInt)*Math.pow(size,bLW)));
             Double maxWeightGain = aLW*((1+confInt)*Math.pow(newsize,bLW) - ((1-confInt)*Math.pow(size,bLW)));
@@ -662,7 +675,7 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
             ageInInstar = 0.0;
             molted = true;
             
-            if(size>30){
+            if(size>30){//??
                 numTrans += number;
             }
         }

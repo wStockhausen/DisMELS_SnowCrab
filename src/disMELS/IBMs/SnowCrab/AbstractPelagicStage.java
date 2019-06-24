@@ -115,7 +115,7 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     protected double  lon=0;
     /** current depth, in meters */
     protected double  depth=0;
-    /** current bathymetric depth, in meters */
+    /** bathymetric depth at individual's location, in meters */
     protected double  bathym=0;
     /** current ROMS grid cell, as a string */
     protected String  gridCellID="";
@@ -140,8 +140,6 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     //other fields
     /** number of individuals transitioning to next stage */
     protected double numTrans;  
-    /** total depth (m) at individual's position */
-    protected double totalDepth;
     
     //IBM Functions
     /** IBM function selected for intermolt time */
@@ -503,7 +501,7 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     }
 
     protected void updatePosition(double[] pos) {
-        totalDepth = i3d.interpolateBathymetricDepth(pos);
+        bathym     = i3d.interpolateBathymetricDepth(pos);
         depth      = -i3d.calcZfromK(pos[0],pos[1],pos[2]);
         lat        = i3d.interpolateLat(pos);
         lon        = i3d.interpolateLon(pos);

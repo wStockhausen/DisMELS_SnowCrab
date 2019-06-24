@@ -40,7 +40,7 @@ public class AnnualMoltFunction  extends AbstractIBMFunction implements IBMFunct
         "\n\t* "+
         "\n\t**************************************************************************";
     /** number of settable parameters */
-    public static final int numParams = 2;
+    public static final int numParams = 6;
     /** number of sub-functions */
     public static final int numSubFuncs = 0;
     /** first day of molting */
@@ -57,23 +57,28 @@ public class AnnualMoltFunction  extends AbstractIBMFunction implements IBMFunct
     public static final String PARAM_skip = "skip";
     
     /** first day of molting */
-    private double firstDay = 0.0;
+    protected double firstDay = 0.0;
     /** time interval during which molting may occur */
-    private double interval = 1.0;
+    protected double interval = 1.0;
     /** day of peak molting */
-    private double peakDay = 0.5;
+    protected double peakDay = 0.5;
     /** width of molting peak */
-    private double width = 1.0;
+    protected double width = 1.0;
     /** flag to randomize molting */
-    private boolean random = false;
+    protected boolean random = false;
     /**probability of skip molting */
-    private double skip = 0.0;
+    protected double skip = 0.0;
     
-    /** */
-    private boolean calcConsts = false;
-    private NormalDistribution norm = null;
-    private double phiL = 0.0;
-    private double phiU = 1.0;
+    /** day on which molting occurs */
+    protected double moltDay = 0.0;
+    /** flag to calculate constants associated with randomized molting */
+    protected boolean calcMoltDay = false;
+    /** class defining a normal distribution */
+    protected NormalDistribution norm = null;
+    /** cdf of norm to start (lower limit) of spawning season */
+    protected double phiL = 0.0;
+    /** cdf of norm to end (upper limit) of spawning season */
+    protected double phiU = 1.0;
     
     public AnnualMoltFunction(){
         super(numParams,numSubFuncs,DEFAULT_type,DEFAULT_name,DEFAULT_descr,DEFAULT_fullDescr);
@@ -106,67 +111,64 @@ public class AnnualMoltFunction  extends AbstractIBMFunction implements IBMFunct
             switch (param) {
                 case PARAM_firstDay:
                     firstDay = ((Double) value);
-                    calcConsts = true;
-                    set = true;
                     break;
                 case PARAM_interval:
                     interval = ((Double) value);
-                    calcConsts = true;
-                    set = true;
                     break;
                 case PARAM_peakDay:
                     peakDay = ((Double) value);
-                    calcConsts = true;
-                    set = true;
                     break;
                 case PARAM_width:
                     width = ((Double) value);
-                    calcConsts = true;
-                    set = true;
                     break;
                 case PARAM_random:
                     random = ((Boolean) value);
-                    calcConsts = true;
-                    set = true;
                     break;
                 case PARAM_skip:
                     skip = ((Double) value);
-                    set = true;
                     break;
             }
+            calcMoltDay = true;
+            set = true;
         }
         return set;
     }
     
     /**
-     * Calculates the day of year on which molting will occur, 
-     * unless molting is skipped.
+     * Returns the day of year on which molting will occur, or 400 if
+     * molting is skipped.
      * 
-     * @param o - not used (can be null)
+     * If the input value "o" is true OR the first time this function is called, 
+     * the day at which molting occurs is
+     * calculated based on the (possibly randomized) parameter values and
+     * subsequently returned. If "o" is false, a previously-calculated value
+     * will be returned. 
      * 
-     * @return Double - day of year on which molting will occur, or -1 for a skip molt.
+     * @param o - boolean to calculate the day of year on which molting will occur
+     * 
+     * @return Double - day of year on which molting will occur, or 400 for a skip molt.
      * 
      */
     @Override
     public Object calculate(Object o) {
-        double doy = peakDay;
-        if (skip>0.0){
-            RandomNumberGenerator rng = GlobalInfo.getInstance().getRandomNumberGenerator();
-            double rnd = rng.computeUniformVariate(0.0, 1.0);
-            if (rnd<=skip) return -1.0;//molt skipped
-            if (random){
-                rnd = rng.computeUniformVariate(0.0, 1.0);
-                if (calcConsts){
+        if (((Boolean) o)||(calcMoltDay)){
+            moltDay = peakDay;
+            if (skip>0.0){
+                RandomNumberGenerator rng = GlobalInfo.getInstance().getRandomNumberGenerator();
+                double rnd = rng.computeUniformVariate(0.0, 1.0);
+                if (rnd<=skip) return 400;//molt skipped
+                if (random){
+                    rnd = rng.computeUniformVariate(0.0, 1.0);
                     norm = new NormalDistribution(peakDay, width);
                     phiL = norm.cumulativeProbability(firstDay);
                     phiU = norm.cumulativeProbability(firstDay+interval);
-                    calcConsts= false;//don't need to re-calculate these unless parameters change
+                    calcMoltDay= false;//don't need to re-calculate these unless parameters change
+                    rnd = phiL+rnd*(phiU-phiL);
+                    moltDay = norm.inverseCumulativeProbability(rnd);
                 }
-                rnd = phiL+rnd*(phiU-phiL);
-                doy = norm.inverseCumulativeProbability(rnd);
             }
         }
-        return doy;
+        return moltDay;
     }
     
 }

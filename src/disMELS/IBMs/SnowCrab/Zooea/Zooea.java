@@ -534,7 +534,7 @@ public class Zooea extends AbstractPelagicStage {
             updatePosition(pos);
             if (debug) {
                 logger.info("pos = ["+lon+", "+lat+"]");
-                logger.info("total depth = "+totalDepth);
+                logger.info("bathymetric depth = "+bathym);
                 logger.info("depth = "+depth);
                 logger.info("-------Finished setting initial position------------");
             }

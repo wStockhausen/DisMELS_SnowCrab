@@ -412,8 +412,8 @@ public class Megalopa extends AbstractPelagicStage {
         output.clear();
         List<LifeStageInterface> nLHSs=null;
         if (moltIndicator>=1.0) {
-            if ((minSettlementDepth<=totalDepth)&&(totalDepth<=maxSettlementDepth)&&
-                    (depth>(totalDepth-5))) {
+            if ((minSettlementDepth<=bathym)&&(bathym<=maxSettlementDepth)&&
+                    ((bathym-depth)<=5)) {
                 nLHSs = createMetamorphosedIndividuals();
                 if (nLHSs!=null) output.addAll(nLHSs);
             }
@@ -542,7 +542,7 @@ public class Megalopa extends AbstractPelagicStage {
             updatePosition(pos);
             if (debug) {
                 logger.info("pos = ["+lon+", "+lat+"]");
-                logger.info("total depth = "+totalDepth);
+                logger.info("bathymetric depth = "+bathym);
                 logger.info("depth = "+depth);
                 logger.info("-------Finished setting initial position------------");
             }
@@ -609,7 +609,7 @@ public class Megalopa extends AbstractPelagicStage {
             w = (Double) fcnVV.calculate(new double[]{dt});
         }
         
-        if ((minSettlementDepth<=totalDepth)&&(totalDepth<=maxSettlementDepth)){
+        if ((minSettlementDepth<=bathym)&&(bathym<=maxSettlementDepth)){
             //individual will swim down to bottom to settle
             w = -Math.abs(w);
         } else
@@ -641,7 +641,7 @@ public class Megalopa extends AbstractPelagicStage {
             *              w        - individual active vertical movement velocity
             *              attached - flag indicating whether individual is attached to bottom(< 0) or not (>0)
             */
-            double[] res = (double[]) fcnVM.calculate(new double[]{dt,depth,totalDepth,w,90.833-ss[4]});
+            double[] res = (double[]) fcnVM.calculate(new double[]{dt,depth,bathym,w,90.833-ss[4]});
             w = res[0];
         }
         
