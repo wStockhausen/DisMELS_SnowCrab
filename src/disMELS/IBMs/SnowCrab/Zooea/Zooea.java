@@ -354,9 +354,9 @@ public class Zooea extends AbstractPelagicStage {
      * Sets the IBM functions from the parameters object
      */
     private void setIBMFunctions(){
-        fcnIntermoltDuration = params.getSelectedIBMFunctionForCategory(ZooeaParameters.FCAT_IntermoltDuration);
-        if (!(fcnIntermoltDuration instanceof IntermoltIntegratorFunction))
-            throw new java.lang.UnsupportedOperationException("Intermolt duration function "+fcnIntermoltDuration.getFunctionName()+" is not supported for Zooea1.");
+        fcnMoltTiming = params.getSelectedIBMFunctionForCategory(ZooeaParameters.FCAT_IntermoltDuration);
+        if (!(fcnMoltTiming instanceof IntermoltIntegratorFunction))
+            throw new java.lang.UnsupportedOperationException("Intermolt duration function "+fcnMoltTiming.getFunctionName()+" is not supported for Zooea1.");
         fcnMort     = params.getSelectedIBMFunctionForCategory(ZooeaParameters.FCAT_Mortality);
         if (!(fcnMort instanceof ConstantMortalityRate||fcnMort instanceof TemperatureDependentMortalityRate_Houde1989))
             throw new java.lang.UnsupportedOperationException("Mortality function "+fcnMort.getFunctionName()+" is not supported for Zooea1.");

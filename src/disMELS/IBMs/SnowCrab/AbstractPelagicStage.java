@@ -4,6 +4,7 @@
 
 package disMELS.IBMs.SnowCrab;
 
+import SnowCrabFunctions.AnnualMoltFunction;
 import SnowCrabFunctions.IntermoltIntegratorFunction;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.wtstockhausen.utils.RandomNumberGenerator;
@@ -143,7 +144,7 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     
     //IBM Functions
     /** IBM function selected for intermolt time */
-    protected IBMFunctionInterface fcnIntermoltDuration = null; 
+    protected IBMFunctionInterface fcnMoltTiming = null; 
     /** IBM function selected for mortality */
     protected IBMFunctionInterface fcnMort = null; 
     /** IBM function selected for vertical movement */
@@ -494,9 +495,25 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
      *
      * @param dt - time step in seconds
      */
-    protected void updateMoltIndicator(double dt){
-        if (fcnIntermoltDuration instanceof IntermoltIntegratorFunction) {
-            moltIndicator += dt/DAY_SECS*((Double) fcnIntermoltDuration.calculate(temperature));
+    protected void updateMoltIndicator(double dt) throws ArithmeticException {
+        if (fcnMoltTiming instanceof IntermoltIntegratorFunction) {
+            moltIndicator += dt/DAY_SECS*((Double) fcnMoltTiming.calculate(temperature));
+            if (Double.isNaN(moltIndicator)|Double.isInfinite(moltIndicator)){
+                String msg = "NaN or Inf detected in updateMoltIndicator\n"
+                           + "for "+typeName+" "+id+". IntermoltIntegratorFunction parameter values are\n"
+                           + "\ta = "+fcnMoltTiming.getParameter(IntermoltIntegratorFunction.PARAM_a).getValueAsString()+"\n"
+                           + "\tb = "+fcnMoltTiming.getParameter(IntermoltIntegratorFunction.PARAM_b).getValueAsString()+"\n";
+                throw(new ArithmeticException(msg));
+            }
+        } else if (fcnMoltTiming instanceof AnnualMoltFunction){
+            if ((Double)fcnMoltTiming.calculate(false)<globalInfo.getCalendar().getYearDay())
+                moltIndicator = 1.0;
+            else
+                moltIndicator = 0.0;
+        } else {
+            String msg = "Logic for "+fcnMoltTiming.getClass().getSimpleName()+"\n"
+                        +"is missing from updateMoltIndicator for "+typeName+".";
+            throw(new ArithmeticException(msg));
         }
     }
 

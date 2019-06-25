@@ -8,6 +8,7 @@ import SnowCrabFunctions.IntermoltIntegratorFunction;
 import com.vividsolutions.jts.geom.Coordinate;
 import disMELS.IBMs.SnowCrab.AbstractBenthicStageAttributes;
 import disMELS.IBMs.SnowCrab.AbstractPelagicStage;
+import disMELS.IBMs.SnowCrab.ImmatureCrab.ImmatureCrab;
 import disMELS.IBMs.SnowCrab.ImmatureCrab.ImmatureFemale;
 import disMELS.IBMs.SnowCrab.ImmatureCrab.ImmatureMale;
 import disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes;
@@ -347,9 +348,9 @@ public class Megalopa extends AbstractPelagicStage {
      * Sets the IBM functions from the parameters object
      */
     private void setIBMFunctions(){
-        fcnIntermoltDuration = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_IntermoltDuration);
-        if (!(fcnIntermoltDuration instanceof IntermoltIntegratorFunction))
-            throw new java.lang.UnsupportedOperationException("Intermolt duration function "+fcnIntermoltDuration.getFunctionName()+" is not supported for Megalopa.");
+        fcnMoltTiming = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_IntermoltDuration);
+        if (!(fcnMoltTiming instanceof IntermoltIntegratorFunction))
+            throw new java.lang.UnsupportedOperationException("Intermolt duration function "+fcnMoltTiming.getFunctionName()+" is not supported for Megalopa.");
         fcnMort     = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_Mortality);
         if (!(fcnMort instanceof ConstantMortalityRate||fcnMort instanceof TemperatureDependentMortalityRate_Houde1989))
             throw new java.lang.UnsupportedOperationException("Mortality function "+fcnMort.getFunctionName()+" is not supported for Megalopa.");
@@ -459,14 +460,28 @@ public class Megalopa extends AbstractPelagicStage {
         }
         if (nLHSs!=null){
             //apply sex ratio 
+            logger.info("createMetamorphosedIndividuals: Applying sex ratio to immature crab.");
             double xr = (Double)params.getValue(MegalopaParameters.PARAM_sexRatio);
             for (LifeStageInterface nLHS : nLHSs){
-                if (nLHS instanceof ImmatureFemale){
-                    double n = (Double) nLHS.getAttributes().getValue(AbstractBenthicStageAttributes.PROP_number);
-                    nLHS.getAttributes().setValue(AbstractBenthicStageAttributes.PROP_number,(1.0-xr)*n);
-                } else if (nLHS instanceof ImmatureMale){
-                    double n = (Double) nLHS.getAttributes().getValue(AbstractBenthicStageAttributes.PROP_number);
-                    nLHS.getAttributes().setValue(AbstractBenthicStageAttributes.PROP_number,xr*n);
+                if (nLHS instanceof ImmatureCrab){
+                    //apply sex ratio
+                    double n = (Double) nLHS.getAttributes().getValue(LifeStageAttributesInterface.PROP_number);
+                    double nr = n;
+                    if (nLHS instanceof ImmatureFemale){
+                        nr = (1.0-xr)*n;
+                        logger.info("createMetamorphosedIndividuals: immature female n: "+nr+". orig = "+n);
+                    } else if (nLHS instanceof ImmatureMale){
+                        nr = xr*n;
+                        logger.info("createMetamorphosedIndividuals: immature male n:   "+nr+". orig = "+n);
+                    }
+                    LifeStageAttributesInterface atts = nLHS.getAttributes();
+                    atts.setValue(LifeStageAttributesInterface.PROP_number,nr);
+                    //generate new id and copy old id to parentID
+                    long pID = atts.getID();
+                    atts.setValue(LifeStageAttributesInterface.PROP_id,LHS_Factory.getNewID());
+                    atts.setValue(LifeStageAttributesInterface.PROP_parentID, pID);
+                    //update attributes on nLHS (updates id, parentID as well as other attributes)
+                    nLHS.setAttributes(atts);
                 }
             }
         }

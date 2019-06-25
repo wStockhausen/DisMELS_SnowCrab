@@ -82,7 +82,7 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
     /** IBM function selected for molt */
     protected IBMFunctionInterface fcnMoltInc = null;
     /** IBM function selected for molt time*/
-    protected IBMFunctionInterface fcnMoltTime = null;
+    protected IBMFunctionInterface fcnMoltTiming = null;
     /** IBM function selected for fecundity */
     protected IBMFunctionInterface fcnFecundity = null; 
     /** IBM function selected for exuviae cost */
@@ -355,17 +355,17 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
      */
     protected void setIBMFunctions(){
         fcnMoltInc  = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_MoltIncrement);
-        fcnMoltTime = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_IntermoltDuration);
+        fcnMoltTiming = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_IntermoltDuration);
         fcnExCost   = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_ExuviaeCost);
         fcnGrowth   = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_Growth);
         fcnMort     = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_Mortality);
         fcnMovement = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_Movement);
-        if (fcnMoltTime instanceof AnnualMoltFunction){
-            if ((Boolean) fcnMoltTime.getParameter(AnnualMoltFunction.PARAM_random).getValue()){
+        if (fcnMoltTiming instanceof AnnualMoltFunction){
+            if ((Boolean) fcnMoltTiming.getParameter(AnnualMoltFunction.PARAM_random).getValue()){
                 //clone and replace 
                 logger.info("cloning AnnualMoltFunction for id "+id);
-                AnnualMoltFunction clone = (AnnualMoltFunction) fcnMoltTime.clone();
-                fcnMoltTime = clone;
+                AnnualMoltFunction clone = (AnnualMoltFunction) fcnMoltTiming.clone();
+                fcnMoltTiming = clone;
             }
         }
     }
@@ -638,16 +638,27 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
      * 
      * @param dt - time step in seconds
      */
-    private void updateSize(double dt) {
-//        double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+    private void updateSize(double dt) throws ArithmeticException {
+//        double D = (Double) fcnMoltTiming.calculate(new double[]{size, temperature});
         double D;
-        if ((instar<8)&&(fcnMoltTime instanceof IntermoltIntegratorFunction)){
-            moltIndicator += dt/DAY_SECS*((Double) fcnMoltTime.calculate(temperature));
-        } else if (fcnMoltTime instanceof AnnualMoltFunction) {
-            if ((Double)fcnMoltTime.calculate(false)<dayOfYear)
+        if ((instar<8)&&(fcnMoltTiming instanceof IntermoltIntegratorFunction)){
+            moltIndicator += dt/DAY_SECS*((Double) fcnMoltTiming.calculate(temperature));
+            if (Double.isNaN(moltIndicator)|Double.isInfinite(moltIndicator)){
+                String msg = "NaN or Inf detected in updateMoltIndicator\n"
+                           + "for "+typeName+" "+id+". IntermoltIntegratorFunction parameter values are\n"
+                           + "\ta = "+fcnMoltTiming.getParameter(IntermoltIntegratorFunction.PARAM_a).getValueAsString()+"\n"
+                           + "\tb = "+fcnMoltTiming.getParameter(IntermoltIntegratorFunction.PARAM_b).getValueAsString()+"\n";
+                throw(new ArithmeticException(msg));
+            }
+        } else if (fcnMoltTiming instanceof AnnualMoltFunction) {
+            if ((Double)fcnMoltTiming.calculate(false)<dayOfYear)
                 moltIndicator = 1.0;
             else
                 moltIndicator = 0.0;
+        } else {
+            String msg = "Logic for "+fcnMoltTiming.getClass().getSimpleName()+"\n"
+                        +"is missing from updateMoltIndicator for "+typeName+".";
+            throw(new ArithmeticException(msg));
         }
         exTot = (Double) fcnExCost.calculate(size);
 //        if((ageInInstar+dt/DAY_SECS)>D){
@@ -687,7 +698,7 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
      * @param dt - time step in seconds
      */
     protected void updateWeight(double dt) {
-//        double D = (Double) fcnMoltTime.calculate(new double[]{size, temperature});
+//        double D = (Double) fcnMoltTiming.calculate(new double[]{size, temperature});
 //        double exPerDay = exTot/D;
         double exPerDay = Math.exp(0.9786)*Math.pow(size, -0.9281);
         fcnGrowth.setParameterValue("sex", 0.0);
