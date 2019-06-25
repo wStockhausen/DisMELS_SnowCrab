@@ -9,6 +9,8 @@
 
 package disMELS.IBMs.SnowCrab.Megalopa;
 
+import SnowCrabFunctions.AnnualMoltFunction;
+import SnowCrabFunctions.FixedDurationFunction;
 import SnowCrabFunctions.IntermoltIntegratorFunction;
 import java.beans.PropertyChangeSupport;
 import java.util.LinkedHashMap;
@@ -32,8 +34,10 @@ import wts.models.DisMELS.framework.LifeStageParametersInterface;
  * 
  * This class uses the IBMParameters/IBMFunctions approach to specifying stage-specific parameters.
  * 
- *  Potential intermolt duration functions          (FCAT_IntermoltDuration)
+ *  Potential intermolt duration functions          (FCAT_MoltTiming)
  *      IntermoltIntegratorFunction()
+ *      AnnualMoltFunction()
+ *      FixedDuration()
  *  Potential mortality functions                   (FCAT_Mortality)
  *      ConstantMortalityRate()
  *      TemperatureDependentMortalityRate_Houde1989()
@@ -115,6 +119,10 @@ public class MegalopaParameters extends AbstractLHSParameters {
         mapOfPotentialFunctions = new LinkedHashMap<>(2); 
         mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new IntermoltIntegratorFunction();
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new AnnualMoltFunction();
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new FixedDurationFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_Mortality;  

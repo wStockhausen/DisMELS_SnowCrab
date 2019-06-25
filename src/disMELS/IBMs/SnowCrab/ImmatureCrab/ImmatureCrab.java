@@ -5,6 +5,7 @@
 package disMELS.IBMs.SnowCrab.ImmatureCrab;
 
 import SnowCrabFunctions.AnnualMoltFunction;
+import SnowCrabFunctions.FixedDurationFunction;
 import SnowCrabFunctions.IntermoltIntegratorFunction;
 import com.vividsolutions.jts.geom.Coordinate;
 import java.util.ArrayList;
@@ -79,12 +80,10 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
     protected double starvCounter;
     protected double weightCounter;
     
-    /** IBM function selected for molt */
-    protected IBMFunctionInterface fcnMoltInc = null;
-    /** IBM function selected for molt time*/
+    /** IBM function selected for molt timing*/
     protected IBMFunctionInterface fcnMoltTiming = null;
-    /** IBM function selected for fecundity */
-    protected IBMFunctionInterface fcnFecundity = null; 
+    /** IBM function selected for molt increment */
+    protected IBMFunctionInterface fcnMoltInc = null;
     /** IBM function selected for exuviae cost */
     protected IBMFunctionInterface fcnExCost = null;
      /** IBM function selected for growth (in weight)*/
@@ -344,7 +343,7 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
             params = (ImmatureCrabParameters) newParams;
             setParametersFromSubClass(params);
             setParameterValues();
-            setIBMFunctions();
+            setParameterFunctions();
         } else {
             //TODO: throw some error
         }
@@ -353,17 +352,27 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
     /**
      * Sets the IBM functions from the parameters object
      */
-    protected void setIBMFunctions(){
-        fcnMoltInc  = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_MoltIncrement);
-        fcnMoltTiming = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_IntermoltDuration);
-        fcnExCost   = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_ExuviaeCost);
-        fcnGrowth   = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_Growth);
-        fcnMort     = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_Mortality);
-        fcnMovement = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_Movement);
+    protected void setParameterFunctions(){
+        fcnMoltTiming = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_MoltTiming);
+        if (!(fcnMoltTiming instanceof IntermoltIntegratorFunction||
+               fcnMoltTiming instanceof AnnualMoltFunction||
+               fcnMoltTiming instanceof FixedDurationFunction))
+            throw new java.lang.UnsupportedOperationException("Intermolt duration function "+fcnMoltTiming.getFunctionName()+" is not supported for ImmatureCrab.");
+        
+        fcnMoltInc    = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_MoltIncrement);
+        
+        fcnExCost     = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_ExuviaeCost);
+        
+        fcnGrowth     = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_Growth);
+        
+        fcnMort       = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_Mortality);
+        
+        fcnMovement   = params.getSelectedIBMFunctionForCategory(ImmatureCrabParameters.FCAT_Movement);
+        
         if (fcnMoltTiming instanceof AnnualMoltFunction){
             if ((Boolean) fcnMoltTiming.getParameter(AnnualMoltFunction.PARAM_random).getValue()){
-                //clone and replace 
-                logger.info("cloning AnnualMoltFunction for id "+id);
+                //clone and replace <- TODO: does this really need to be done when randomizing??
+                logger.info("cloning AnnualMoltFunction for "+typeName+"id "+id);
                 AnnualMoltFunction clone = (AnnualMoltFunction) fcnMoltTiming.clone();
                 fcnMoltTiming = clone;
             }
@@ -655,23 +664,19 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
                 moltIndicator = 1.0;
             else
                 moltIndicator = 0.0;
+        } else if (fcnMoltTiming instanceof FixedDurationFunction){
+            if ((Double)fcnMoltTiming.calculate(false)>=ageInInstar)
+                moltIndicator = 1.0;
+            else
+                moltIndicator = 0.0;
         } else {
             String msg = "Logic for "+fcnMoltTiming.getClass().getSimpleName()+"\n"
-                        +"is missing from updateMoltIndicator for "+typeName+".";
+                        +"is missing from updateSize for "+typeName+".";
             throw(new ArithmeticException(msg));
         }
+        
         exTot = (Double) fcnExCost.calculate(size);
-//        if((ageInInstar+dt/DAY_SECS)>D){
-//            size = (Double) fcnMoltInc.calculate(size);
-//            instar += 1;
-//            ageInInstar = 0.0;
-//            molted = true;
-//
-//            if(size>35){
-//                numTrans += number;
-//            }
-//        }
-        if ((exEnergy>exTot)&&(moltIndicator>1.0)){
+        if ((exEnergy>exTot)&&(moltIndicator>=1.0)){
             Double newsize = (Double) fcnMoltInc.calculate(size);
             Double minWeightGain = aLW*((1-confInt)*Math.pow(newsize,bLW) - ((1+confInt)*Math.pow(size,bLW)));
             Double maxWeightGain = aLW*((1+confInt)*Math.pow(newsize,bLW) - ((1-confInt)*Math.pow(size,bLW)));
@@ -763,9 +768,6 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
             }
         }
         number = number*Math.exp(-dt*totRate/DAY_SECS);
-//        if(number==0){
-//            active=false;alive=false;number=number+numTrans;
-//        }
         if(number<0.01){//TODO: make this a parameter!
             active=false;alive=false;number=number+numTrans;
         }

@@ -7,9 +7,11 @@
 
 package disMELS.IBMs.SnowCrab.ImmatureCrab;
 
+import SnowCrabFunctions.AnnualMoltFunction;
 import SnowCrabFunctions.CrabBioenergeticsGrowthFunction;
 import SnowCrabFunctions.MoltIncrementFunction;
 import SnowCrabFunctions.ExCostFunction;
+import SnowCrabFunctions.FixedDurationFunction;
 import SnowCrabFunctions.IntermoltIntegratorFunction;
 import java.beans.PropertyChangeSupport;
 import java.util.LinkedHashMap;
@@ -31,9 +33,29 @@ import wts.models.DisMELS.framework.IBMFunctions.IBMParameterBoolean;
 import wts.models.DisMELS.framework.IBMFunctions.IBMParameterDouble;
 import wts.models.DisMELS.framework.LifeStageParametersInterface;
 /**
- * DisMELS class representing parameters for Bering Sea snow crab
+ * DisMELS class representing parameters for immature Bering Sea snow crab.
+ * 
  * 
  * This class uses the IBMParameters/IBMFunctions approach to specifying stage-specific parameters.
+ * 
+ *  Potential intermolt duration functions         (FCAT_MoltTiming)
+ *      IntermoltIntegratorFunction()
+ *      AnnualMoltFunction()
+ *      FixedDuration()
+ *  Potential molt increment functions             (FCAT_MoltInc)
+ *      MoltIncrementFunction
+ *  Potential growth (weight) functions            (FCAT_Growth)
+ *      CrabBioenergeticsGrowthFunction
+ *      LinearGrowthFunction
+ *      ExponentialGrowthFunction
+ *      vonBertalanffyGrowthFunction
+ *  Potential exuviae cost functions               (FCAT_ExuviaeCost)
+ *      ExCostFunction
+ *  Potential mortality functions                  (FCAT_Mortality)
+ *      ConstantMortalityRate()
+ *      TemperatureDependentMortalityRate_Houde1989()
+ *  Potential (horizontal) movement functions      (FCAT_Movement)
+ *      DielVerticalMigration_FixedDepthRanges()
  * 
  * @author William Stockhausen
  */
@@ -61,8 +83,8 @@ public class ImmatureCrabParameters extends AbstractLHSParameters {
     
     /** the number of IBMFunction categories defined in the class */
     public static final int numFunctionCats = 6;
+    public static final String FCAT_MoltTiming = "intermolt duration";
     public static final String FCAT_MoltIncrement     = "molt increment";
-    public static final String FCAT_IntermoltDuration = "intermolt duration";
     public static final String FCAT_Growth            = "growth in weight";
     public static final String FCAT_ExuviaeCost       = "exuviae cost";
     public static final String FCAT_Mortality         = "mortality";
@@ -118,20 +140,24 @@ public class ImmatureCrabParameters extends AbstractLHSParameters {
         Map<String,IBMFunctionInterface> mapOfPotentialFunctions; 
         IBMFunctionInterface ifi;
         
+       cat = FCAT_MoltTiming;
+       mapOfPotentialFunctions = new LinkedHashMap<>(4); 
+       mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        ifi = new IntermoltIntegratorFunction();
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new AnnualMoltFunction();
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new FixedDurationFunction();
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+               
        cat = FCAT_MoltIncrement;
        mapOfPotentialFunctions = new LinkedHashMap<>(2); 
        mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
        ifi = new MoltIncrementFunction();
                mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
                
-       cat = FCAT_IntermoltDuration;
-       mapOfPotentialFunctions = new LinkedHashMap<>(2); 
-       mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
-        ifi = new IntermoltIntegratorFunction();
-            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
-               
         cat = FCAT_Growth;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(10); 
+        mapOfPotentialFunctions = new LinkedHashMap<>(8); 
         mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new CrabBioenergeticsGrowthFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);

@@ -5,6 +5,7 @@
 package disMELS.IBMs.SnowCrab;
 
 import SnowCrabFunctions.AnnualMoltFunction;
+import SnowCrabFunctions.FixedDurationFunction;
 import SnowCrabFunctions.IntermoltIntegratorFunction;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.wtstockhausen.utils.RandomNumberGenerator;
@@ -507,6 +508,11 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
             }
         } else if (fcnMoltTiming instanceof AnnualMoltFunction){
             if ((Double)fcnMoltTiming.calculate(false)<globalInfo.getCalendar().getYearDay())
+                moltIndicator = 1.0;
+            else
+                moltIndicator = 0.0;
+        } else if (fcnMoltTiming instanceof FixedDurationFunction){
+            if ((Double)fcnMoltTiming.calculate(false)<=ageInStage)
                 moltIndicator = 1.0;
             else
                 moltIndicator = 0.0;

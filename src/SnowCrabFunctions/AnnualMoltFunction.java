@@ -72,7 +72,7 @@ public class AnnualMoltFunction  extends AbstractIBMFunction implements IBMFunct
     /** day on which molting occurs */
     protected double moltDay = 0.0;
     /** flag to calculate constants associated with randomized molting */
-    protected boolean calcMoltDay = false;
+    protected boolean calcMoltDay = true;
     /** class defining a normal distribution */
     protected NormalDistribution norm = null;
     /** cdf of norm to start (lower limit) of spawning season */
@@ -84,10 +84,10 @@ public class AnnualMoltFunction  extends AbstractIBMFunction implements IBMFunct
         super(numParams,numSubFuncs,DEFAULT_type,DEFAULT_name,DEFAULT_descr,DEFAULT_fullDescr);
         String key; 
         key = PARAM_firstDay; addParameter(key,Double.class,"first day for molting (DOY)");
-        key = PARAM_interval; addParameter(key,Double.class,"molting interval (days)");
+        key = PARAM_interval; addParameter(key,Double.class,"molt season length (days)");
         key = PARAM_peakDay;  addParameter(key,Double.class,"peak day of molting (DOY)");
-        key = PARAM_width;    addParameter(key,Double.class,"width of molting peak (DOY)");
-        key = PARAM_random;   addParameter(key,Double.class,"randomize molt timing?");
+        key = PARAM_width;    addParameter(key,Double.class,"width of molting peak (days)");
+        key = PARAM_random;   addParameter(key,Boolean.class,"randomize molt timing?");
         key = PARAM_skip;     addParameter(key,Double.class,"probability of skip molting");
     }
     
@@ -152,6 +152,7 @@ public class AnnualMoltFunction  extends AbstractIBMFunction implements IBMFunct
     @Override
     public Object calculate(Object o) {
         if (((Boolean) o)||(calcMoltDay)){
+            calcMoltDay= false;//don't need to re-calculate automatically these unless the parameters change
             moltDay = peakDay;
             if (skip>0.0){
                 RandomNumberGenerator rng = GlobalInfo.getInstance().getRandomNumberGenerator();
@@ -162,7 +163,6 @@ public class AnnualMoltFunction  extends AbstractIBMFunction implements IBMFunct
                     norm = new NormalDistribution(peakDay, width);
                     phiL = norm.cumulativeProbability(firstDay);
                     phiU = norm.cumulativeProbability(firstDay+interval);
-                    calcMoltDay= false;//don't need to re-calculate these unless parameters change
                     rnd = phiL+rnd*(phiU-phiL);
                     moltDay = norm.inverseCumulativeProbability(rnd);
                 }
