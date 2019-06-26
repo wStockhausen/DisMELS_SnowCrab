@@ -484,7 +484,7 @@ public class Megalopa extends AbstractPelagicStage {
                     }
                     LifeStageAttributesInterface atts = nLHS.getAttributes();
                     atts.setValue(LifeStageAttributesInterface.PROP_number,nr);
-                    atts.setValue(AbstractBenthicStageAttributes.PROP_instar, 1);
+                    atts.setValue(AbstractBenthicStageAttributes.PROP_instar, 0);//reset to 0, will be incremented
                     if (!isSuperIndividual){
                         //generate new id and copy old id to parentID (already done if isSuperIndividual is true)
                         long pID = atts.getID();
@@ -492,7 +492,7 @@ public class Megalopa extends AbstractPelagicStage {
                         atts.setValue(LifeStageAttributesInterface.PROP_parentID, pID);
                     }
                     //update attributes on nLHS (updates id, parentID as well as other attributes)
-                    nLHS.setAttributes(atts);
+                    nLHS.setAttributes(atts);//instar incremented in setAttributes(atts)
                 }
             }
         }

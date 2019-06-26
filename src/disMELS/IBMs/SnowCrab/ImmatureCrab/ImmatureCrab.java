@@ -215,6 +215,7 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
             key = MegalopaAttributes.PROP_horizPos1;  atts.setValue(key, spAtts.getValue(key));
             key = MegalopaAttributes.PROP_horizPos2;  atts.setValue(key, spAtts.getValue(key));
             key = MegalopaAttributes.PROP_vertPos;    atts.setValue(key, spAtts.getValue(key));
+            key = MegalopaAttributes.PROP_bathym;     atts.setValue(key, spAtts.getValue(key));
             key = MegalopaAttributes.PROP_gridCellID; atts.setValue(key, spAtts.getValue(key));
             key = MegalopaAttributes.PROP_track;      atts.setValue(key, spAtts.getValue(key));
             key = MegalopaAttributes.PROP_active;     atts.setValue(key, spAtts.getValue(key));
