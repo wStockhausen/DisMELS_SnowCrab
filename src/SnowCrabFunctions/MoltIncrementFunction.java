@@ -8,13 +8,13 @@ import org.openide.util.lookup.ServiceProvider;
 import org.openide.util.lookup.ServiceProviders;
 import wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
-@ServiceProviders(value={
-    @ServiceProvider(service=IBMFunctionInterface.class)})
+
         
 /**
  *
  * @author christine.stawitz
  */
+@ServiceProviders(value={@ServiceProvider(service=IBMFunctionInterface.class)})
 public class MoltIncrementFunction extends AbstractIBMFunction implements IBMFunctionInterface {
      /** function classification */
     public static final String DEFAULT_type = "generic";
