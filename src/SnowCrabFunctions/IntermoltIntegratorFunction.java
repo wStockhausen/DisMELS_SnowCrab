@@ -14,7 +14,7 @@ import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
  * This class provides a method of determining the intermolt period using
  * Reaumur's Law from heat summation theory based on integrating the
  * temperature experienced by an individual crab over time.
- * 
+ * <pre>
  * At constant temperature T, the intermolt duration D based on Reaumur's Law is given by
  *      D = a/(T-b)             (1)
  * Taking the inverse of (1) yields 
@@ -31,11 +31,11 @@ import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
  * pelagic life stage (zooea 1, zooea 2 or megalops) or benthic instar (I through 
  * instar VII). When the integral reaches 1, the molt to the next life stage occurs.
  * 
- * @author William Stockhausen
- * 
  * Citations:
  * Yamada et al. 2014. J. Shellfish Res. 33(1): 19-24.
  * Yamada et al. 2015. J. Crust. Biol. 35(2): 140-148.
+ * </pre>
+ * @author William Stockhausen
  */
 @ServiceProviders(value={
     @ServiceProvider(service=IBMFunctionInterface.class)}
@@ -127,12 +127,27 @@ public class IntermoltIntegratorFunction extends AbstractIBMFunction implements 
         return set;
     }
     
+    /**
+     * Calculate the intermolt increment at T, as well as the total intermolt 
+     * duration at constant temperature T.
+     * 
+     * @param o Double: temperature T
+     * 
+     * @return double[] with elements<pre>
+     *      intermolt increment (days)
+     *      total intermolt duration at T (days)</pre>
+     */
     @Override
     public Object calculate(Object o) {
         double inc = 0.0;
+        double tot = Double.POSITIVE_INFINITY;
         double T = (Double) o;
-        if (T>b) inc = (T-b)/a; 
-        return inc;
+        if (T>b) {
+            inc = (T-b)/a;
+            tot = a/(T-b);
+        }
+        double[] vals = new double[]{inc,tot};
+        return vals;
     }
     
 }

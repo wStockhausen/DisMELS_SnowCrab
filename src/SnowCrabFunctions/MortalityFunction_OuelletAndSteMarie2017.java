@@ -11,30 +11,31 @@ import wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 
 /**
- * This class provides a function to calculate an end-of-stage, temperature-dependent 
- * survival probability for the zooea I, zooea II, and megalopal stages of snow crab,
+ * This class provides a function to calculate a temperature-dependent 
+ * mortality rate for the zooea I, zooea II, and megalopal stages of snow crab
  * based on Ouellet and Sainte-Marie (2017).
  * 
- * @author William Stockhausen
- * 
+ * <pre>
  * Citations:
  * Ouellet, P. and B. Sainte-Marie.2017. ICES JMS. doi:10.1093/icesjms/fsx169.
+ * </pre>
+ * @author William Stockhausen
  */
 @ServiceProviders(value={
     @ServiceProvider(service=IBMFunctionInterface.class)}
 )
-public class SurvivalFunction_OuelletAndSteMarie2017 extends AbstractIBMFunction implements IBMFunctionInterface {
+public class MortalityFunction_OuelletAndSteMarie2017 extends AbstractIBMFunction implements IBMFunctionInterface {
     
     public static final String DEFAULT_type = "generic";
     /** user-friendly function name */
-    public static final String DEFAULT_name = "Temperature-based survival";
+    public static final String DEFAULT_name = "Temperature-based mortality rate";
     /** function description */
-    public static final String DEFAULT_descr = "Temperature-dependent function to calculate stage survival.";
+    public static final String DEFAULT_descr = "Temperature-dependent function to calculate a mortality rate.";
     /** full description */
     public static final String DEFAULT_fullDescr = 
         "\n\t**************************************************************************"+
-        "\n\t* This class provides a function to calculate an end-of-stage, temperature-dependent"+
-        "\n\t* survival probability for the zooea I, zooea II, and megalopal stages of snow crab,"+
+        "\n\t* This class provides a function to calculate a temperature-dependent"+
+        "\n\t* mortality rate for the zooea I, zooea II, and megalopal stages of snow crab,"+
         "\n\t* based on Ouellet and Sainte-Marie (2017)."+
         "\n\t* "+
         "\n\t* @author William Stockhausen"+
@@ -46,10 +47,14 @@ public class SurvivalFunction_OuelletAndSteMarie2017 extends AbstractIBMFunction
     public static final int numParams = 2;
     /** number of sub-functions */
     public static final int numSubFuncs = 0;
-    /** key for the survival at 10 deg C */
-    public static final String PARAM_S10 = "S10: survival at 10C";
-    /** survival at 10 deg C */
-    private double S10 = 0;
+    /** key for the stage survival at reference temperature */
+    public static final String PARAM_refTempS = "sAtRefTemp: stage survival at reference temp";
+    /** stage survival at reference temperature */
+    private double sAtRefTemp = 0;
+    /** key for the reference temperature */
+    public static final String PARAM_refTemp = "refTemp: reference temp (deg C)";
+    /** reference temperature */
+    private double refTemp = 0;
     /** key for the intercept coefficient */
     public static final String PARAM_c0 = "c0: the intercept";
     /** value of the intercept coefficient */
@@ -63,16 +68,17 @@ public class SurvivalFunction_OuelletAndSteMarie2017 extends AbstractIBMFunction
     /** value of the quadratic coefficient */
     private double c2 = 0;
     /** key for the minimum temperature for survival */
-    public static final String PARAM_minT = "min temperature";
+    public static final String PARAM_minT = "min temperature (deg C)";
     /** value of the minimum temperature */
     private double minT = 0;
     /** key for the minimum temperature for survival */
-    public static final String PARAM_maxT = "max temperature";
+    public static final String PARAM_maxT = "max temperature (deg C)";
      /** value of the maximum temperature */
     private double maxT = 0;
    
+    private double refSI = -1.0;//survival index at reference temperature
     
-    public SurvivalFunction_OuelletAndSteMarie2017(){
+    public MortalityFunction_OuelletAndSteMarie2017(){
         super(numParams,numSubFuncs,DEFAULT_type,DEFAULT_name,DEFAULT_descr,DEFAULT_fullDescr);
         String key; 
         key = PARAM_c0; addParameter(key,Double.class,"c0: the intercept");
@@ -81,7 +87,7 @@ public class SurvivalFunction_OuelletAndSteMarie2017 extends AbstractIBMFunction
 
     @Override
     public Object clone() {
-        SurvivalFunction_OuelletAndSteMarie2017 clone = new SurvivalFunction_OuelletAndSteMarie2017();
+        MortalityFunction_OuelletAndSteMarie2017 clone = new MortalityFunction_OuelletAndSteMarie2017();
         clone.setFunctionType(getFunctionType());
         clone.setFunctionName(getFunctionName());
         clone.setDescription(getDescription());
@@ -97,12 +103,32 @@ public class SurvivalFunction_OuelletAndSteMarie2017 extends AbstractIBMFunction
         boolean set = false;
         if (super.setParameterValue(param, value)){
             switch (param) {
+                case PARAM_refTempS:
+                    sAtRefTemp = ((Double) value);
+                    set = true;
+                    break;
+                case PARAM_refTemp:
+                    refTemp = ((Double) value);
+                    set = true;
+                    break;
                 case PARAM_c0:
                     c0 = ((Double) value);
                     set = true;
                     break;
+                case PARAM_c1:
+                    c1 = ((Double) value);
+                    set = true;
+                    break;
+                case PARAM_c2:
+                    c2 = ((Double) value);
+                    set = true;
+                    break;
                 case PARAM_minT:
                     minT = ((Double) value);
+                    set = true;
+                    break;
+                case PARAM_maxT:
+                    maxT = ((Double) value);
                     set = true;
                     break;
             }
@@ -110,12 +136,32 @@ public class SurvivalFunction_OuelletAndSteMarie2017 extends AbstractIBMFunction
         return set;
     }
     
+    /**
+     * Calculate the instantaneous mortality rate.
+     * 
+     * @param o double[] with elements <pre>
+     *      T   - temperature
+     *      mnD - mean stage duration at T</pre>
+     * 
+     * @return double - instantaneous mortality rate (no survival if &lt 0) 
+     * <pre>
+     * Note: units of the mortality rate are the inverse of those for <code>mnD</code>
+     * </pre>
+     */
     @Override
     public Object calculate(Object o) {
-        double S = 0.0;
-        double T = (Double) o;
-        if (T>minT) S = c0 + c1*T +c2*T*T; 
-        return S;
+        double[] vals = (double[]) o; int k = 0;
+        double T   = vals[k++];//current temperature
+        double mnD = vals[k++];//mean intermolt duration at T
+        double M = -1.0;//flag for  no survival
+        if ((T>minT)&&(T<maxT)) {
+            if (refSI<0) refSI = (c0 + c1*refTemp +c2*refTemp*refTemp);
+            //intermolt survival at T 
+            double stageS = sAtRefTemp*(c0 + c1*T +c2*T*T)/refSI;
+            //equivalent instantaneous mortality rate
+            if (stageS>0.0) M = -(1.0/mnD)*Math.log(stageS);
+        } 
+        return M;
     }
     
 }

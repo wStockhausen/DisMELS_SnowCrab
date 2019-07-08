@@ -142,6 +142,8 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     //other fields
     /** number of individuals transitioning to next stage */
     protected double numTrans;  
+    /** mean stage duration (days) at in situ temperature */
+    protected double meanStageDuration;
     
     //IBM Functions
     /** IBM function selected for intermolt time */
@@ -493,12 +495,19 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     }
 
     /**
-     *
+     * Update the molt indicator variables.
+     * <pre>
+     * This changes the values of the variables
+     *      <code>moltIndicator</code> 
+     *      <code>meanStageDuration</code> (in days)
+     * </pre>
      * @param dt - time step in seconds
      */
     protected void updateMoltIndicator(double dt) throws ArithmeticException {
         if (fcnMoltTiming instanceof IntermoltIntegratorFunction) {
-            moltIndicator += dt/DAY_SECS*((Double) fcnMoltTiming.calculate(temperature));
+            double[] res = (double[]) fcnMoltTiming.calculate(temperature);
+            moltIndicator    += dt/DAY_SECS*res[0];
+            meanStageDuration = res[1];
             if (Double.isNaN(moltIndicator)|Double.isInfinite(moltIndicator)){
                 String msg = "NaN or Inf detected in updateMoltIndicator\n"
                            + "for "+typeName+" "+id+". IntermoltIntegratorFunction parameter values are\n"

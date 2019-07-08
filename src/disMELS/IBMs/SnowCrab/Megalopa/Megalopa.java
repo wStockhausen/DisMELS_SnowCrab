@@ -7,6 +7,7 @@ package disMELS.IBMs.SnowCrab.Megalopa;
 import SnowCrabFunctions.AnnualMoltFunction;
 import SnowCrabFunctions.FixedDurationFunction;
 import SnowCrabFunctions.IntermoltIntegratorFunction;
+import SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017;
 import com.vividsolutions.jts.geom.Coordinate;
 import disMELS.IBMs.SnowCrab.AbstractBenthicStageAttributes;
 import disMELS.IBMs.SnowCrab.AbstractPelagicStage;
@@ -21,6 +22,10 @@ import org.openide.util.lookup.ServiceProvider;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
 import wts.models.DisMELS.IBMFunctions.Movement.DielVerticalMigration_FixedDepthRanges;
+import wts.models.DisMELS.IBMFunctions.Movement.VerticalMovement_FixedDepthAndTempRange;
+import wts.models.DisMELS.IBMFunctions.Movement.VerticalMovement_FixedDepthRange;
+import wts.models.DisMELS.IBMFunctions.Movement.VerticalMovement_FixedOffBottomAndTempRange;
+import wts.models.DisMELS.IBMFunctions.Movement.VerticalMovement_FixedOffBottomRange;
 import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunction;
 import wts.models.DisMELS.framework.*;
 import wts.models.utilities.DateTimeFunctions;
@@ -357,12 +362,15 @@ public class Megalopa extends AbstractPelagicStage {
             throw new java.lang.UnsupportedOperationException("Intermolt duration function "+fcnMoltTiming.getFunctionName()+" is not supported for Megalopa.");
         
         fcnMort     = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_Mortality);
-        if (!(fcnMort instanceof ConstantMortalityRate||
+        if (!(fcnMort instanceof MortalityFunction_OuelletAndSteMarie2017||
+              fcnMort instanceof ConstantMortalityRate||
               fcnMort instanceof TemperatureDependentMortalityRate_Houde1989))
             throw new java.lang.UnsupportedOperationException("Mortality function "+fcnMort.getFunctionName()+" is not supported for Megalopa.");
         
         fcnVM       = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_VerticalMovement);
-        if (!(fcnVM instanceof DielVerticalMigration_FixedDepthRanges))
+        if (!(fcnVM instanceof VerticalMovement_FixedOffBottomRange||
+              fcnVM instanceof VerticalMovement_FixedOffBottomAndTempRange||
+              fcnVM instanceof DielVerticalMigration_FixedDepthRanges))
             throw new java.lang.UnsupportedOperationException("Vertical movement function "+fcnVM.getFunctionName()+" is not supported for Megalopa.");
         
         fcnVV       = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_VerticalVelocity);
@@ -600,7 +608,8 @@ public class Megalopa extends AbstractPelagicStage {
             pos = lp.getIJK();
             if (debugOps) logger.info("Depth after corrector step = "+(-i3d.calcZfromK(pos[0],pos[1],pos[2])));
         time = time+dt;
-        numTrans = 0.0;
+        
+        numTrans = 0.0;        
         updateAge(dt);          //calling superclass method
         updateMoltIndicator(dt);//calling superclass method
         updateNum(dt);
@@ -618,10 +627,10 @@ public class Megalopa extends AbstractPelagicStage {
     }
     
     /**
-     * Function to calculate movement rates.
+     * Function to calculate vertical and horizontal movement rates.
      * 
-     * @param dt - time step
-     * @return 
+     * @param dt - time step (s)
+     * @return double[] with elements u, v, w
      */
     public double[] calcUVW(double[] pos, double dt) {
         //compute vertical velocity
@@ -639,7 +648,13 @@ public class Megalopa extends AbstractPelagicStage {
             //individual will swim down to bottom to settle
             w = -Math.abs(w);
         } else
-        if (fcnVM instanceof wts.models.DisMELS.IBMFunctions.Movement.DielVerticalMigration_FixedDepthRanges) {            
+        if (fcnVM instanceof VerticalMovement_FixedOffBottomRange) {    
+            w = (Double) fcnVM.calculate(new double[]{dt,depth,bathym});
+        } else     
+        if (fcnVM instanceof VerticalMovement_FixedOffBottomAndTempRange) {    
+            w = (Double) fcnVM.calculate(new double[]{dt,depth,bathym,temperature});
+        } else     
+        if (fcnVM instanceof DielVerticalMigration_FixedDepthRanges) {            
             /**
             * Compute time of local sunrise, sunset and solar noon (in minutes, UTC) 
             * for given lon, lat, and time (in Julian day-of-year).
@@ -690,6 +705,18 @@ public class Megalopa extends AbstractPelagicStage {
      */
     private void updateNum(double dt) {
         double mortalityRate = 0.0D;//in unis of [days]^-1
+        if (fcnMort instanceof MortalityFunction_OuelletAndSteMarie2017){
+            /**
+             * Calculate the instantaneous mortality rate.
+             * 
+             * @param o double[] with elements <pre>
+             *      T   - temperature
+             *      mnD - mean stage duration at T</pre>
+             * 
+             * @return double - instantaneous mortality rate (no survival if &lt 0).
+             */
+            mortalityRate = (Double)fcnMort.calculate(new double[]{temperature,meanStageDuration});
+        } else 
         if (fcnMort instanceof ConstantMortalityRate){
             /**
              * @param vars - null
@@ -704,24 +731,28 @@ public class Megalopa extends AbstractPelagicStage {
              */
             mortalityRate = (Double)fcnMort.calculate(temperature);//using temperature as covariate for mortality
         }
-        double totRate = mortalityRate;
-        if (moltIndicator>=1.0) {
-            if((numTrans<number)&&(numTrans>0.0)){
-                double transRate = numTrans/number;
-                double instTransRate = -Math.log(1-transRate);
-                totRate += instTransRate;
-                //apply mortality rate to previous number transitioning and
-                //add in new transitioners
-                numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
-                        (instTransRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
-            } else if(numTrans==number){
-                number = number - numTrans;
+        if (mortalityRate<0.0){
+            //no survival
+            active=false;alive=false;number=0.0;
+        } else {
+            double totRate = mortalityRate;
+            if (moltIndicator>=1.0) {
+                if((numTrans<number)&&(numTrans>0.0)){
+                    double transRate = numTrans/number;
+                    double instTransRate = -Math.log(1-transRate);
+                    totRate += instTransRate;
+                    //apply mortality rate to previous number transitioning and
+                    //add in new transitioners
+                    numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
+                            (instTransRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
+                } else if(numTrans==number){
+                    number = number - numTrans;//TODO: = 0, right?? why the logic?
+                }
             }
-        }
-        number = number*Math.exp(-dt*totRate/DAY_SECS);
-//        if(number==0){
-        if(number<0.01){ //TODO: replace this with parameter
-            active=false;alive=false;number=number+numTrans;
+            number = number*Math.exp(-dt*totRate/DAY_SECS);
+            if(number<0.01){ //TODO: replace this with parameter
+                active=false;alive=false;number=number+numTrans;//TODO: ??
+            }
         }
     }
     

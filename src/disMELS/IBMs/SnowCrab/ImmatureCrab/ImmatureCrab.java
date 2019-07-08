@@ -71,6 +71,8 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
             //other fields
     /** number of individuals transitioning to next stage */
     protected double numTrans;  
+    /** mean stage duration (days) at in situ temperature */
+    protected double meanStageDuration;
     /** day of year */
     protected double dayOfYear;
     protected double starvationMort;
@@ -652,7 +654,9 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
 //        double D = (Double) fcnMoltTiming.calculate(new double[]{size, temperature});
         double D;
         if ((instar<8)&&(fcnMoltTiming instanceof IntermoltIntegratorFunction)){
-            moltIndicator += dt/DAY_SECS*((Double) fcnMoltTiming.calculate(temperature));
+            double[] res = (double[]) fcnMoltTiming.calculate(temperature);
+            moltIndicator    += dt/DAY_SECS*res[0];
+            meanStageDuration = res[1];
             if (Double.isNaN(moltIndicator)|Double.isInfinite(moltIndicator)){
                 String msg = "NaN or Inf detected in updateMoltIndicator\n"
                            + "for "+typeName+" "+id+". IntermoltIntegratorFunction parameter values are\n"

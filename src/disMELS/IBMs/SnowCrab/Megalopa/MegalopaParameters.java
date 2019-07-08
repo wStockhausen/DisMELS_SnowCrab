@@ -12,6 +12,7 @@ package disMELS.IBMs.SnowCrab.Megalopa;
 import SnowCrabFunctions.AnnualMoltFunction;
 import SnowCrabFunctions.FixedDurationFunction;
 import SnowCrabFunctions.IntermoltIntegratorFunction;
+import SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017;
 import java.beans.PropertyChangeSupport;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -21,6 +22,8 @@ import org.openide.util.lookup.ServiceProvider;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
 import wts.models.DisMELS.IBMFunctions.Movement.DielVerticalMigration_FixedDepthRanges;
+import wts.models.DisMELS.IBMFunctions.Movement.VerticalMovement_FixedOffBottomAndTempRange;
+import wts.models.DisMELS.IBMFunctions.Movement.VerticalMovement_FixedOffBottomRange;
 import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunction;
 import wts.models.DisMELS.framework.AbstractLHSParameters;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
@@ -116,7 +119,7 @@ public class MegalopaParameters extends AbstractLHSParameters {
         IBMFunctionInterface ifi;
         
         cat = FCAT_IntermoltDuration;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(2); 
+        mapOfPotentialFunctions = new LinkedHashMap<>(6); 
         mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new IntermoltIntegratorFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
@@ -126,8 +129,10 @@ public class MegalopaParameters extends AbstractLHSParameters {
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_Mortality;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(4); 
+        mapOfPotentialFunctions = new LinkedHashMap<>(6); 
         mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        ifi = new MortalityFunction_OuelletAndSteMarie2017(); 
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new ConstantMortalityRate(); 
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new TemperatureDependentMortalityRate_Houde1989(); 
@@ -136,6 +141,10 @@ public class MegalopaParameters extends AbstractLHSParameters {
         cat = FCAT_VerticalMovement;  
         mapOfPotentialFunctions = new LinkedHashMap<>(4); 
         mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
+        ifi = new VerticalMovement_FixedOffBottomRange(); 
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new VerticalMovement_FixedOffBottomAndTempRange(); 
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new DielVerticalMigration_FixedDepthRanges(); 
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
