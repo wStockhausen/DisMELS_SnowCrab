@@ -7,11 +7,19 @@ package disMELS.IBMs.SnowCrab;
 import SnowCrabFunctions.AnnualMoltFunction;
 import SnowCrabFunctions.FixedDurationFunction;
 import SnowCrabFunctions.IntermoltIntegratorFunction;
+import SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.wtstockhausen.utils.RandomNumberGenerator;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Logger;
+import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
+import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
+import wts.models.DisMELS.IBMFunctions.Movement.VerticalMovement_FixedDepthAndTempRange;
+import wts.models.DisMELS.IBMFunctions.Movement.VerticalMovement_FixedDepthRange;
+import wts.models.DisMELS.IBMFunctions.Movement.VerticalMovement_FixedOffBottomAndTempRange;
+import wts.models.DisMELS.IBMFunctions.Movement.VerticalMovement_FixedOffBottomRange;
 import wts.models.DisMELS.framework.GlobalInfo;
 import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 import wts.models.DisMELS.framework.LHS_Factory;
@@ -19,6 +27,7 @@ import wts.models.DisMELS.framework.LifeStageAttributesInterface;
 import wts.models.DisMELS.framework.LifeStageInterface;
 import static wts.models.DisMELS.framework.LifeStageInterface.DAY_SECS;
 import wts.models.DisMELS.framework.LifeStageParametersInterface;
+import wts.models.utilities.DateTimeFunctions;
 import wts.roms.gis.AlbersNAD83;
 import wts.roms.model.Interpolator3D;
 import wts.roms.model.LagrangianParticle;
@@ -93,12 +102,10 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     protected boolean isSuperIndividual;
     /** horizontal random walk parameter */
     protected double horizRWP;
-    /** minimum preferred bottom depth */
-    protected double minDepth;
-    /** maximum preferred bottom depth */
-    protected double maxDepth;
     /** maximum stage duration (followed by death) */
     protected double maxStageDuration;
+    /** stage transition rate */
+    protected double stageTransRate;
     /** flag to use stochastic transitions */
     protected boolean randomizeTransitions;
     
@@ -155,6 +162,11 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     /** IBM function selected for vertical velocity */
     protected IBMFunctionInterface fcnVV = null; 
     
+    //private members (not inherited by subclasses)
+    /* flag to log debugging information */
+    private boolean debugOps = false;
+    /* logger */
+    private Logger logger  = Logger.getLogger(this.getClass().getName());
     
     /**
      * Partially instantiates an instance of a class inheriting from AbstractPelagicStage
@@ -180,8 +192,8 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     }
     
     /**
-     * Subclasses can use this method to make sure the attributes object from
-     * this superclass refers to the one from their class.
+     * Subclasses can use this method to make sure the parameters object from
+     * this superclass refers to the one from the subclass.
      * 
      * @param subParams - the parameters object from the subclass 
      */
@@ -314,7 +326,11 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
      * @return - the attributes and track as a csv-formatted String
      */
     @Override
-    public abstract String getReport();
+    public String getReport() {
+        updateAttributes();//make sure attributes are up to date
+        atts.setValue(LifeStageAttributesInterface.PROP_track, getTrackAsString(COORDINATE_TYPE_GEOGRAPHIC));//
+        return atts.getCSV();
+    }
 
      /**
      * Returns the report header for the implementing class as a CSV formatted string.
@@ -322,7 +338,9 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
      * @return - the header names as a csv-formatted String
      */
     @Override
-   public abstract String getReportHeader();
+    public String getReportHeader() {
+        return atts.getCSVHeaderShortNames();
+    }
     
    /**
     * Sets the tolerance used to determine whether an individual is "at" the
@@ -481,8 +499,196 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
         ph            = atts.getValue(AbstractPelagicStageAttributes.PROP_ph,ph);
     }
     
+    @Override
+    public boolean isSuperIndividual() {
+        return isSuperIndividual;
+    }
+    
+    @Override
+    public double getStartTime() {
+        return startTime;
+    }
+
+    @Override
+    public void setStartTime(double newTime) {
+        startTime = newTime;
+        time      = startTime;
+        atts.setValue(LifeStageAttributesInterface.PROP_startTime,startTime);
+        atts.setValue(LifeStageAttributesInterface.PROP_time,time);
+    }
+
+    @Override
+    public boolean isActive() {
+        return active;
+    }
+
+    @Override
+    public void setActive(boolean b) {
+        active = b;
+        atts.setActive(b);
+    }
+
+    @Override
+    public boolean isAlive() {
+        return alive;
+    }
+
+    @Override
+    public void setAlive(boolean b) {
+        alive = b;
+        atts.setAlive(b);
+    }
+
+    @Override
+    public List<LifeStageInterface> getSpawnedIndividuals() {
+        output.clear();
+        return output;
+    }
+
     /**
-     *
+     * Provides a 
+     * @param dt
+     * @throws ArrayIndexOutOfBoundsException 
+     */
+    @Override
+    public void step(double dt) throws ArrayIndexOutOfBoundsException {
+        stepPosition(dt);
+        double[] pos = pos = lp.getIJK();
+        time = time+dt;
+        
+        updateAge(dt);
+        updateMoltIndicator(dt);
+        updateNum(dt);
+        updatePosition(pos);
+        updateEnvVars(pos);
+        
+        //check for exiting grid
+        if (i3d.isAtGridEdge(pos,tolGridEdge)){
+            alive=false;
+            active=false;
+            gridCellID=i3d.getGridCellID(pos, tolGridEdge);
+            logger.info("Indiv "+id+" exited grid at ["+pos[0]+","+pos[1]+"]: "+gridCellID);
+        }
+        updateAttributes(); //update the attributes object w/ nmodified values
+    }
+    
+    /**
+     * 
+     * @param dt
+     * @throws ArrayIndexOutOfBoundsException 
+     */
+    protected void stepPosition(double dt) throws ArrayIndexOutOfBoundsException {
+        double[] pos = lp.getIJK();
+        double[] uvw = calcUVW(pos,dt);//this also sets "attached" and may change pos[2] to 0
+        //do lagrangian particle tracking
+        lp.setU(uvw[0],lp.getN());
+        lp.setV(uvw[1],lp.getN());
+        lp.setW(uvw[2],lp.getN());
+        //now do predictor step
+        lp.doPredictorStep();
+        //assume same daytime status, but recalc depth and revise W 
+        pos = lp.getPredictedIJK();
+        depth = -i3d.calcZfromK(pos[0],pos[1],pos[2]);
+        if (debugOps) logger.info("Depth after predictor step = "+depth);
+        //w = calcW(dt,lp.getNP1())+r; //set swimming rate for predicted position
+        lp.setU(uvw[0],lp.getNP1());
+        lp.setV(uvw[1],lp.getNP1());
+        lp.setW(uvw[2],lp.getNP1());
+        //now do corrector step
+        lp.doCorrectorStep();
+        if (debugOps) {
+            pos = lp.getIJK();
+            logger.info("Depth after corrector step = "+(-i3d.calcZfromK(pos[0],pos[1],pos[2])));
+        }
+    }
+    
+    /**
+     * Function to calculate vertical and horizontal movement rates.
+     * 
+     * @param dt time step (s) 
+     * @return double[] with elements u, v, w
+     */
+    protected double[] calcUVW(double[] pos, double dt) {
+        //compute vertical velocity
+        double w = 0;
+        if (fcnVV instanceof wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunction) {
+            //calculate nominal vertical swimming speed
+            /**
+            * @param vars - double[]{dt}.
+            * @return     - movement rate as a Double 
+            */
+            w = (Double) fcnVV.calculate(new double[]{dt});
+        }
+        //add in other considerations
+        if (fcnVM instanceof VerticalMovement_FixedDepthRange) {    
+            double ssh = i3d.interpolateSSH(pos);
+            w = (Double) fcnVM.calculate(new double[]{dt,depth-ssh,bathym,w});
+        } else     
+        if (fcnVM instanceof VerticalMovement_FixedDepthAndTempRange) {    
+            double ssh = i3d.interpolateSSH(pos);
+            w = (Double) fcnVM.calculate(new double[]{dt,depth-ssh,bathym,temperature,w});
+        } else     
+        if (fcnVM instanceof VerticalMovement_FixedOffBottomRange) {    
+            double ssh = i3d.interpolateSSH(pos);
+            w = (Double) fcnVM.calculate(new double[]{dt,depth-ssh,bathym,w});
+        } else     
+        if (fcnVM instanceof VerticalMovement_FixedOffBottomAndTempRange) {    
+            double ssh = i3d.interpolateSSH(pos);
+            w = (Double) fcnVM.calculate(new double[]{dt,depth-ssh,bathym,temperature,w});
+        } else     
+        if (fcnVM instanceof wts.models.DisMELS.IBMFunctions.Movement.DielVerticalMigration_FixedDepthRanges) {
+            /**
+            * Compute time of local sunrise, sunset and solar noon (in minutes, UTC) 
+            * for given lon, lat, and time (in Julian day-of-year).
+            *@param lon : longitude of position (deg Greenwich, prime meridian)
+            *@param lat : latitude of position (deg)
+            *@param time : day-of-year (1-366, fractional part indicates time-of-day)
+            *@return double[5] = [0] time of sunrise (min UTC from midnight)
+            *                    [1] time of sunset (min UTC from midnight)
+            *                    [2] time of solarnoon (min UTC from midnight)
+            *                    [3] solar declination angle (deg)
+            *                    [4] solar zenith angle (deg)
+            * If sunrise/sunset=NaN then its either 24-hr day or night 
+            * (if lat*declination>0, it's summer in the hemisphere, hence daytime). 
+            * Alternatively, if the solar zenith angle > 90.833 deg, then it is night.
+            */
+            double[] ss = DateTimeFunctions.computeSunriseSunset(lon,lat,globalInfo.getCalendar().getYearDay());
+            /**
+            * @param vars - the inputs variables as a double[] array with elements
+            *                  dt          - [0] - integration time step
+            *                  depth       - [1] - current depth of individual
+            *                  total depth - [2] - total depth at location
+            *                  w           - [3] - active vertical swimming speed outside preferred depth range
+            *                  lightLevel  - [4] - value >= 0 indicates daytime, otherwise night 
+            * @return     - double[] with elements
+            *              w        - individual active vertical movement velocity
+            *              attached - flag indicating whether individual is attached to bottom(< 0) or not (>0)
+            */
+            double td = i3d.interpolateBathymetricDepth(lp.getIJK());
+            double[] res = (double[]) fcnVM.calculate(new double[]{dt,depth,td,w,90.833-ss[4]});
+            w = res[0];
+        }
+        
+        //calculate horizontal movement
+        double[] uv = {0.0,0.0};
+        if ((horizRWP>0)&&(Math.abs(dt)>0)) {
+            double r = Math.sqrt(horizRWP/Math.abs(dt));
+            uv[0] += r*rng.computeNormalVariate(); //stochastic swimming rate
+            uv[1] += r*rng.computeNormalVariate(); //stochastic swimming rate
+            if (debugOps) logger.info("id: "+id+"; r, uv: "+r+", {"+uv[0]+", "+uv[1]+"}\n");
+        }
+        
+        //return the result
+        return new double[]{Math.signum(dt)*uv[0],Math.signum(dt)*uv[1],Math.signum(dt)*w};
+    }
+
+    /**
+     * Update age-related variables.
+     * <pre>
+     * This changes the values of the variables
+     *      <code>age</code> 
+     *      <code>ageInStage</code>
+     * </pre>
      * @param dt - time step in seconds
      */
     protected void updateAge(double dt) {
@@ -532,6 +738,73 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
         }
     }
 
+    /**
+     * Update the number of individuals associated with this object.
+     * 
+     * @param dt - time step in seconds
+     */
+    protected void updateNum(double dt) {
+        double mortalityRate = 0.0D;//in unis of [days]^-1
+        if (fcnMort instanceof MortalityFunction_OuelletAndSteMarie2017){
+            /**
+             * Calculate the instantaneous mortality rate.
+             * 
+             * @param o double[] with elements <pre>
+             *      T   - temperature
+             *      mnD - mean stage duration at T</pre>
+             * 
+             * @return double - instantaneous mortality rate (no survival if &lt 0).
+             */
+            mortalityRate = (Double)fcnMort.calculate(new double[]{temperature,meanStageDuration});
+        } else 
+        if (fcnMort instanceof ConstantMortalityRate){
+            /**
+             * @param vars - null
+             * @return     - Double - the corresponding mortality rate (per day) 
+             */
+            mortalityRate = (Double)fcnMort.calculate(null);
+        } else 
+        if (fcnMort instanceof TemperatureDependentMortalityRate_Houde1989){
+            /**
+             * @param vars - Double - temperature (deg C)
+             * @return     - Double - the corresponding mortality rate (per day) 
+             */
+            mortalityRate = (Double)fcnMort.calculate(temperature);//using temperature as covariate for mortality
+        }
+        if (mortalityRate<0){
+            //no survival
+            active=false;alive=false;number=0.0;
+        } else {
+            double totRate = mortalityRate;
+            if (moltIndicator>=1.0) {
+                totRate += stageTransRate;
+                //apply mortality rate to previous number transitioning and
+                //add in new transitioners
+                numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
+                        (stageTransRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
+            }
+            number = number*Math.exp(-dt*totRate/DAY_SECS);
+            if(number<0.01){ //TODO: replace this with parameter
+                active=false;alive=false;number=number+numTrans;//TODO: ??
+            }
+        }
+    }
+    
+    /**
+     * Updates position-related information.
+     * 
+     * <pre>
+     * This changes the following variables:
+         * <code>bathym<\code>, bathymetric depth (m)
+         * <code>depth<\code>, total depth (m)
+         * <code>lat<\code>
+         * <code>lon<\code>
+         * <code>gridCellID<\code>
+         * <code>track<\code>
+     * </pre>
+     * 
+     * @param pos double[] in ROMS grid coordinates
+     */
     protected void updatePosition(double[] pos) {
         bathym     = i3d.interpolateBathymetricDepth(pos);
         depth      = -i3d.calcZfromK(pos[0],pos[1],pos[2]);
@@ -541,55 +814,20 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
         updateTrack();
     }
     
+    /**
+     * Updates environmental variables based on input position.
+     * 
+     * <pre>
+     * This changes the following variables:
+         * <code>temperature<\code>
+         * <code>salinity<\code>
+     * </pre>
+     * 
+     * @param pos double[] in ROMS grid coordinates
+     */
     protected void updateEnvVars(double[] pos) {
         temperature = i3d.interpolateTemperature(pos);
         salinity    = i3d.interpolateSalinity(pos);
-    }
-
-    @Override
-    public boolean isSuperIndividual() {
-        return isSuperIndividual;
-    }
-    
-    @Override
-    public double getStartTime() {
-        return startTime;
-    }
-
-    @Override
-    public void setStartTime(double newTime) {
-        startTime = newTime;
-        time      = startTime;
-        atts.setValue(LifeStageAttributesInterface.PROP_startTime,startTime);
-        atts.setValue(LifeStageAttributesInterface.PROP_time,time);
-    }
-
-    @Override
-    public boolean isActive() {
-        return active;
-    }
-
-    @Override
-    public void setActive(boolean b) {
-        active = b;
-        atts.setActive(b);
-    }
-
-    @Override
-    public boolean isAlive() {
-        return alive;
-    }
-
-    @Override
-    public void setAlive(boolean b) {
-        alive = b;
-        atts.setAlive(b);
-    }
-
-    @Override
-    public List<LifeStageInterface> getSpawnedIndividuals() {
-        output.clear();
-        return output;
     }
 
 }

@@ -22,13 +22,10 @@ import org.openide.util.lookup.ServiceProvider;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
 import wts.models.DisMELS.IBMFunctions.Movement.DielVerticalMigration_FixedDepthRanges;
-import wts.models.DisMELS.IBMFunctions.Movement.VerticalMovement_FixedDepthAndTempRange;
-import wts.models.DisMELS.IBMFunctions.Movement.VerticalMovement_FixedDepthRange;
 import wts.models.DisMELS.IBMFunctions.Movement.VerticalMovement_FixedOffBottomAndTempRange;
 import wts.models.DisMELS.IBMFunctions.Movement.VerticalMovement_FixedOffBottomRange;
 import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunction;
 import wts.models.DisMELS.framework.*;
-import wts.models.utilities.DateTimeFunctions;
 import wts.roms.model.LagrangianParticle;
 
 /**
@@ -388,12 +385,14 @@ public class Megalopa extends AbstractPelagicStage {
                 params.getValue(MegalopaParameters.PARAM_horizRWP,horizRWP);
         maxStageDuration = 
                 params.getValue(MegalopaParameters.PARAM_maxStageDuration,maxStageDuration);
+        stageTransRate = 
+                params.getValue(MegalopaParameters.PARAM_stageTransRate,stageTransRate);
+        randomizeTransitions = 
+                params.getValue(MegalopaParameters.PARAM_randomizeTransitions,true);
         minSettlementDepth = 
                 params.getValue(MegalopaParameters.PARAM_minSettlementDepth,minSettlementDepth);
         maxSettlementDepth = 
                 params.getValue(MegalopaParameters.PARAM_maxSettlementDepth,maxSettlementDepth);
-        randomizeTransitions = 
-                params.getValue(MegalopaParameters.PARAM_randomizeTransitions,true);
     }
     
     /**
@@ -419,7 +418,7 @@ public class Megalopa extends AbstractPelagicStage {
     }
 
     /**
-     *
+     * 
      * @param dt - time step in seconds
      * @return
      */
@@ -586,177 +585,6 @@ public class Megalopa extends AbstractPelagicStage {
     }
     
     @Override
-    public void step(double dt) throws ArrayIndexOutOfBoundsException {
-        double[] pos = lp.getIJK();
-        double[] uvw = calcUVW(pos,dt);//this also sets "attached" and may change pos[2] to 0
-            //do lagrangian particle tracking
-            lp.setU(uvw[0],lp.getN());
-            lp.setV(uvw[1],lp.getN());
-            lp.setW(uvw[2],lp.getN());
-            //now do predictor step
-            lp.doPredictorStep();
-            //assume same daytime status, but recalc depth and revise W 
-            pos = lp.getPredictedIJK();
-            depth = -i3d.calcZfromK(pos[0],pos[1],pos[2]);
-            if (debugOps) logger.info("Depth after predictor step = "+depth);
-            //w = calcW(dt,lp.getNP1())+r; //set swimming rate for predicted position
-            lp.setU(uvw[0],lp.getNP1());
-            lp.setV(uvw[1],lp.getNP1());
-            lp.setW(uvw[2],lp.getNP1());
-            //now do corrector step
-            lp.doCorrectorStep();
-            pos = lp.getIJK();
-            if (debugOps) logger.info("Depth after corrector step = "+(-i3d.calcZfromK(pos[0],pos[1],pos[2])));
-        time = time+dt;
-        
-        numTrans = 0.0;        
-        updateAge(dt);          //calling superclass method
-        updateMoltIndicator(dt);//calling superclass method
-        updateNum(dt);
-        updatePosition(pos);
-    
-        updateEnvVars(pos);
-        //check for exiting grid
-        if (i3d.isAtGridEdge(pos,tolGridEdge)){
-            alive=false;
-            active=false;
-            gridCellID=i3d.getGridCellID(pos, tolGridEdge);
-            logger.info("Indiv "+id+" exited grid at ["+pos[0]+","+pos[1]+"]: "+gridCellID);
-        }
-        updateAttributes(); //update the attributes object w/ nmodified values
-    }
-    
-    /**
-     * Function to calculate vertical and horizontal movement rates.
-     * 
-     * @param dt - time step (s)
-     * @return double[] with elements u, v, w
-     */
-    public double[] calcUVW(double[] pos, double dt) {
-        //compute vertical velocity
-        double w = 0;
-        //calculate the vertical movement rate
-        if (fcnVV instanceof wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunction) {
-            /**
-            * @param vars - double[]{dt}.
-            * @return     - movement rate as a Double 
-            */
-            w = (Double) fcnVV.calculate(new double[]{dt});
-        }
-        
-        if ((minSettlementDepth<=bathym)&&(bathym<=maxSettlementDepth)){
-            //individual will swim down to bottom to settle
-            w = -Math.abs(w);
-        } else
-        if (fcnVM instanceof VerticalMovement_FixedOffBottomRange) {    
-            w = (Double) fcnVM.calculate(new double[]{dt,depth,bathym});
-        } else     
-        if (fcnVM instanceof VerticalMovement_FixedOffBottomAndTempRange) {    
-            w = (Double) fcnVM.calculate(new double[]{dt,depth,bathym,temperature});
-        } else     
-        if (fcnVM instanceof DielVerticalMigration_FixedDepthRanges) {            
-            /**
-            * Compute time of local sunrise, sunset and solar noon (in minutes, UTC) 
-            * for given lon, lat, and time (in Julian day-of-year).
-            *@param lon : longitude of position (deg Greenwich, prime meridian)
-            *@param lat : latitude of position (deg)
-            *@param time : day-of-year (1-366, fractional part indicates time-of-day)
-            *@return double[5] = [0] time of sunrise (min UTC from midnight)
-            *                    [1] time of sunset (min UTC from midnight)
-            *                    [2] time of solarnoon (min UTC from midnight)
-            *                    [3] solar declination angle (deg)
-            *                    [4] solar zenith angle (deg)
-            * If sunrise/sunset=NaN then its either 24-hr day or night 
-            * (if lat*declination>0, it's summer in the hemisphere, hence daytime). 
-            * Alternatively, if the solar zenith angle > 90.833 deg, then it is night.
-            */
-            double[] ss = DateTimeFunctions.computeSunriseSunset(lon,lat,globalInfo.getCalendar().getYearDay());
-            /**
-            * @param vars - the inputs variables as a double[] array with elements
-            *                  dt          - [0] - integration time step
-            *                  depth       - [1] - current depth of individual
-            *                  total depth - [2] - total depth at location
-            *                  w           - [3] - active vertical swimming speed outside preferred depth range
-            *                  lightLevel  - [4] - value >= 0 indicates daytime, otherwise night 
-            * @return     - double[] with elements
-            *              w        - individual active vertical movement velocity
-            *              attached - flag indicating whether individual is attached to bottom(< 0) or not (>0)
-            */
-            double[] res = (double[]) fcnVM.calculate(new double[]{dt,depth,bathym,w,90.833-ss[4]});
-            w = res[0];
-        }
-        
-        //calculate horizontal movement
-        double[] uv = {0.0,0.0};
-        if ((horizRWP>0)&&(Math.abs(dt)>0)) {
-            double r = Math.sqrt(horizRWP/Math.abs(dt));
-            uv[0] += r*rng.computeNormalVariate(); //stochastic swimming rate
-            uv[1] += r*rng.computeNormalVariate(); //stochastic swimming rate
-            if (debugOps) logger.info("id: "+id+"; r, uv: "+r+", {"+uv[0]+", "+uv[1]+"}\n");
-        }
-        
-        //return the result
-        return new double[]{Math.signum(dt)*uv[0],Math.signum(dt)*uv[1],Math.signum(dt)*w};
-    }
-
-    /**
-     *
-     * @param dt - time step in seconds
-     */
-    private void updateNum(double dt) {
-        double mortalityRate = 0.0D;//in unis of [days]^-1
-        if (fcnMort instanceof MortalityFunction_OuelletAndSteMarie2017){
-            /**
-             * Calculate the instantaneous mortality rate.
-             * 
-             * @param o double[] with elements <pre>
-             *      T   - temperature
-             *      mnD - mean stage duration at T</pre>
-             * 
-             * @return double - instantaneous mortality rate (no survival if &lt 0).
-             */
-            mortalityRate = (Double)fcnMort.calculate(new double[]{temperature,meanStageDuration});
-        } else 
-        if (fcnMort instanceof ConstantMortalityRate){
-            /**
-             * @param vars - null
-             * @return     - Double - the corresponding mortality rate (per day) 
-             */
-            mortalityRate = (Double)fcnMort.calculate(null);
-        } else 
-        if (fcnMort instanceof TemperatureDependentMortalityRate_Houde1989){
-            /**
-             * @param vars - Double - temperature (deg C)
-             * @return     - Double - the corresponding mortality rate (per day) 
-             */
-            mortalityRate = (Double)fcnMort.calculate(temperature);//using temperature as covariate for mortality
-        }
-        if (mortalityRate<0.0){
-            //no survival
-            active=false;alive=false;number=0.0;
-        } else {
-            double totRate = mortalityRate;
-            if (moltIndicator>=1.0) {
-                if((numTrans<number)&&(numTrans>0.0)){
-                    double transRate = numTrans/number;
-                    double instTransRate = -Math.log(1-transRate);
-                    totRate += instTransRate;
-                    //apply mortality rate to previous number transitioning and
-                    //add in new transitioners
-                    numTrans = numTrans*Math.exp(-dt*mortalityRate/DAY_SECS)+
-                            (instTransRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
-                } else if(numTrans==number){
-                    number = number - numTrans;//TODO: = 0, right?? why the logic?
-                }
-            }
-            number = number*Math.exp(-dt*totRate/DAY_SECS);
-            if(number<0.01){ //TODO: replace this with parameter
-                active=false;alive=false;number=number+numTrans;//TODO: ??
-            }
-        }
-    }
-    
-    @Override
     public String getAttributesClassName() {
         return attributesClass;
     }
@@ -781,37 +609,4 @@ public class Megalopa extends AbstractPelagicStage {
         return spawnedLHSClasses;
     }
 
-    @Override
-    public String getReport() {
-        updateAttributes();//make sure attributes are up to date
-        atts.setValue(LifeStageAttributesInterface.PROP_track, getTrackAsString(COORDINATE_TYPE_GEOGRAPHIC));//
-        return atts.getCSV();
-    }
-
-    @Override
-    public String getReportHeader() {
-        return atts.getCSVHeaderShortNames();
-    }
-    
-    /**
-     * Updates attribute values defined for this class. 
-     */
-    @Override
-    protected void updateAttributes() {
-        //update superclass (AbstractPelagicStage) attributes
-        super.updateAttributes();
-        //update attributes new to class
-        //--NONE!
-    }
-
-    /**
-     * Updates local variables from the attributes.  
-     */
-    @Override
-    protected void updateVariables() {
-        //update superclass variables
-        super.updateVariables();
-        //update variables new to class
-        //--NONE
-    }
 }

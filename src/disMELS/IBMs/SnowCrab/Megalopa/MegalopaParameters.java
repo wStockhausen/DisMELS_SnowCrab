@@ -57,13 +57,14 @@ public class MegalopaParameters extends AbstractLHSParameters {
     public static final long serialVersionUID = 1L;
     
     /** the number of IBMParameter objects defined in the class */
-    public static final int numParams = 6;
+    public static final int numParams = 8;
     public static final String PARAM_isSuperIndividual      = "is a super-individual?";
     public static final String PARAM_horizRWP               = "horizontal random walk parameter [m^2]/[s]";
     public static final String PARAM_maxStageDuration       = "max stage duration [d]";
     public static final String PARAM_minSettlementDepth     = "min settlement depth (m)";
     public static final String PARAM_maxSettlementDepth     = "max settlement depth (m)";
     public static final String PARAM_sexRatio               = "fraction male abundance at 1st benthic instar";
+    public static final String PARAM_stageTransRate         = "stage transition rate (1/d)";
     public static final String PARAM_randomizeTransitions   = "randomize transitions?";
     
     
@@ -108,6 +109,7 @@ public class MegalopaParameters extends AbstractLHSParameters {
         key = PARAM_minSettlementDepth;   mapParams.put(key,new IBMParameterDouble(key,key,  0.0));
         key = PARAM_maxSettlementDepth;   mapParams.put(key,new IBMParameterDouble(key,key, 50.0));
         key = PARAM_sexRatio;             mapParams.put(key,new IBMParameterDouble(key,key,  0.5));
+        key = PARAM_stageTransRate;             mapParams.put(key,new IBMParameterDouble(key,key,  0.0));
         key = PARAM_randomizeTransitions; mapParams.put(key,new IBMParameterBoolean(key,key,false));
     }
 

@@ -288,7 +288,11 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
      * @return - the attributes and track as a csv-formatted String
      */
     @Override
-    public abstract String getReport();
+    public String getReport() {
+        updateAttributes();//make sure attributes are up to date
+        atts.setValue(LifeStageAttributesInterface.PROP_track, getTrackAsString(COORDINATE_TYPE_GEOGRAPHIC));//
+        return atts.getCSV();
+    }
 
      /**
      * Returns the report header for the implementing class as a CSV formatted string.
@@ -296,7 +300,44 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
      * @return - the header names as a csv-formatted String
      */
     @Override
-   public abstract String getReportHeader();
+    public String getReportHeader() {
+        return atts.getCSVHeaderShortNames();
+    }
+
+    @Override
+    public double getStartTime() {
+        return startTime;
+    }
+
+    @Override
+    public void setStartTime(double newTime) {
+        startTime = newTime;
+        time      = startTime;
+        atts.setValue(LifeStageAttributesInterface.PROP_startTime,startTime);
+        atts.setValue(LifeStageAttributesInterface.PROP_time,time);
+    }
+
+    @Override
+    public boolean isActive() {
+        return active;
+    }
+
+    @Override
+    public void setActive(boolean b) {
+        active = b;
+        atts.setActive(b);
+    }
+
+    @Override
+    public boolean isAlive() {
+        return alive;
+    }
+
+    @Override
+    public void setAlive(boolean b) {
+        alive = b;
+        atts.setAlive(b);
+    }
     
    /**
     * Sets the tolerance used to determine whether an individual is "at" the

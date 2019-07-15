@@ -55,10 +55,10 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
     protected double initialSize;
     /** initial weight (g) */
     protected double initialWeight;
+    /** stage transition rate */
+    protected double stageTransRate;
     /** flag to use stochastic transitions */
     protected boolean randomizeTransitions;
-    /** ratio of male to female */
-    protected double sexRatio;//TODO: this should be in Megalopa, not here!!
     protected double maxStarvTime;
     protected double percLostWeight;
     protected double sCost;
@@ -100,7 +100,7 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
     private static final Logger logger = Logger.getLogger(ImmatureCrab.class.getName());
     
     /**
-     * Creates a new instance of MaleImmature class.  
+     * Called when creating a new instance of an ImmatureCrab subclass.  
      *  This constructor should be used ONLY to obtain
      *  the class names of the associated classes.
      * DO NOT DELETE THIS CONSTRUCTOR!!
@@ -112,7 +112,7 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
     }
     
     /**
-     * Creates a new life stage instance with the given typeName.
+     * Called to create a new subclass life stage instance with the given typeName.
      * A new id number is calculated in the superclass and assigned to
      * the new instance's id, parentID, and origID. 
      * 
@@ -396,6 +396,8 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
                 params.getValue(ImmatureCrabParameters.PARAM_initialWeight,initialWeight);
         maxStageDuration = 
                 params.getValue(ImmatureCrabParameters.PARAM_maxStageDuration,maxStageDuration);
+        stageTransRate = 
+                params.getValue(ImmatureCrabParameters.PARAM_stageTransRate,maxStageDuration);
         randomizeTransitions = 
                 params.getValue(ImmatureCrabParameters.PARAM_randomizeTransitions,randomizeTransitions);
         sCost = 
@@ -793,42 +795,7 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
         temperature = i3d.interpolateTemperature(pos);
         salinity    = i3d.interpolateSalinity(pos);
     }
-
-    @Override
-    public double getStartTime() {
-        return startTime;
-    }
-
-    @Override
-    public void setStartTime(double newTime) {
-        startTime = newTime;
-        time      = startTime;
-        atts.setValue(LifeStageAttributesInterface.PROP_startTime,startTime);
-        atts.setValue(LifeStageAttributesInterface.PROP_time,time);
-    }
-
-    @Override
-    public boolean isActive() {
-        return active;
-    }
-
-    @Override
-    public void setActive(boolean b) {
-        active = b;
-        atts.setActive(b);
-    }
-
-    @Override
-    public boolean isAlive() {
-        return alive;
-    }
-
-    @Override
-    public void setAlive(boolean b) {
-        alive = b;
-        atts.setAlive(b);
-    }
-
+    
     @Override
     public List<LifeStageInterface> getSpawnedIndividuals() {
         output.clear();
@@ -838,18 +805,6 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
     @Override
     public boolean isSuperIndividual() {
         return isSuperIndividual;
-    }
-    
-    @Override
-    public String getReport() {
-        updateAttributes();//make sure attributes are up to date
-        atts.setValue(LifeStageAttributesInterface.PROP_track, getTrackAsString(COORDINATE_TYPE_GEOGRAPHIC));//
-        return atts.getCSV();
-    }
-
-    @Override
-    public String getReportHeader() {
-        return atts.getCSVHeaderShortNames();
     }
     
     /**

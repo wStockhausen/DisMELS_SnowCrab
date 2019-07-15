@@ -65,11 +65,12 @@ public class ImmatureCrabParameters extends AbstractLHSParameters {
     public static final long serialVersionUID = 1L;
     
     /** the number of IBMParameter objects defined in the class */
-    public static final int numParams = 13;
+    public static final int numParams = 14;
     public static final String PARAM_isSuperIndividual      = "is a super-individual?";
     public static final String PARAM_horizRWP               = "horizontal random walk parameter [m^2]/[s]";
     public static final String PARAM_maxStageDuration       = "max stage duration [d]";
     public static final String PARAM_minWeight              = "min weight before metamorphosis (g)";
+    public static final String PARAM_stageTransRate         = "stage transition rate (1/d)";
     public static final String PARAM_randomizeTransitions   = "randomize transitions?";
     public static final String PARAM_initialSize            = "initial size in stage (mm)";
     public static final String PARAM_initialWeight          = "initial weight in stage (g)";
@@ -83,7 +84,7 @@ public class ImmatureCrabParameters extends AbstractLHSParameters {
     
     /** the number of IBMFunction categories defined in the class */
     public static final int numFunctionCats = 6;
-    public static final String FCAT_MoltTiming = "intermolt duration";
+    public static final String FCAT_MoltTiming        = "intermolt duration";
     public static final String FCAT_MoltIncrement     = "molt increment";
     public static final String FCAT_Growth            = "growth in weight";
     public static final String FCAT_ExuviaeCost       = "exuviae cost";
@@ -124,6 +125,7 @@ public class ImmatureCrabParameters extends AbstractLHSParameters {
         key = PARAM_initialWeight;        mapParams.put(key,new IBMParameterDouble(key,key,0.01));
         key = PARAM_maxStageDuration;     mapParams.put(key,new IBMParameterDouble(key,key,365.0));
         key = PARAM_minWeight;            mapParams.put(key,new IBMParameterDouble(key,key,0.001));
+        key = PARAM_stageTransRate;       mapParams.put(key,new IBMParameterDouble(key,key,  0.0));
         key = PARAM_randomizeTransitions; mapParams.put(key,new IBMParameterBoolean(key,key,false));
         key = PARAM_sCost;                mapParams.put(key,new IBMParameterDouble(key,key,0.0));
         key = PARAM_maxStarvTime;         mapParams.put(key, new IBMParameterDouble(key, key, 514800));

@@ -58,10 +58,11 @@ public class ZooeaParameters extends AbstractLHSParameters {
     public static final long serialVersionUID = 1L;
     
     /** the number of IBMParameter objects defined in the class */
-    public static final int numParams = 4;
+    public static final int numParams = 5;
     public static final String PARAM_isSuperIndividual      = "is a super-individual?";
     public static final String PARAM_horizRWP               = "horizontal random walk parameter [m^2]/[s]";
     public static final String PARAM_maxStageDuration       = "max stage duration [d]";
+    public static final String PARAM_stageTransRate         = "stage transition rate (1/d)";
     public static final String PARAM_randomizeTransitions   = "randomize transitions?";
     
     
@@ -103,6 +104,7 @@ public class ZooeaParameters extends AbstractLHSParameters {
         key = PARAM_isSuperIndividual;    mapParams.put(key,new IBMParameterBoolean(key,key,false));
         key = PARAM_horizRWP;             mapParams.put(key,new IBMParameterDouble(key,key,0.0));
         key = PARAM_maxStageDuration;     mapParams.put(key,new IBMParameterDouble(key,key,365.0));
+        key = PARAM_stageTransRate;       mapParams.put(key,new IBMParameterDouble(key,key,  0.0));
         key = PARAM_randomizeTransitions; mapParams.put(key,new IBMParameterBoolean(key,key,false));
     }
 
