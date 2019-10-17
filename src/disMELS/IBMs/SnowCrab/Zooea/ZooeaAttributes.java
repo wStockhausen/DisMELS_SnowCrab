@@ -176,7 +176,7 @@ public class ZooeaAttributes extends disMELS.IBMs.SnowCrab.AbstractPelagicStageA
 
     /**
      * Returns Class types for all attributes (including typeName) as a Class[]
- in the order the keys are defined.
+     * in the order the keys are defined.
      * 
      * @return 
      */
@@ -204,7 +204,7 @@ public class ZooeaAttributes extends disMELS.IBMs.SnowCrab.AbstractPelagicStageA
 
     /**
      * Returns short names for all attributes (including typeName) as a String[]
- in the order the keys are defined.
+     * in the order the keys are defined.
      * 
      * @return 
      */

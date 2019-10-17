@@ -27,9 +27,9 @@ import wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface;
 public class FixedDurationFunction  extends AbstractIBMFunction implements IBMFunctionInterface  {
     public static final String DEFAULT_type = "generic";
     /** user-friendly function name */
-    public static final String DEFAULT_name = "Annual molt cycle";
+    public static final String DEFAULT_name = "Fixed intermolt duration";
     /** function description */
-    public static final String DEFAULT_descr = "Annual molt cycle";
+    public static final String DEFAULT_descr = "Fixed intermolt duration";
     /** full description */
     public static final String DEFAULT_fullDescr = 
         "\n\t**************************************************************************"+

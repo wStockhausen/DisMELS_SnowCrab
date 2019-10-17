@@ -53,7 +53,7 @@ public abstract class AbstractPelagicStageAttributes implements LifeStageAttribu
      * the attribute keys and information defined in this class to the static Set "keys" 
      * and the static Map mapAttributes.
      * 
-     * Subclasses should call this constructor with a valid life stsage type name from
+     * Subclasses should call this constructor with a valid life stage type name from
      * all constructors to set the type name.  They should then 
      * 
      *@param typeName - the type name as a String.
