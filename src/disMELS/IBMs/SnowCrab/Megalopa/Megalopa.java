@@ -6,6 +6,7 @@ package disMELS.IBMs.SnowCrab.Megalopa;
 
 import SnowCrabFunctions.AnnualMoltFunction;
 import SnowCrabFunctions.FixedDurationFunction;
+import SnowCrabFunctions.IntermoltDurationFunction_Belehradek;
 import SnowCrabFunctions.IntermoltIntegratorFunction;
 import SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -354,8 +355,9 @@ public class Megalopa extends AbstractPelagicStage {
     private void setParameterFunctions(){
         fcnMoltTiming = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_IntermoltDuration);
         if (!(fcnMoltTiming instanceof IntermoltIntegratorFunction||
-               fcnMoltTiming instanceof AnnualMoltFunction||
-               fcnMoltTiming instanceof FixedDurationFunction))
+              fcnMoltTiming instanceof IntermoltDurationFunction_Belehradek||
+              fcnMoltTiming instanceof AnnualMoltFunction||
+              fcnMoltTiming instanceof FixedDurationFunction))
             throw new java.lang.UnsupportedOperationException("Intermolt duration function "+fcnMoltTiming.getFunctionName()+" is not supported for Megalopa.");
         
         fcnMort     = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_Mortality);

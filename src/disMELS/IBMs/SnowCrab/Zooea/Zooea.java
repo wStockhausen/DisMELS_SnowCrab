@@ -6,6 +6,7 @@ package disMELS.IBMs.SnowCrab.Zooea;
 
 import SnowCrabFunctions.AnnualMoltFunction;
 import SnowCrabFunctions.FixedDurationFunction;
+import SnowCrabFunctions.IntermoltDurationFunction_Belehradek;
 import SnowCrabFunctions.IntermoltIntegratorFunction;
 import SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -359,25 +360,26 @@ public class Zooea extends AbstractPelagicStage {
     private void setParameterFunctions(){
         fcnMoltTiming = params.getSelectedIBMFunctionForCategory(ZooeaParameters.FCAT_IntermoltDuration);
         if (!(fcnMoltTiming instanceof IntermoltIntegratorFunction||
-               fcnMoltTiming instanceof AnnualMoltFunction||
-               fcnMoltTiming instanceof FixedDurationFunction))
-            throw new java.lang.UnsupportedOperationException("Intermolt duration function "+fcnMoltTiming.getFunctionName()+" is not supported for Megalopa.");
+              fcnMoltTiming instanceof IntermoltDurationFunction_Belehradek||
+              fcnMoltTiming instanceof AnnualMoltFunction||
+              fcnMoltTiming instanceof FixedDurationFunction))
+            throw new java.lang.UnsupportedOperationException("Intermolt duration function "+fcnMoltTiming.getFunctionName()+" is not supported for Zooea.");
         
         fcnMort     = params.getSelectedIBMFunctionForCategory(ZooeaParameters.FCAT_Mortality);
         if (!(fcnMort instanceof MortalityFunction_OuelletAndSteMarie2017||
               fcnMort instanceof ConstantMortalityRate||
               fcnMort instanceof TemperatureDependentMortalityRate_Houde1989))
-            throw new java.lang.UnsupportedOperationException("Mortality function "+fcnMort.getFunctionName()+" is not supported for Zooea1.");
+            throw new java.lang.UnsupportedOperationException("Mortality function "+fcnMort.getFunctionName()+" is not supported for Zooea.");
         
         fcnVM       = params.getSelectedIBMFunctionForCategory(ZooeaParameters.FCAT_VerticalMovement);
         if (!(fcnVM instanceof VerticalMovement_FixedDepthRange||
               fcnVM instanceof VerticalMovement_FixedDepthAndTempRange||
               fcnVM instanceof DielVerticalMigration_FixedDepthRanges))
-            throw new java.lang.UnsupportedOperationException("Vertical movement function "+fcnVM.getFunctionName()+" is not supported for Zooea1.");
+            throw new java.lang.UnsupportedOperationException("Vertical movement function "+fcnVM.getFunctionName()+" is not supported for Zooea.");
         
         fcnVV       = params.getSelectedIBMFunctionForCategory(ZooeaParameters.FCAT_VerticalVelocity);
         if (!(fcnVV instanceof ConstantMovementRateFunction))
-            throw new java.lang.UnsupportedOperationException("Vertical velocity function "+fcnVV.getFunctionName()+" is not supported for Zooea1.");
+            throw new java.lang.UnsupportedOperationException("Vertical velocity function "+fcnVV.getFunctionName()+" is not supported for Zooea.");
     }
     
     /*

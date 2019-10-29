@@ -11,6 +11,7 @@ package disMELS.IBMs.SnowCrab.Megalopa;
 
 import SnowCrabFunctions.AnnualMoltFunction;
 import SnowCrabFunctions.FixedDurationFunction;
+import SnowCrabFunctions.IntermoltDurationFunction_Belehradek;
 import SnowCrabFunctions.IntermoltIntegratorFunction;
 import SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017;
 import java.beans.PropertyChangeSupport;
@@ -121,9 +122,11 @@ public class MegalopaParameters extends AbstractLHSParameters {
         IBMFunctionInterface ifi;
         
         cat = FCAT_IntermoltDuration;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(6); 
+        mapOfPotentialFunctions = new LinkedHashMap<>(8); 
         mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new IntermoltIntegratorFunction();
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new IntermoltDurationFunction_Belehradek();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new AnnualMoltFunction();
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);

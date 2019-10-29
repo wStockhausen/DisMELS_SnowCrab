@@ -6,6 +6,7 @@ package disMELS.IBMs.SnowCrab;
 
 import SnowCrabFunctions.AnnualMoltFunction;
 import SnowCrabFunctions.FixedDurationFunction;
+import SnowCrabFunctions.IntermoltDurationFunction_Belehradek;
 import SnowCrabFunctions.IntermoltIntegratorFunction;
 import SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017;
 import com.vividsolutions.jts.geom.Coordinate;
@@ -721,13 +722,29 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
                            + "\tb = "+fcnMoltTiming.getParameter(IntermoltIntegratorFunction.PARAM_b).getValueAsString()+"\n";
                 throw(new ArithmeticException(msg));
             }
+        } else if (fcnMoltTiming instanceof IntermoltDurationFunction_Belehradek){
+            double[] res = (double[]) fcnMoltTiming.calculate(temperature);
+            moltIndicator    += dt/DAY_SECS*res[0];
+            meanStageDuration = res[1];
+            if (Double.isNaN(moltIndicator)|Double.isInfinite(moltIndicator)){
+                String msg = "NaN or Inf detected in updateMoltIndicator\n"
+                           + "for "+typeName+" "+id+". IntermoltDurationFunction_Belehradek parameter values are\n"
+                           + "\ta = "+fcnMoltTiming.getParameter(IntermoltDurationFunction_Belehradek.PARAM_a).getValueAsString()+"\n"
+                           + "\tb = "+fcnMoltTiming.getParameter(IntermoltDurationFunction_Belehradek.PARAM_b).getValueAsString()+"\n"
+                           + "\tc = "+fcnMoltTiming.getParameter(IntermoltDurationFunction_Belehradek.PARAM_c).getValueAsString()+"\n";
+                throw(new ArithmeticException(msg));
+            }
         } else if (fcnMoltTiming instanceof AnnualMoltFunction){
+            //TODO: the following logic is incorrect!
             if ((Double)fcnMoltTiming.calculate(false)<globalInfo.getCalendar().getYearDay())
                 moltIndicator = 1.0;
             else
                 moltIndicator = 0.0;
+            String msg = "Logic for "+fcnMoltTiming.getClass().getSimpleName()+"\n"
+                        +"is WRONG!! updateMoltIndicator for "+typeName+".";
+            throw(new ArithmeticException(msg));
         } else if (fcnMoltTiming instanceof FixedDurationFunction){
-            if ((Double)fcnMoltTiming.calculate(false)<=ageInStage)
+            if (ageInStage>=(Double)fcnMoltTiming.calculate(false))
                 moltIndicator = 1.0;
             else
                 moltIndicator = 0.0;
