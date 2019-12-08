@@ -55,6 +55,8 @@ public class AnnualMoltFunction  extends AbstractIBMFunction implements IBMFunct
     public static final String PARAM_random = "random";
     /**probability of skip molting */
     public static final String PARAM_skip = "skip";
+    /** random number generator */
+    protected static final RandomNumberGenerator rng = GlobalInfo.getInstance().getRandomNumberGenerator();
     
     /** first day of molting */
     protected double firstDay = 0.0;
@@ -155,7 +157,6 @@ public class AnnualMoltFunction  extends AbstractIBMFunction implements IBMFunct
             calcMoltDay= false;//don't need to re-calculate automatically these unless the parameters change
             moltDay = peakDay;
             if (skip>0.0){
-                RandomNumberGenerator rng = GlobalInfo.getInstance().getRandomNumberGenerator();
                 double rnd = rng.computeUniformVariate(0.0, 1.0);
                 if (rnd<=skip) return 400;//molt skipped
                 if (random){

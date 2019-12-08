@@ -17,6 +17,11 @@ import wts.models.DisMELS.framework.Types;
 /**
  * DisMELS class representing an extruded clutch of eggs on the abdomen of a post-adolescent
  * female snow crab.
+ * 
+ * @TODO: finish logic: 
+ *   position should depend on parent
+ *   should this inherit from AbstractLHS?
+ * 
  */
 public abstract class AbstractEggMassStage extends AbstractLHS {
     

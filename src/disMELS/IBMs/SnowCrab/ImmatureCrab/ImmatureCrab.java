@@ -574,8 +574,16 @@ public abstract class ImmatureCrab extends AbstractBenthicStage {
         }
     }
     
+    /**
+     * Provides the logic to move an individual ahead by one time step.
+     * 
+     * @param dt - the time step in seconds)
+     * 
+     * @throws ArrayIndexOutOfBoundsException 
+     */
     @Override
     public void step(double dt) throws ArrayIndexOutOfBoundsException {
+        super.step(dt);
         //determine daytime/nighttime
         dayOfYear = globalInfo.getCalendar().getYearDay();
         starvationMort = 0.0;

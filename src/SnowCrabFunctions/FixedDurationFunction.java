@@ -48,6 +48,8 @@ public class FixedDurationFunction  extends AbstractIBMFunction implements IBMFu
     public static final String PARAM_mean = "mean duration (days)";
     /** key for the standard deviation in intermolt duration */
     public static final String PARAM_stdev = "standard deviation (days)";
+    /** random number generator */
+    protected static final RandomNumberGenerator rng = GlobalInfo.getInstance().getRandomNumberGenerator();
     
     /** mean intermolt duration */
     protected double mean = 0.0;
@@ -122,7 +124,6 @@ public class FixedDurationFunction  extends AbstractIBMFunction implements IBMFu
             calcDur = false;//don't need to doo this automatically unless the parameters change
             intermoltDuration = mean;
             if ((stddev>0.0)||calcDur){
-                RandomNumberGenerator rng = GlobalInfo.getInstance().getRandomNumberGenerator();
                 double rnd = rng.computeUniformVariate(0.0, 1.0);
                 norm = new NormalDistribution(mean, stddev);
                 phiL = norm.cumulativeProbability(0.0);

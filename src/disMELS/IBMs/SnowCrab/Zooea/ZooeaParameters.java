@@ -133,9 +133,9 @@ public class ZooeaParameters extends AbstractLHSParameters {
         cat = FCAT_Mortality;  
         mapOfPotentialFunctions = new LinkedHashMap<>(6); 
         mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
-        ifi = new MortalityFunction_OuelletAndSteMarie2017(); 
-            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new ConstantMortalityRate(); 
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new MortalityFunction_OuelletAndSteMarie2017(); 
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new TemperatureDependentMortalityRate_Houde1989(); 
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);

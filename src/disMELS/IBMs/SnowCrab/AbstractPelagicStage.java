@@ -42,9 +42,9 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     /** boolean flag indicating no advection by currents (= false) */
     public static final boolean noAdvection = false;
     /** ROMS 3d interpolator object */
-    protected static Interpolator3D i3d;
+    public static Interpolator3D i3d; //can't be final, must be public!
     /** Random Number Generator */
-    protected static RandomNumberGenerator rng = null;
+    protected static final RandomNumberGenerator rng = GlobalInfo.getInstance().getRandomNumberGenerator();
     /** tolerance to edge of model grid */
     protected static double tolGridEdge = 0.5;
     
@@ -178,7 +178,6 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
         this.typeName = typeName;
         id = LHS_Factory.getNewID();
         lp.setNoAdvection(noAdvection);
-        if (rng==null) rng = GlobalInfo.getInstance().getRandomNumberGenerator();
         if (i3d==null) i3d = GlobalInfo.getInstance().getInterpolator3D();
     }
     
@@ -553,6 +552,7 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
      */
     @Override
     public void step(double dt) throws ArrayIndexOutOfBoundsException {
+        if (i3d==null) i3d = GlobalInfo.getInstance().getInterpolator3D();
         stepPosition(dt);
         double[] pos = pos = lp.getIJK();
         time = time+dt;

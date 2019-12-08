@@ -23,27 +23,23 @@ public class MortalityFunction_OuelletAndSteMarie2017BeanInfo extends SimpleBean
 
 
     // Property identifiers//GEN-FIRST:Properties
-    private static final int PROPERTY_CSV = 0;
-    private static final int PROPERTY_CSVHeader = 1;
-    private static final int PROPERTY_description = 2;
-    private static final int PROPERTY_fullDescription = 3;
-    private static final int PROPERTY_functionName = 4;
-    private static final int PROPERTY_functionType = 5;
-    private static final int PROPERTY_parameterNames = 6;
-    private static final int PROPERTY_subfunctionNames = 7;
+    private static final int PROPERTY_description = 0;
+    private static final int PROPERTY_fullDescription = 1;
+    private static final int PROPERTY_functionName = 2;
+    private static final int PROPERTY_functionType = 3;
+    private static final int PROPERTY_parameterNames = 4;
+    private static final int PROPERTY_subfunctionNames = 5;
 
     // Property array 
     /*lazy PropertyDescriptor*/
     private static PropertyDescriptor[] getPdescriptor(){
-        PropertyDescriptor[] properties = new PropertyDescriptor[8];
+        PropertyDescriptor[] properties = new PropertyDescriptor[6];
     
         try {
-            properties[PROPERTY_CSV] = new PropertyDescriptor ( "CSV", SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017.class, "getCSV", null ); // NOI18N
-            properties[PROPERTY_CSVHeader] = new PropertyDescriptor ( "CSVHeader", SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017.class, "getCSVHeader", null ); // NOI18N
-            properties[PROPERTY_description] = new PropertyDescriptor ( "description", SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017.class, "getDescription", "setDescription" ); // NOI18N
-            properties[PROPERTY_fullDescription] = new PropertyDescriptor ( "fullDescription", SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017.class, "getFullDescription", "setFullDescription" ); // NOI18N
-            properties[PROPERTY_functionName] = new PropertyDescriptor ( "functionName", SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017.class, "getFunctionName", "setFunctionName" ); // NOI18N
-            properties[PROPERTY_functionType] = new PropertyDescriptor ( "functionType", SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017.class, "getFunctionType", "setFunctionType" ); // NOI18N
+            properties[PROPERTY_description] = new PropertyDescriptor ( "description", SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017.class, "getDescription", null ); // NOI18N
+            properties[PROPERTY_fullDescription] = new PropertyDescriptor ( "fullDescription", SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017.class, "getFullDescription", null ); // NOI18N
+            properties[PROPERTY_functionName] = new PropertyDescriptor ( "functionName", SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017.class, "getFunctionName", null ); // NOI18N
+            properties[PROPERTY_functionType] = new PropertyDescriptor ( "functionType", SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017.class, "getFunctionType", null ); // NOI18N
             properties[PROPERTY_parameterNames] = new PropertyDescriptor ( "parameterNames", SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017.class, "getParameterNames", null ); // NOI18N
             properties[PROPERTY_subfunctionNames] = new PropertyDescriptor ( "subfunctionNames", SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017.class, "getSubfunctionNames", null ); // NOI18N
         }
@@ -73,46 +69,31 @@ public class MortalityFunction_OuelletAndSteMarie2017BeanInfo extends SimpleBean
         return eventSets;     }//GEN-LAST:Events
 
     // Method identifiers//GEN-FIRST:Methods
-    private static final int METHOD_calculate0 = 0;
-    private static final int METHOD_clone1 = 1;
-    private static final int METHOD_createInstance2 = 2;
-    private static final int METHOD_getParameter3 = 3;
-    private static final int METHOD_getParameterDescription4 = 4;
-    private static final int METHOD_getSubfunction5 = 5;
-    private static final int METHOD_hasParameters6 = 6;
-    private static final int METHOD_hasSubfunctions7 = 7;
-    private static final int METHOD_setParameterDescription8 = 8;
-    private static final int METHOD_setParameterValue9 = 9;
-    private static final int METHOD_setSubfunction10 = 10;
+    private static final int METHOD_createInstance0 = 0;
+    private static final int METHOD_getParameter1 = 1;
+    private static final int METHOD_getParameterDescription2 = 2;
+    private static final int METHOD_hasParameters3 = 3;
+    private static final int METHOD_hasSubfunctions4 = 4;
+    private static final int METHOD_setParameterValue5 = 5;
 
     // Method array 
     /*lazy MethodDescriptor*/
     private static MethodDescriptor[] getMdescriptor(){
-        MethodDescriptor[] methods = new MethodDescriptor[11];
+        MethodDescriptor[] methods = new MethodDescriptor[6];
     
         try {
-            methods[METHOD_calculate0] = new MethodDescriptor(SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017.class.getMethod("calculate", new Class[] {java.lang.Object.class})); // NOI18N
-            methods[METHOD_calculate0].setDisplayName ( "" );
-            methods[METHOD_clone1] = new MethodDescriptor(SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017.class.getMethod("clone", new Class[] {})); // NOI18N
-            methods[METHOD_clone1].setDisplayName ( "" );
-            methods[METHOD_createInstance2] = new MethodDescriptor(wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction.class.getMethod("createInstance", new Class[] {java.lang.String[].class})); // NOI18N
-            methods[METHOD_createInstance2].setDisplayName ( "" );
-            methods[METHOD_getParameter3] = new MethodDescriptor(wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction.class.getMethod("getParameter", new Class[] {java.lang.String.class})); // NOI18N
-            methods[METHOD_getParameter3].setDisplayName ( "" );
-            methods[METHOD_getParameterDescription4] = new MethodDescriptor(wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction.class.getMethod("getParameterDescription", new Class[] {java.lang.String.class})); // NOI18N
-            methods[METHOD_getParameterDescription4].setDisplayName ( "" );
-            methods[METHOD_getSubfunction5] = new MethodDescriptor(wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction.class.getMethod("getSubfunction", new Class[] {java.lang.String.class})); // NOI18N
-            methods[METHOD_getSubfunction5].setDisplayName ( "" );
-            methods[METHOD_hasParameters6] = new MethodDescriptor(wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction.class.getMethod("hasParameters", new Class[] {})); // NOI18N
-            methods[METHOD_hasParameters6].setDisplayName ( "" );
-            methods[METHOD_hasSubfunctions7] = new MethodDescriptor(wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction.class.getMethod("hasSubfunctions", new Class[] {})); // NOI18N
-            methods[METHOD_hasSubfunctions7].setDisplayName ( "" );
-            methods[METHOD_setParameterDescription8] = new MethodDescriptor(wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction.class.getMethod("setParameterDescription", new Class[] {java.lang.String.class, java.lang.String.class})); // NOI18N
-            methods[METHOD_setParameterDescription8].setDisplayName ( "" );
-            methods[METHOD_setParameterValue9] = new MethodDescriptor(SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017.class.getMethod("setParameterValue", new Class[] {java.lang.String.class, java.lang.Object.class})); // NOI18N
-            methods[METHOD_setParameterValue9].setDisplayName ( "" );
-            methods[METHOD_setSubfunction10] = new MethodDescriptor(wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction.class.getMethod("setSubfunction", new Class[] {java.lang.String.class, wts.models.DisMELS.framework.IBMFunctions.IBMFunctionInterface.class})); // NOI18N
-            methods[METHOD_setSubfunction10].setDisplayName ( "" );
+            methods[METHOD_createInstance0] = new MethodDescriptor(wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction.class.getMethod("createInstance", new Class[] {java.lang.String[].class})); // NOI18N
+            methods[METHOD_createInstance0].setDisplayName ( "" );
+            methods[METHOD_getParameter1] = new MethodDescriptor(wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction.class.getMethod("getParameter", new Class[] {java.lang.String.class})); // NOI18N
+            methods[METHOD_getParameter1].setDisplayName ( "" );
+            methods[METHOD_getParameterDescription2] = new MethodDescriptor(wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction.class.getMethod("getParameterDescription", new Class[] {java.lang.String.class})); // NOI18N
+            methods[METHOD_getParameterDescription2].setDisplayName ( "" );
+            methods[METHOD_hasParameters3] = new MethodDescriptor(wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction.class.getMethod("hasParameters", new Class[] {})); // NOI18N
+            methods[METHOD_hasParameters3].setDisplayName ( "" );
+            methods[METHOD_hasSubfunctions4] = new MethodDescriptor(wts.models.DisMELS.framework.IBMFunctions.AbstractIBMFunction.class.getMethod("hasSubfunctions", new Class[] {})); // NOI18N
+            methods[METHOD_hasSubfunctions4].setDisplayName ( "" );
+            methods[METHOD_setParameterValue5] = new MethodDescriptor(SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017.class.getMethod("setParameterValue", new Class[] {java.lang.String.class, java.lang.Object.class})); // NOI18N
+            methods[METHOD_setParameterValue5].setDisplayName ( "" );
         }
         catch( Exception e) {}//GEN-HEADEREND:Methods
         // Here you can add code for customizing the methods array.

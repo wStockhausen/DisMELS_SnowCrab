@@ -542,6 +542,7 @@ public class MaleAdult extends AbstractBenthicStage {
     
     @Override
     public void step(double dt) throws ArrayIndexOutOfBoundsException {
+        super.step(dt);
         //determine daytime/nighttime for vertical migration & calc indiv. W
         dayOfYear = globalInfo.getCalendar().getYearDay();
         starvationMort = 0.0;

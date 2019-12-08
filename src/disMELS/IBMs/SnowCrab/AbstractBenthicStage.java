@@ -26,10 +26,10 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
     /** boolean flag indicating no advection by currents (= true) */
     public static final boolean noAdvection = true;
     /** ROMS 3d interpolator object */
-    protected static Interpolator3D i3d;
+    public static Interpolator3D i3d; //can't be final, must be public!
     /** Random Number Generator */
-    protected static RandomNumberGenerator rng = null;
-    /** tolerance to edge of model grid */
+    protected static final RandomNumberGenerator rng = GlobalInfo.getInstance().getRandomNumberGenerator();
+   /** tolerance to edge of model grid */
     protected static double tolGridEdge = 0.5;
     
     /** comma for output strings */
@@ -139,8 +139,19 @@ public abstract class AbstractBenthicStage implements LifeStageInterface {
         this.typeName = typeName;
         id = LHS_Factory.getNewID();
         lp.setNoAdvection(noAdvection);
-        if (rng==null) rng = GlobalInfo.getInstance().getRandomNumberGenerator();
         if (i3d==null) i3d = GlobalInfo.getInstance().getInterpolator3D();
+    }
+    
+    /**
+     * ALL subclasses overriding this superclass method should call it (super.step(dt)) 
+     * as the first executable statement in the overriding method. 
+     * 
+     * This method:
+     *   1. Checks that the Interpolator3D instance is not null and gets it if it is
+     */
+    @Override
+    public void step(double dt) throws ArrayIndexOutOfBoundsException {
+        if (i3d==null) i3d = GlobalInfo.getInstance().getInterpolator3D();        
     }
     
     /**

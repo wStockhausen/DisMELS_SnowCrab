@@ -575,6 +575,7 @@ public class FemaleAdolescent extends AbstractBenthicStage {
     
     @Override
     public void step(double dt) throws ArrayIndexOutOfBoundsException {
+        super.step(dt);
         //determine daytime/nighttime
         dayOfYear = globalInfo.getCalendar().getYearDay();
         starvationMort = 0.0;
