@@ -101,8 +101,12 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     /** fields that reflect parameter values */
     /** flag indicating instance is a super-individual */
     protected boolean isSuperIndividual;
+    /** max decrease allowed in relative abundance */
+    protected double maxDecrease;
     /** horizontal random walk parameter */
     protected double horizRWP;
+    /** max molt indicator for stage prior to transition to next stage */
+    protected double maxMoltIndicator;
     /** maximum stage duration (followed by death) */
     protected double maxStageDuration;
     /** stage transition rate */
@@ -134,7 +138,7 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     /** age in life stage, in days */
     protected double  ageInStage=0;
     /** number of individuals represented */
-    protected double  number=0;
+    protected double number = 0;
     
     /** molt indicator */
     protected double moltIndicator = 0;
@@ -148,6 +152,8 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
     protected double ph = 0; 
     
     //other fields
+    /** initial abundance when LHS is created */
+    public double initialN;
     /** number of individuals transitioning to next stage */
     protected double numTrans;  
     /** mean stage duration (days) at in situ temperature */
@@ -435,6 +441,9 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
         if (newAtts instanceof AbstractPelagicStageAttributes){
             key = AbstractPelagicStageAttributes.PROP_moltindicator; atts.setValue(key,newAtts.getValue(key));
             key = AbstractPelagicStageAttributes.PROP_shellthick;    atts.setValue(key,newAtts.getValue(key));
+            key = AbstractPelagicStageAttributes.PROP_salinity;      atts.setValue(key,newAtts.getValue(key));
+            key = AbstractPelagicStageAttributes.PROP_temperature;   atts.setValue(key,newAtts.getValue(key));
+            key = AbstractPelagicStageAttributes.PROP_ph;            atts.setValue(key,newAtts.getValue(key));
         }
         
         id = atts.getValue(LifeStageAttributesInterface.PROP_id, id);
@@ -458,7 +467,7 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
         atts.setValue(AbstractPelagicStageAttributes.PROP_horizPos1,lon);
         atts.setValue(AbstractPelagicStageAttributes.PROP_horizPos2,lat);
         atts.setValue(AbstractPelagicStageAttributes.PROP_vertPos,depth);
-        atts.setValue(AbstractBenthicStageAttributes.PROP_bathym,bathym);
+        atts.setValue(AbstractPelagicStageAttributes.PROP_bathym,bathym);
         atts.setValue(AbstractPelagicStageAttributes.PROP_gridCellID,gridCellID);
         //track
         atts.setValue(AbstractPelagicStageAttributes.PROP_active,active);
@@ -485,6 +494,7 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
         lon        = atts.getValue(AbstractPelagicStageAttributes.PROP_horizPos1,lon);
         lat        = atts.getValue(AbstractPelagicStageAttributes.PROP_horizPos2,lat);
         depth      = atts.getValue(AbstractPelagicStageAttributes.PROP_vertPos,depth);
+        bathym     = atts.getValue(AbstractPelagicStageAttributes.PROP_bathym,bathym);
         gridCellID = atts.getValue(AbstractPelagicStageAttributes.PROP_gridCellID,gridCellID);
         active     = atts.getValue(AbstractPelagicStageAttributes.PROP_active,active);        
         alive      = atts.getValue(AbstractPelagicStageAttributes.PROP_alive,alive);
@@ -570,7 +580,7 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
             gridCellID=i3d.getGridCellID(pos, tolGridEdge);
             logger.info("Indiv "+id+" exited grid at ["+pos[0]+","+pos[1]+"]: "+gridCellID);
         }
-        updateAttributes(); //update the attributes object w/ nmodified values
+        updateAttributes(); //update the attributes object w/ modified values
     }
     
     /**
@@ -622,20 +632,30 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
         }
         //add in other considerations
         if (fcnVM instanceof VerticalMovement_FixedDepthRange) {    
-            double ssh = i3d.interpolateSSH(pos);
-            w = (Double) fcnVM.calculate(new double[]{dt,depth-ssh,bathym,w});
+//            double ssh = i3d.interpolateSSH(pos);
+//            w = (Double) fcnVM.calculate(new double[]{dt,depth-ssh,bathym,w});
+            w = (Double) fcnVM.calculate(new double[]{dt,depth,bathym,w});
         } else     
         if (fcnVM instanceof VerticalMovement_FixedDepthAndTempRange) {    
-            double ssh = i3d.interpolateSSH(pos);
-            w = (Double) fcnVM.calculate(new double[]{dt,depth-ssh,bathym,temperature,w});
+//            double ssh = i3d.interpolateSSH(pos);
+//            w = (Double) fcnVM.calculate(new double[]{dt,depth-ssh,bathym,temperature,w});
+            w = (Double) fcnVM.calculate(new double[]{dt,depth,bathym,temperature,w});
         } else     
         if (fcnVM instanceof VerticalMovement_FixedOffBottomRange) {    
-            double ssh = i3d.interpolateSSH(pos);
-            w = (Double) fcnVM.calculate(new double[]{dt,depth-ssh,bathym,w});
+////            double ssh = i3d.interpolateSSH(pos);
+//            logger.info("--Calculating w for FixedOffBottomRange");
+////            logger.info("---- depth-ssh = "+(depth-ssh));
+//            logger.info("---- swim w    = "+(w));
+//            logger.info("---- depth     = "+(depth));
+//            logger.info("---- bathym    = "+(bathym));
+////            w = (Double) fcnVM.calculate(new double[]{dt,depth-ssh,bathym,w});
+            w = (Double) fcnVM.calculate(new double[]{dt,depth,bathym,w});
+//            logger.info("---- final w   = "+(w));
         } else     
         if (fcnVM instanceof VerticalMovement_FixedOffBottomAndTempRange) {    
-            double ssh = i3d.interpolateSSH(pos);
-            w = (Double) fcnVM.calculate(new double[]{dt,depth-ssh,bathym,temperature,w});
+//            double ssh = i3d.interpolateSSH(pos);
+//            w = (Double) fcnVM.calculate(new double[]{dt,depth-ssh,bathym,temperature,w});
+            w = (Double) fcnVM.calculate(new double[]{dt,depth,bathym,temperature,w});
         } else     
         if (fcnVM instanceof wts.models.DisMELS.IBMFunctions.Movement.DielVerticalMigration_FixedDepthRanges) {
             /**
@@ -744,10 +764,7 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
                         +"is WRONG!! updateMoltIndicator for "+typeName+".";
             throw(new ArithmeticException(msg));
         } else if (fcnMoltTiming instanceof FixedDurationFunction){
-            if (ageInStage>=(Double)fcnMoltTiming.calculate(false))
-                moltIndicator = 1.0;
-            else
-                moltIndicator = 0.0;
+            moltIndicator += (dt/DAY_SECS)/((Double)fcnMoltTiming.calculate(false));
         } else {
             String msg = "Logic for "+fcnMoltTiming.getClass().getSimpleName()+"\n"
                         +"is missing from updateMoltIndicator for "+typeName+".";
@@ -788,12 +805,12 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
              */
             mortalityRate = (Double)fcnMort.calculate(temperature);//using temperature as covariate for mortality
         }
-        if (mortalityRate<0){
+        if ((mortalityRate<0)||(number<maxDecrease*initialN)){
             //no survival
-            active=false;alive=false;number=0.0;
+            active=false;alive=false;number=0.0;//TODO: is this correct??
         } else {
             double totRate = mortalityRate;
-            if (moltIndicator>=1.0) {
+            if (moltIndicator>=maxMoltIndicator) {
                 totRate += stageTransRate;
                 //apply mortality rate to previous number transitioning and
                 //add in new transitioners
@@ -801,9 +818,6 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
                         (stageTransRate/totRate)*number*(1-Math.exp(-dt*totRate/DAY_SECS));
             }
             number = number*Math.exp(-dt*totRate/DAY_SECS);
-            if(number<0.01){ //TODO: replace this with parameter
-                active=false;alive=false;number=number+numTrans;//TODO: ??
-            }
         }
     }
     

@@ -12,9 +12,11 @@ import SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017;
 import com.vividsolutions.jts.geom.Coordinate;
 import disMELS.IBMs.SnowCrab.AbstractBenthicStageAttributes;
 import disMELS.IBMs.SnowCrab.AbstractPelagicStage;
+import disMELS.IBMs.SnowCrab.AbstractPelagicStageAttributes;
 import disMELS.IBMs.SnowCrab.ImmatureCrab.ImmatureCrab;
 import disMELS.IBMs.SnowCrab.ImmatureCrab.ImmatureFemale;
 import disMELS.IBMs.SnowCrab.ImmatureCrab.ImmatureMale;
+import disMELS.IBMs.SnowCrab.Zooea.Zooea;
 import disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes;
 import java.util.ArrayList;
 import java.util.List;
@@ -23,6 +25,7 @@ import org.openide.util.lookup.ServiceProvider;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
 import wts.models.DisMELS.IBMFunctions.Movement.DielVerticalMigration_FixedDepthRanges;
+import wts.models.DisMELS.IBMFunctions.Movement.VerticalMovement_FixedDepthRange;
 import wts.models.DisMELS.IBMFunctions.Movement.VerticalMovement_FixedOffBottomAndTempRange;
 import wts.models.DisMELS.IBMFunctions.Movement.VerticalMovement_FixedOffBottomRange;
 import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunction;
@@ -202,6 +205,7 @@ public class Megalopa extends AbstractPelagicStage {
     public void setAttributes(String[] strv) {
         long aid;
         atts.setValues(strv);
+        initialN = atts.getValue(MegalopaAttributes.PROP_number, initialN);
         aid = atts.getValue(LifeStageAttributesInterface.PROP_id, id);
         if (aid==-1) {
             //change atts id to lhs id
@@ -223,25 +227,24 @@ public class Megalopa extends AbstractPelagicStage {
 
     /**
      * Sets the attributes for the instance by copying values from the input.
+     * 
      * This does NOT change the typeName of the LHS instance (or the associated 
      * LHSAttributes instance) on which the method is called.
      * Note that ALL attributes are copied, so id, parentID, and origID are copied
      * as well. 
+     * 
      *  Side effects:
-     *      updateVariables() is called to update instance variables.
-     *      Instance field "id" is also updated.
-     *      Instance field "moltindicator" is set to 0.
-     * @param newAtts - should be instance of ZooeaAttributes
+     *      1. Instance field "moltIndicator" is set to 0 if molt occurred (moltIndicator>=maxMoltIndicator)
+     *           or transition is from Zooea stage, but is carried over otherwise.
+     *      2. Instance field "id" is also updated.
+     *      3. updateVariables() is called to update instance variables.
+     * 
+     * @param newAtts - should be instance of ZooeaAttributes or MegalopaAttributes
      */
     @Override
     public void setAttributes(LifeStageAttributesInterface newAtts) {
         //copy attributes, regardless of life stage associated w/ newAtts
         for (String key: newAtts.getKeys()) atts.setValue(key,newAtts.getValue(key));
-        //fill in missing attributes depending on class of newAtts
-        if (newAtts instanceof ZooeaAttributes) {
-            //set moltIndicator to 0
-            atts.setValue(MegalopaAttributes.PROP_moltindicator, 0.0);
-        }
         id = atts.getValue(LifeStageAttributesInterface.PROP_id, id);
         updateVariables();
     }
@@ -270,6 +273,23 @@ public class Megalopa extends AbstractPelagicStage {
         atts.setValue(LifeStageAttributesInterface.PROP_alive,true);     //set alive to true
         id = atts.getID(); //reset id for current LHS to one from old LHS
 
+        //check some other attributes
+        if (oldLHS instanceof Zooea) {
+            //set the initialN based on previous initialN
+            initialN = ((Zooea) oldLHS).initialN;
+            //set moltIndicator to 0, as molt just occurred
+            atts.setValue(MegalopaAttributes.PROP_moltindicator, 0.0);
+        } else
+        if (oldLHS instanceof Megalopa) {
+            //set the initialN based on previous initialN
+            initialN = ((Megalopa) oldLHS).initialN;
+            //set moltIndicator to 0 if molt occurred 
+            String key = MegalopaAttributes.PROP_moltindicator;
+            double mi = ((MegalopaAttributes) oldAtts).getValue(key,1.0);//moltIndicator value from oldLHS
+            if (mi>=1.0) atts.setValue(key, 0.0);//molt occurred, so reset. 
+            //otherwise old value copied over, as desired
+        }
+        
         //copy LagrangianParticle information
         this.setLagrangianParticle(oldLHS.getLagrangianParticle());
         //start track at last position of oldLHS track
@@ -369,6 +389,7 @@ public class Megalopa extends AbstractPelagicStage {
         fcnVM       = params.getSelectedIBMFunctionForCategory(MegalopaParameters.FCAT_VerticalMovement);
         if (!(fcnVM instanceof VerticalMovement_FixedOffBottomRange||
               fcnVM instanceof VerticalMovement_FixedOffBottomAndTempRange||
+              fcnVM instanceof VerticalMovement_FixedDepthRange||
               fcnVM instanceof DielVerticalMigration_FixedDepthRanges))
             throw new java.lang.UnsupportedOperationException("Vertical movement function "+fcnVM.getFunctionName()+" is not supported for Megalopa.");
         
@@ -383,8 +404,12 @@ public class Megalopa extends AbstractPelagicStage {
     private void setParameterValues() {
         isSuperIndividual = 
                 params.getValue(MegalopaParameters.PARAM_isSuperIndividual,isSuperIndividual);
+        maxDecrease = 
+                params.getValue(MegalopaParameters.PARAM_maxDecrease,maxDecrease);
         horizRWP = 
                 params.getValue(MegalopaParameters.PARAM_horizRWP,horizRWP);
+        maxMoltIndicator = 
+                params.getValue(MegalopaParameters.PARAM_maxMoltIndicator,maxMoltIndicator);
         maxStageDuration = 
                 params.getValue(MegalopaParameters.PARAM_maxStageDuration,maxStageDuration);
         stageTransRate = 
@@ -429,9 +454,12 @@ public class Megalopa extends AbstractPelagicStage {
         double dtp = 0.25*(dt/DAY_SECS);//use 1/4 timestep (converted from sec to d)
         output.clear();
         List<LifeStageInterface> nLHSs=null;
-        if (moltIndicator>=1.0) {
-            if ((minSettlementDepth<=bathym)&&(bathym<=maxSettlementDepth)&&
-                    ((bathym-depth)<=5)) {
+        if (moltIndicator>=maxMoltIndicator) {
+            //transition to next stage
+            //--if maxSettlementDepth<0, then next stage should be Megalopa also and settlement does not occur
+            //--if minSettlementDepth<=bathym<=maxSettlementDepth, settlement occurs and next stage should be ImmatureCrab
+            if ((maxSettlementDepth<0)||
+                    (minSettlementDepth<=bathym)&&(bathym<=maxSettlementDepth)) {
                 nLHSs = createMetamorphosedIndividuals();
                 if (nLHSs!=null) output.addAll(nLHSs);
             }
@@ -476,11 +504,19 @@ public class Megalopa extends AbstractPelagicStage {
             ex.printStackTrace();
         }
         if (nLHSs!=null){
-            //apply sex ratio 
-            logger.info("createMetamorphosedIndividuals: Applying sex ratio to immature crab.");
-            double xr = (Double)params.getValue(MegalopaParameters.PARAM_sexRatio);
             for (LifeStageInterface nLHS : nLHSs){
+//                if (nLHS instanceof Megalopa){
+//                    logger.info("createMetamorphosedIndividuals: transition to next Megalopa stage.");
+//                    MegalopaAttributes atts = (MegalopaAttributes) nLHS.getAttributes();
+//                    atts.setValue(LifeStageAttributesInterface.PROP_number,number);
+//                    atts.setValue(AbstractPelagicStageAttributes.PROP_moltindicator, moltIndicator);//moltIndicator is continuous
+//                    //update attributes on nLHS (updates id, parentID as well as other attributes)
+//                    nLHS.setAttributes(atts);//instar incremented in setAttributes(atts)
+//                } else
                 if (nLHS instanceof ImmatureCrab){
+                    //apply sex ratio 
+                    logger.info("createMetamorphosedIndividuals: transition to immature crab stage.");
+                    double xr = (Double)params.getValue(MegalopaParameters.PARAM_sexRatio);
                     //apply sex ratio
                     double n = (Double) nLHS.getAttributes().getValue(LifeStageAttributesInterface.PROP_number);
                     double nr = n;

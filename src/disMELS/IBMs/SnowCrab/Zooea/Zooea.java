@@ -11,7 +11,7 @@ import SnowCrabFunctions.IntermoltIntegratorFunction;
 import SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017;
 import com.vividsolutions.jts.geom.Coordinate;
 import disMELS.IBMs.SnowCrab.AbstractPelagicStage;
-import disMELS.IBMs.SnowCrab.EggMassExtruded.ExtrudedEggMassAttributes;
+import disMELS.IBMs.SnowCrab.EggMassExtruded.ExtrudedEggMass;
 import disMELS.IBMs.SnowCrab.Megalopa.Megalopa;
 import java.util.ArrayList;
 import java.util.List;
@@ -194,6 +194,7 @@ public class Zooea extends AbstractPelagicStage {
     public void setAttributes(String[] strv) {
         long aid;
         atts.setValues(strv);
+        initialN = atts.getValue(ZooeaAttributes.PROP_number, initialN);
         aid = atts.getValue(LifeStageAttributesInterface.PROP_id, id);
         if (aid==-1) {
             //change atts id to lhs id
@@ -222,9 +223,10 @@ public class Zooea extends AbstractPelagicStage {
      * as well. 
      * 
      *  Side effects:
-     *      1. updateVariables() is called to update instance variables.
+     *      1. Instance field "moltIndicator" is set to 0 if molt occurred (moltIndicator>=1),
+     *           but is carried over otherwise.
      *      2. Instance field "id" is also updated.
-     *      3. Instance field "moltindicator" is set to 0 if molt occurred
+     *      3. updateVariables() is called to update instance variables.
      * 
      * @param newAtts - should be instance of ExtrudedEggMassAttributes or ZooeaAttributes
      */
@@ -232,17 +234,6 @@ public class Zooea extends AbstractPelagicStage {
     public void setAttributes(LifeStageAttributesInterface newAtts) {
         //copy attributes, regardless of life stage associated w/ newAtts
         for (String key: newAtts.getKeys()) atts.setValue(key,newAtts.getValue(key));
-        //fill in missing attributes depending on class of newAtts
-        if (newAtts instanceof ExtrudedEggMassAttributes) {
-            //set moltIndicator to 0
-            atts.setValue(ZooeaAttributes.PROP_moltindicator, 0.0);
-        } else
-        if (newAtts instanceof ZooeaAttributes) {
-            //set moltIndicator to 0 ifmolt occurred 
-            String key = ZooeaAttributes.PROP_moltindicator;
-            double mi = ((ZooeaAttributes) newAtts).getValue(key,1.0);
-            if (mi>=1.0) atts.setValue(key, 0.0);
-        }
         id = atts.getValue(LifeStageAttributesInterface.PROP_id, id);
         updateVariables();
     }
@@ -265,7 +256,8 @@ public class Zooea extends AbstractPelagicStage {
          *  7) update local variables
          */
         LifeStageAttributesInterface oldAtts = oldLHS.getAttributes();            
-        setAttributes(oldAtts);
+        setAttributes(oldAtts);//sets attributes depending on class of oldAtts
+        
         
         //reset some attributes
         atts.setValue(LifeStageAttributesInterface.PROP_ageInStage, 0.0);//reset age in stage
@@ -273,6 +265,23 @@ public class Zooea extends AbstractPelagicStage {
         atts.setValue(LifeStageAttributesInterface.PROP_alive,true);     //set alive to true
         id = atts.getID(); //reset id for current LHS to one from old LHS
 
+        //fill in missing attributes depending on class of newAtts
+        if (oldLHS instanceof ExtrudedEggMass) {
+            //set the initialN based on "number"
+            initialN = atts.getValue(ZooeaAttributes.PROP_number, initialN);
+            //set moltIndicator to 0
+            atts.setValue(ZooeaAttributes.PROP_moltindicator, 0.0);
+        } else
+        if (oldLHS instanceof Zooea) {
+            //set the initialN based on previous initialN
+            initialN = ((Zooea) oldLHS).initialN;
+            //set moltIndicator to 0 ifmolt occurred 
+            String key = ZooeaAttributes.PROP_moltindicator;
+            double mi = ((ZooeaAttributes) oldAtts).getValue(key,1.0);
+            if (mi>=1.0) atts.setValue(key, 0.0);//molt occurred, so reset. 
+            //otherwise old value copied over, as desired
+        }
+        
         //copy LagrangianParticle information
         this.setLagrangianParticle(oldLHS.getLagrangianParticle());
         //start track at last position of oldLHS track
@@ -388,8 +397,12 @@ public class Zooea extends AbstractPelagicStage {
     private void setParameterValues() {
         isSuperIndividual = 
                 params.getValue(ZooeaParameters.PARAM_isSuperIndividual,isSuperIndividual);
+        maxDecrease = 
+                params.getValue(ZooeaParameters.PARAM_maxDecrease,maxDecrease);
         horizRWP = 
                 params.getValue(ZooeaParameters.PARAM_horizRWP,horizRWP);
+        maxMoltIndicator = 
+                params.getValue(ZooeaParameters.PARAM_maxMoltIndicator,maxMoltIndicator);
         maxStageDuration = 
                 params.getValue(ZooeaParameters.PARAM_maxStageDuration,maxStageDuration);
         stageTransRate = 
@@ -430,9 +443,9 @@ public class Zooea extends AbstractPelagicStage {
         double dtp = 0.25*(dt/DAY_SECS);//use 1/4 timestep (converted from sec to d)
         output.clear();
         List<LifeStageInterface> nLHSs;
-        if (moltIndicator>=1.0) {
+        if (moltIndicator>=maxMoltIndicator) {
             if ((numTrans>0)||!isSuperIndividual){
-                nLHSs = getMetamorphosedIndividuals();
+                nLHSs = createMetamorphosedIndividuals();
                 if (nLHSs!=null) output.addAll(nLHSs);
             }
         }
@@ -444,7 +457,7 @@ public class Zooea extends AbstractPelagicStage {
      * 
      * @return 
      */
-    private List<LifeStageInterface> getMetamorphosedIndividuals() {
+    private List<LifeStageInterface> createMetamorphosedIndividuals() {
         List<LifeStageInterface> nLHSs = null;
         try {
             //create LHS with "next" stage

@@ -23,6 +23,7 @@ import org.openide.util.lookup.ServiceProvider;
 import wts.models.DisMELS.IBMFunctions.Mortality.ConstantMortalityRate;
 import wts.models.DisMELS.IBMFunctions.Mortality.TemperatureDependentMortalityRate_Houde1989;
 import wts.models.DisMELS.IBMFunctions.Movement.DielVerticalMigration_FixedDepthRanges;
+import wts.models.DisMELS.IBMFunctions.Movement.VerticalMovement_FixedDepthRange;
 import wts.models.DisMELS.IBMFunctions.Movement.VerticalMovement_FixedOffBottomAndTempRange;
 import wts.models.DisMELS.IBMFunctions.Movement.VerticalMovement_FixedOffBottomRange;
 import wts.models.DisMELS.IBMFunctions.SwimmingBehavior.ConstantMovementRateFunction;
@@ -60,10 +61,11 @@ public class MegalopaParameters extends AbstractLHSParameters {
     public static final long serialVersionUID = 1L;
     
     /** the number of IBMParameter objects defined in the class */
-    public static final int numParams = 9;
+    public static final int numParams = 10;
     public static final String PARAM_isSuperIndividual      = "is a super-individual?";
     public static final String PARAM_maxDecrease            = "min allowed N/N0";
     public static final String PARAM_horizRWP               = "horizontal random walk parameter [m^2]/[s]";
+    public static final String PARAM_maxMoltIndicator       = "max molt increment [0-1] prior to stage transition";
     public static final String PARAM_maxStageDuration       = "max stage duration [d]";
     public static final String PARAM_minSettlementDepth     = "min settlement depth (m)";
     public static final String PARAM_maxSettlementDepth     = "max settlement depth (m)";
@@ -110,6 +112,7 @@ public class MegalopaParameters extends AbstractLHSParameters {
         key = PARAM_isSuperIndividual;    mapParams.put(key,new IBMParameterBoolean(key,key,false));
         key = PARAM_maxDecrease;          mapParams.put(key,new IBMParameterDouble(key,key,  0.0));
         key = PARAM_horizRWP;             mapParams.put(key,new IBMParameterDouble(key,key,  0.0));
+        key = PARAM_maxMoltIndicator;     mapParams.put(key,new IBMParameterDouble(key,key,  1.0));
         key = PARAM_maxStageDuration;     mapParams.put(key,new IBMParameterDouble(key,key,365.0));
         key = PARAM_minSettlementDepth;   mapParams.put(key,new IBMParameterDouble(key,key,  0.0));
         key = PARAM_maxSettlementDepth;   mapParams.put(key,new IBMParameterDouble(key,key, 50.0));
@@ -148,11 +151,13 @@ public class MegalopaParameters extends AbstractLHSParameters {
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         
         cat = FCAT_VerticalMovement;  
-        mapOfPotentialFunctions = new LinkedHashMap<>(4); 
+        mapOfPotentialFunctions = new LinkedHashMap<>(8); 
         mapOfPotentialFunctionsByCategory.put(cat,mapOfPotentialFunctions);
         ifi = new VerticalMovement_FixedOffBottomRange(); 
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new VerticalMovement_FixedOffBottomAndTempRange(); 
+            mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
+        ifi = new VerticalMovement_FixedDepthRange(); 
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
         ifi = new DielVerticalMigration_FixedDepthRanges(); 
             mapOfPotentialFunctions.put(ifi.getFunctionName(),ifi);
