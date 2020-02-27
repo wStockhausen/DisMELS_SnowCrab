@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
 OpenIDE-Module: wts.models.DisMELS.IBMs.SnowCrab
 OpenIDE-Module-Localizing-Bundle: disMELS/IBMs/SnowCrab/Bundle.properties
-OpenIDE-Module-Specification-Version: 20200216
+OpenIDE-Module-Specification-Version: 20200227
 

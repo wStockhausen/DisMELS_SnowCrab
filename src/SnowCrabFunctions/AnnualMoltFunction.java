@@ -70,6 +70,8 @@ public class AnnualMoltFunction  extends AbstractIBMFunction implements IBMFunct
     protected boolean random = false;
     /**probability of skip molting */
     protected double skip = 0.0;
+    /** flag indicating skip occurred */
+    protected boolean skipped = false;
     
     /** day on which molting occurs */
     protected double moltDay = 0.0;
@@ -137,36 +139,41 @@ public class AnnualMoltFunction  extends AbstractIBMFunction implements IBMFunct
     }
     
     /**
-     * Returns the day of year on which molting will occur, or 400 if
-     * molting is skipped.
+     * Returns the day of year on which molting will occur, or 1000 if
+     * molting is skipped for the year.
      * 
-     * If the input value "o" is true OR the first time this function is called, 
-     * the day at which molting occurs is
-     * calculated based on the (possibly randomized) parameter values and
-     * subsequently returned. If "o" is false, a previously-calculated value
-     * will be returned. 
+     * If the input value "o" corresponds to the first day of the year, or this
+     * call is the first time
      * 
-     * @param o - boolean to calculate the day of year on which molting will occur
+     * @param o - Double with current day of year
      * 
-     * @return Double - day of year on which molting will occur, or 400 for a skip molt.
+     * @return Double - day of year on which molting will occur, or 1000 for a skip molt.
      * 
      */
     @Override
     public Object calculate(Object o) {
-        if (((Boolean) o)||(calcMoltDay)){
+        Double doy = (Double) o;
+        if ((doy<1)||calcMoltDay){
+            //new year (or first time called), so recalculate as necessary
             calcMoltDay= false;//don't need to re-calculate automatically these unless the parameters change
             moltDay = peakDay;
             if (skip>0.0){
+                skipped = false;//assume molt not skipped
+                //compute probability of skip molting
                 double rnd = rng.computeUniformVariate(0.0, 1.0);
-                if (rnd<=skip) return 400;//molt skipped
-                if (random){
-                    rnd = rng.computeUniformVariate(0.0, 1.0);
-                    norm = new NormalDistribution(peakDay, width);
-                    phiL = norm.cumulativeProbability(firstDay);
-                    phiU = norm.cumulativeProbability(firstDay+interval);
-                    rnd = phiL+rnd*(phiU-phiL);
-                    moltDay = norm.inverseCumulativeProbability(rnd);
-                }
+                if (rnd<=skip) {
+                    //molt skipped
+                    moltDay = 1000;
+                    skipped = true;
+                }//otherwise moltDay defaults to peakDay
+            }
+            if ((!skipped)&&(random)){
+                double rnd = rng.computeUniformVariate(0.0, 1.0);
+                norm = new NormalDistribution(peakDay, width);
+                phiL = norm.cumulativeProbability(firstDay);
+                phiU = norm.cumulativeProbability(firstDay+interval);
+                rnd = phiL+rnd*(phiU-phiL);
+                moltDay = norm.inverseCumulativeProbability(rnd);
             }
         }
         return moltDay;

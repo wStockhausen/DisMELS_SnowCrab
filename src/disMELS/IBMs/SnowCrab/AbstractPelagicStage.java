@@ -731,6 +731,10 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
      * @param dt - time step in seconds
      */
     protected void updateMoltIndicator(double dt) throws ArithmeticException {
+        if (moltIndicator>=maxMoltIndicator){
+            //don't really need to do anything, so don't (save some CPU time)
+            return;
+        }
         if (fcnMoltTiming instanceof IntermoltIntegratorFunction) {
             double[] res = (double[]) fcnMoltTiming.calculate(temperature);
             moltIndicator    += dt/DAY_SECS*res[0];
@@ -755,14 +759,16 @@ public abstract class AbstractPelagicStage implements LifeStageInterface {
                 throw(new ArithmeticException(msg));
             }
         } else if (fcnMoltTiming instanceof AnnualMoltFunction){
-            //TODO: the following logic is incorrect!
-            if ((Double)fcnMoltTiming.calculate(false)<globalInfo.getCalendar().getYearDay())
-                moltIndicator = 1.0;
-            else
-                moltIndicator = 0.0;
-            String msg = "Logic for "+fcnMoltTiming.getClass().getSimpleName()+"\n"
-                        +"is WRONG!! updateMoltIndicator for "+typeName+".";
-            throw(new ArithmeticException(msg));
+            //TODO: is the following logic is correct?!
+            double doy = globalInfo.getCalendar().getYearDay();
+            double moltDay = ((Double)fcnMoltTiming.calculate(doy));
+            if (moltDay==doy){
+                //individual is competent to molt
+                moltIndicator = maxMoltIndicator;
+            }
+//            String msg = "Logic for "+fcnMoltTiming.getClass().getSimpleName()+"\n"
+//                        +"is WRONG!! updateMoltIndicator for "+typeName+".";
+//            throw(new ArithmeticException(msg));
         } else if (fcnMoltTiming instanceof FixedDurationFunction){
             moltIndicator += (dt/DAY_SECS)/((Double)fcnMoltTiming.calculate(false));
         } else {

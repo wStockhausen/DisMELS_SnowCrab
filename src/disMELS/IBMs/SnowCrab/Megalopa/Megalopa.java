@@ -12,12 +12,10 @@ import SnowCrabFunctions.MortalityFunction_OuelletAndSteMarie2017;
 import com.vividsolutions.jts.geom.Coordinate;
 import disMELS.IBMs.SnowCrab.AbstractBenthicStageAttributes;
 import disMELS.IBMs.SnowCrab.AbstractPelagicStage;
-import disMELS.IBMs.SnowCrab.AbstractPelagicStageAttributes;
 import disMELS.IBMs.SnowCrab.ImmatureCrab.ImmatureCrab;
 import disMELS.IBMs.SnowCrab.ImmatureCrab.ImmatureFemale;
 import disMELS.IBMs.SnowCrab.ImmatureCrab.ImmatureMale;
 import disMELS.IBMs.SnowCrab.Zooea.Zooea;
-import disMELS.IBMs.SnowCrab.Zooea.ZooeaAttributes;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.logging.Logger;
@@ -283,10 +281,13 @@ public class Megalopa extends AbstractPelagicStage {
         if (oldLHS instanceof Megalopa) {
             //set the initialN based on previous initialN
             initialN = ((Megalopa) oldLHS).initialN;
-            //set moltIndicator to 0 if molt occurred 
-            String key = MegalopaAttributes.PROP_moltindicator;
-            double mi = ((MegalopaAttributes) oldAtts).getValue(key,1.0);//moltIndicator value from oldLHS
-            if (mi>=1.0) atts.setValue(key, 0.0);//molt occurred, so reset. 
+            //if oldLHS is Megalopa, then moltIndicator >=1.0 
+            //indicates the stage is competent to settle once it
+            //reaches suitable benthic nursery habitat. 
+            //Thus, no need to reset it to 0.
+//            String key = MegalopaAttributes.PROP_moltindicator;
+//            double mi = ((MegalopaAttributes) oldAtts).getValue(key,1.0);//moltIndicator value from oldLHS
+//            if (mi>=1.0) atts.setValue(key, 0.0);//molt occurred, so reset. 
             //otherwise old value copied over, as desired
         }
         
@@ -336,6 +337,26 @@ public class Megalopa extends AbstractPelagicStage {
         atts.setValue(LifeStageAttributesInterface.PROP_active,true);     //set active to true
         atts.setValue(LifeStageAttributesInterface.PROP_alive,true);      //set alive to true
             
+        //check some other attributes
+        if (oldLHS instanceof Zooea) {
+            //set the initialN based on previous initialN
+            initialN = ((Zooea) oldLHS).initialN;
+            //set moltIndicator to 0, as molt just occurred
+            atts.setValue(MegalopaAttributes.PROP_moltindicator, 0.0);
+        } else
+        if (oldLHS instanceof Megalopa) {
+            //set the initialN based on previous initialN
+            initialN = ((Megalopa) oldLHS).initialN;
+            //if oldLHS is Megalopa, then moltIndicator >=1.0 
+            //indicates the stage is competent to settle once it
+            //reaches suitable benthic nursery habitat. 
+            //Thus, no need to reset it to 0.
+//            String key = MegalopaAttributes.PROP_moltindicator;
+//            double mi = ((MegalopaAttributes) oldAtts).getValue(key,1.0);//moltIndicator value from oldLHS
+//            if (mi>=1.0) atts.setValue(key, 0.0);//molt occurred, so reset. 
+            //otherwise old value copied over, as desired
+        }
+        
         //copy LagrangianParticle information
         this.setLagrangianParticle(oldLHS.getLagrangianParticle());
         //start track at last position of oldLHS track
